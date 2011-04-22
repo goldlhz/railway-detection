@@ -44,7 +44,7 @@ public:
 private:
 	bool CreateSocketInstance();									// 创建重叠模式的套接字实例
 	bool BindListenSocket(int nPort);								// 邦定操作
-	bool GetExFunPointer();											// 获取扩展指针
+	bool GetSocket2FunPointer();											// 获取扩展指针
 	bool GetAcceptExPointer();										// 获取WinSocket2里的AcceptEx
 	bool GetAcceptExSockaddrsPointer();								// 获取WinSocket2里的AcceptExSockaddrs
 

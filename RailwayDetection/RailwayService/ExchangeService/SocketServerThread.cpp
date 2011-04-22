@@ -6,6 +6,7 @@
 CSocketServerThread::CSocketServerThread(void)
 {
 	m_hCompletionPort = NULL;
+	m_hRevcSocket = NULL;
 	m_pBaseSocket = NULL;
 	m_pSocketPoolManager = NULL;
 	m_pMemoryPoolManager = NULL;

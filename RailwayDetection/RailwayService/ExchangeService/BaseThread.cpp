@@ -102,9 +102,9 @@ void  CBaseThread::SafeTerminate()
 {
 	if(m_hThread)
 	{
+		m_bIsTerminate = true;
 		WaitForSingleObject(m_hThread, 2000);
 		CloseHandle(m_hThread);
-		m_bIsTerminate = true;
 		m_hThread = NULL;
 	}
 }

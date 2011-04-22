@@ -82,7 +82,7 @@ bool CBaseSocket::CreateListenSocket(int nPort)
 			return false;
 		}
 
-		if(!GetExFunPointer())
+		if(!GetSocket2FunPointer())
 		{
 			CloseSocket();
 			return false;
@@ -166,7 +166,8 @@ bool CBaseSocket::CreateSocketInstance()
 			{
 				nError = WSAGetLastError();
 				WriteLogInfo(LOG_INFO, _T("CBaseSocket::CreateSocketInstance(), 设置监听套接字接收缓冲大小时出错,错误代码:%d"), nError);
-
+				
+				closesocket(m_scSocket);
 				return false;
 			}
 
@@ -176,7 +177,8 @@ bool CBaseSocket::CreateSocketInstance()
 			{
 				nError = WSAGetLastError();
 				WriteLogInfo(LOG_INFO, _T("CBaseSocket::CreateSocketInstance(), 设置监听套接字发送缓冲大小时出错,错误代码:%d"), nError);
-
+			
+				closesocket(m_scSocket);
 				return false;
 			}
 
@@ -186,7 +188,8 @@ bool CBaseSocket::CreateSocketInstance()
 			{
 				nError = WSAGetLastError();
 				WriteLogInfo(LOG_INFO, _T("CBaseSocket::CreateSocketInstance(), 设置监听套接字为取消延迟模式时出错,错误代码:%d"), nError);
-
+			
+				closesocket(m_scSocket);
 				return false;
 			}
 
@@ -226,7 +229,7 @@ bool CBaseSocket::BindListenSocket(int nPort)
 				return true;
 			}
 
-			int nError = WSAGetLastError();
+			nError = WSAGetLastError();
 			WriteLogInfo(LOG_INFO, _T("CBaseSocket::BindListenSocket(%d), 监听套接字置为监听状态时出错，错误代码:%d"), nPort, nError);
 
 			return false;
@@ -239,7 +242,7 @@ bool CBaseSocket::BindListenSocket(int nPort)
 	return false;
 }
 
-bool CBaseSocket::GetExFunPointer()
+bool CBaseSocket::GetSocket2FunPointer()
 {
 	if(!GetAcceptExPointer())
 	{

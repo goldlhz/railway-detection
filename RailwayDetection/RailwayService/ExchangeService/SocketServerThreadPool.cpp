@@ -16,6 +16,7 @@ CSocketServerThreadPool::CSocketServerThreadPool(void)
 
 CSocketServerThreadPool::~CSocketServerThreadPool(void)
 {
+	CloseServerThreads();
 }
 
 bool CSocketServerThreadPool::CreateServerThreads(HANDLE hCompletionPort, 
