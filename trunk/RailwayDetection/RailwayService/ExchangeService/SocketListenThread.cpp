@@ -14,6 +14,7 @@ CSocketListenThread::CSocketListenThread(void)
 
 CSocketListenThread::~CSocketListenThread(void)
 {
+	ReleaseAllSource();
 }
 
 unsigned int CSocketListenThread::ExecuteThread()
@@ -42,7 +43,8 @@ unsigned int CSocketListenThread::ExecuteThread()
 
 	while(!m_bIsTerminate)
 	{
-		int nIndex = ::WSAWaitForMultipleEvents(JUDGEHANDLESIZE, m_hJudgeEvent, FALSE, WSA_INFINITE, FALSE);
+		static int nIndex = 0;
+		nIndex = ::WSAWaitForMultipleEvents(JUDGEHANDLESIZE, m_hJudgeEvent, FALSE, 60 * 1000, FALSE);
 
 		if(WSA_WAIT_FAILED == nIndex)
 		{
@@ -51,10 +53,16 @@ unsigned int CSocketListenThread::ExecuteThread()
 			return 0;
 		}	
 
+		if(WSA_WAIT_TIMEOUT == nIndex)
+		{
+			// 可以此检测一些东西,现在先不用
+			continue;
+		}
+
 		nIndex = nIndex - WAIT_OBJECT_0;			
 		if(nIndex >= 0)
 		{
-			WSANETWORKEVENTS networkEvent;
+			static WSANETWORKEVENTS networkEvent;
 			switch (nIndex)
 			{
 			case 0:
@@ -62,7 +70,8 @@ unsigned int CSocketListenThread::ExecuteThread()
 					::WSAEnumNetworkEvents(m_BaseSocket.GetSocket(), m_hJudgeEvent[0], &networkEvent);
 					if(networkEvent.lNetworkEvents & FD_ACCEPT)
 					{
-						for (int nIndex = 0; nIndex < nPostCount; ++nIndex)
+						static int nCount;
+						for (nCount = 0; nCount < nPostCount; ++nCount)
 						{
 							if(!PostAcceptExMSG())
 							{
@@ -97,54 +106,69 @@ bool CSocketListenThread::InitListenThreadInstance()
 {
 	int nPort = CGobalConfig::GetGobalConfig().GetServerPort();
 
-	if(CreateIOCPHandle())
+	if(!CreateIOCPHandle())
 	{
-		if(CreateServerSocket(nPort))
-		{
-			if(m_MemoryPoolManager.InitMemoryPool())
-			{
-				DoWriteLogInfo(LOG_DEBUG, _T("CSocketListenThread::InitListenThreadInstance(), 初始化内存池成功"));
-
-				if(m_SocketPoolManager.InitSocketPool())
-				{
-					DoWriteLogInfo(LOG_DEBUG, _T("CSocketListenThread::InitListenThreadInstance(), 初始化套接字池成功"));
-
-					HANDLE hHandle = CreateIoCompletionPort((HANDLE)m_BaseSocket.GetSocket(), m_hCompletionPort, (ULONG_PTR)NULL, NULL);
-					if(hHandle)
-					{
-						DoWriteLogInfo(LOG_DEBUG, _T("CSocketListenThread::InitListenThreadInstance(), 绑定监听套接字到完成端口时成功"));
-
-						if(SOCKET_ERROR == WSAEventSelect(m_BaseSocket.GetSocket(), m_hJudgeEvent[0], FD_ACCEPT))
-						{
-							int nError = WSAGetLastError();
-							WriteLogInfo(LOG_INFO, _T("CSocketListenThread::InitListenThreadInstance(), 注册FD_ACCEPT事件错误, 错误代码:%d"), nError);
-						}
-						else
-						{
-							DoWriteLogInfo(LOG_DEBUG, _T("CSocketListenThread::InitListenThreadInstance(), 注册FD_ACCEPT事件成功"));
-
-							if(CreateServerThreadPool())
-							{
-								DoWriteLogInfo(LOG_DEBUG, _T("CSocketListenThread::InitListenThreadInstance(), 初始化监听线程完成"));
-								return true;
-							}
-						}
-					}
-					else
-					{
-						int nError = GetLastError();
-						WriteLogInfo(LOG_INFO, _T("CSocketListenThread::InitListenThreadInstance(), 绑定监听套接字到完成端口时出错,错误代码:%d"), nError);
-					}
-				}
-
-				m_MemoryPoolManager.ClearMemoryPool();
-			}
-			CloseServerSocket();
-		}
-		CloseIOCPHandle();
+		// 创建IOCP所要用的句柄出错
+		return false;
 	}
 
-	DoWriteLogInfo(LOG_INFO, _T("CSocketListenThread::InitListenThreadInstance(), 初始化内存池出错"));
+	if(!CreateServerSocket(nPort))
+	{
+		// 创建Socket出错
+		CloseIOCPHandle();
+		return false;
+	}
+
+	if(!m_MemoryPoolManager.InitMemoryPool())
+	{
+		DoWriteLogInfo(LOG_INFO, _T("CSocketListenThread::InitListenThreadInstance(), 初始化内存池错误"));
+
+		CloseServerSocket();
+		CloseIOCPHandle();
+
+		return false;
+	}
+
+	DoWriteLogInfo(LOG_DEBUG, _T("CSocketListenThread::InitListenThreadInstance(), 初始化内存池成功"));
+
+	if(!m_SocketPoolManager.InitSocketPool())
+	{
+		DoWriteLogInfo(LOG_INFO, _T("CSocketListenThread::InitListenThreadInstance(), 初始化套接字池错误"));
+
+		CloseServerSocket();
+		CloseIOCPHandle();
+
+		return false;
+	}
+				
+	DoWriteLogInfo(LOG_DEBUG, _T("CSocketListenThread::InitListenThreadInstance(), 初始化套接字池成功"));
+
+	HANDLE hHandle = CreateIoCompletionPort((HANDLE)m_BaseSocket.GetSocket(), m_hCompletionPort, (ULONG_PTR)NULL, NULL);
+	if(hHandle)
+	{
+		DoWriteLogInfo(LOG_DEBUG, _T("CSocketListenThread::InitListenThreadInstance(), 绑定监听套接字到完成端口时成功"));
+
+		if(SOCKET_ERROR == WSAEventSelect(m_BaseSocket.GetSocket(), m_hJudgeEvent[0], FD_ACCEPT))
+		{
+			int nError = WSAGetLastError();
+			WriteLogInfo(LOG_INFO, _T("CSocketListenThread::InitListenThreadInstance(), 注册FD_ACCEPT事件错误, 错误代码:%d"), nError);
+		}
+		else
+		{
+			DoWriteLogInfo(LOG_DEBUG, _T("CSocketListenThread::InitListenThreadInstance(), 注册FD_ACCEPT事件成功"));
+
+			if(CreateServerThreadPool())
+			{
+				DoWriteLogInfo(LOG_DEBUG, _T("CSocketListenThread::InitListenThreadInstance(), 初始化监听线程完成"));
+				return true;
+			}
+		}
+	}
+	else
+	{
+		int nError = GetLastError();
+		WriteLogInfo(LOG_INFO, _T("CSocketListenThread::InitListenThreadInstance(), 绑定监听套接字到完成端口时出错,错误代码:%d"), nError);
+	}
 	return false;
 }
 
@@ -159,35 +183,41 @@ bool CSocketListenThread::CreateIOCPHandle()
 	if(!m_hCompletionPort)
 	{
 		m_hCompletionPort = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0);
-		if(m_hCompletionPort)
+		if(!m_hCompletionPort)
 		{
-			DoWriteLogInfo(LOG_DEBUG, _T("CSocketListenThread::CreateIOCPHandle(), 创建完成端口成功"));
-
-			m_hJudgeEvent[0] = WSACreateEvent();
-			if(WSA_INVALID_EVENT != m_hJudgeEvent[0])
-			{
-				DoWriteLogInfo(LOG_DEBUG, _T("CSocketListenThread::CreateIOCPHandle(), 创建关联于接收连接事件成功"));
-
-				m_hJudgeEvent[1] = CreateEvent(NULL, FALSE, FALSE, _T("Global\\Notify_Accept_Link"));
-				if(m_hJudgeEvent[1])
-				{
-					DoWriteLogInfo(LOG_DEBUG, _T("CSocketListenThread::CreateIOCPHandle(), 创建通知接收到一个连接事件成功"));
-					return true;
-				}
-
-				int nError = GetLastError();
-				WriteLogInfo(LOG_INFO, _T("CSocketListenThread::CreateIOCPHandle(), 创建通知接收到一个连接事件出错，错误代码:%d"), nError);
-				return false;
-			}
-
-			int nError = WSAGetLastError();
-			WriteLogInfo(LOG_INFO, _T("CSocketListenThread::CreateIOCPHandle(), 创建关联于接收连接事件出错，错误代码:%d"), nError);
+			int nError = GetLastError();
+			WriteLogInfo(LOG_INFO, _T("CSocketListenThread::CreateIOCPHandle(), 创建完成端口出错，错误代码:%d"), nError);
 			return false;
 		}
 
-		int nError = GetLastError();
-		WriteLogInfo(LOG_INFO, _T("CSocketListenThread::CreateIOCPHandle(), 创建完成端口出错，错误代码:%d"), nError);
-		return false;
+		DoWriteLogInfo(LOG_DEBUG, _T("CSocketListenThread::CreateIOCPHandle(), 创建完成端口成功"));
+
+		m_hJudgeEvent[0] = WSACreateEvent();
+		if(WSA_INVALID_EVENT == m_hJudgeEvent[0])
+		{
+			int nError = WSAGetLastError();
+			WriteLogInfo(LOG_INFO, _T("CSocketListenThread::CreateIOCPHandle(), 创建关联于接收连接事件出错，错误代码:%d"), nError);
+
+			CloseHandle(m_hCompletionPort);
+	
+			return false;
+		}
+		
+		DoWriteLogInfo(LOG_DEBUG, _T("CSocketListenThread::CreateIOCPHandle(), 创建关联于接收连接事件成功"));
+
+		m_hJudgeEvent[1] = CreateEvent(NULL, FALSE, FALSE, _T("Global\\Notify_Accept_Link"));
+		if(NULL == m_hJudgeEvent[1])
+		{
+			int nError = GetLastError();
+			WriteLogInfo(LOG_INFO, _T("CSocketListenThread::CreateIOCPHandle(), 创建通知接收到一个连接事件出错，错误代码:%d"), nError);
+
+			CloseHandle(m_hJudgeEvent[0]);
+			CloseHandle(m_hCompletionPort);
+
+			return false;
+		}
+
+		DoWriteLogInfo(LOG_DEBUG, _T("CSocketListenThread::CreateIOCPHandle(), 创建通知接收到一个连接事件成功"));
 	}
 	return true;
 }
@@ -198,11 +228,11 @@ bool CSocketListenThread::CreateServerSocket(int nPort)
 	{
 		if(m_BaseSocket.CreateListenSocket(nPort))
 		{
-			DoWriteLogInfo(LOG_DEBUG, _T("创建服务器套接字成功"));
+			DoWriteLogInfo(LOG_DEBUG, _T("CSocketListenThread::CreateServerSocket(), 创建服务器套接字成功"));
 			return true;
 		}
 
-		DoWriteLogInfo(LOG_DEBUG, _T("创建服务器套接字失败"));
+		DoWriteLogInfo(LOG_INFO, _T("CSocketListenThread::CreateServerSocket(), 创建服务器套接字失败"));
 	}
 	return false;
 }
@@ -218,11 +248,11 @@ bool CSocketListenThread::CreateServerThreadPool()
 			&m_MemoryPoolManager))
 
 		{
-			DoWriteLogInfo(LOG_DEBUG, _T("创建工作者线程池成功"));
+			DoWriteLogInfo(LOG_DEBUG, _T("CSocketListenThread::CreateServerThreadPool(), 创建工作者线程池成功"));
 			return true;
 		}
 
-		DoWriteLogInfo(LOG_DEBUG, _T("创建工作者线程池失败"));
+		DoWriteLogInfo(LOG_DEBUG, _T("CSocketListenThread::CreateServerThreadPool(), 创建工作者线程池失败"));
 	}
 	return false;
 }
