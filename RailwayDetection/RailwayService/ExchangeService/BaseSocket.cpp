@@ -129,7 +129,7 @@ bool CBaseSocket::InitSocketLib()
 	nBack = WSAStartup(wVersionRequested, &wsaOutData);
 	if(0 == nBack)
 	{
-		DoWriteLogInfo(LOG_DEBUG, _T("CBaseSocket::InitSocketLib(), 初始化SOCKET库成功"));
+		DoWriteLogInfo(LOG_INFO, _T("CBaseSocket::InitSocketLib(), 初始化SOCKET库成功"));
 		return true;
 	}
 	else
