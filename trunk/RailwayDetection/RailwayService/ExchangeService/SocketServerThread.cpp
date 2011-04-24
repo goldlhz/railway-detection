@@ -42,10 +42,10 @@ unsigned int CSocketServerThread::ExecuteThread()
 			);
 		if(FALSE == bTempTest)
 		{
-			int nError = WSAGetLastError();
-			if(ERROR_NETNAME_DELETED == nError)
+			int nErrorCode = WSAGetLastError();
+			if(ERROR_NETNAME_DELETED == nErrorCode)
 			{
-				WriteLogInfo(LOG_INFO, _T("CSocketServerThread::ExecuteThread(), 网络上有一个SOCKET发生错误，错误代码:%d"), nError);
+				WriteLogInfo(LOG_INFO, _T("CSocketServerThread::ExecuteThread(), 网络上有一个SOCKET发生错误，错误代码:%d"), nErrorCode);
 
 				if(pireCompletionKey)
 				{
@@ -134,9 +134,25 @@ void CSocketServerThread::DealRevcDate(DWORD dNumberOfBytes, KeyOverPire * pKeyO
 	ASSERT(m_pSocketPoolManager);
 	ASSERT(m_pMemoryPoolManager);
 
+	DWORD dwNumberOfBytesRecvd;
+	DWORD dwFlags;
+
 	if(pKeyOverPire)
 	{
+		USES_CONVERSION;
 
+		DoWriteLogInfo(LOG_INFO, CA2T(pKeyOverPire->pireOverLappedex.wsaBuffer));
+
+		SOCKET scClientSocket = pKeyOverPire->pireOverLappedex.wsaClientSocket;
+		WSARecv(
+			scClientSocket,
+			&(pKeyOverPire->pireOverLappedex.wsaWSABuf),
+			BUFFER_SIZE_TO_SOCKET,
+			&dwNumberOfBytesRecvd,
+			&dwFlags,
+			&(pKeyOverPire->pireOverLappedex.wsaOverlapped),
+			NULL
+			);
 	}
 }
 
@@ -154,7 +170,7 @@ void CSocketServerThread::DealAccpDate(DWORD dNumberOfBytes, KeyOverPire * pKeyO
 
 	if(pKeyOverPire)
 	{
-		int nError = 0;
+		int nErrorCode = 0;
 		DWORD dwNumberOfBytesRecvd = 0;
 		DWORD dwFlags = 0;
 		int nLocalAddrLength = 0;
@@ -165,8 +181,8 @@ void CSocketServerThread::DealAccpDate(DWORD dNumberOfBytes, KeyOverPire * pKeyO
 		m_pBaseSocket->GetAcceptExSockaddrs(
 			pKeyOverPire->pireOverLappedex.wsaAcceptBuffer,
 			0,
-			sizeof(sockaddr_in) + 16,
-			sizeof(sockaddr_in) + 16,
+			ADDRESS_LENGTH,
+			ADDRESS_LENGTH,
 			(SOCKADDR **)&pLocalAddr,
 			&nLocalAddrLength,
 			(SOCKADDR **)&pRemoteAddr,
@@ -179,39 +195,49 @@ void CSocketServerThread::DealAccpDate(DWORD dNumberOfBytes, KeyOverPire * pKeyO
 		SOCKET scServerSocket = m_pBaseSocket->GetSocket();
 		SOCKET scClientSocket = pKeyOverPire->pireOverLappedex.wsaClientSocket;
 
-		if (SOCKET_ERROR == setsockopt(
-			scClientSocket, 
-			SOL_SOCKET, 
-			SO_UPDATE_ACCEPT_CONTEXT, 
-			(char *)&scServerSocket, 
-			sizeof (SOCKET)))
-		{
-			m_pSocketPoolManager->CloseSpecSocket(scClientSocket);
-			m_pMemoryPoolManager->ReleaseKeyOverPire(pKeyOverPire);
+		//if (SOCKET_ERROR == setsockopt(
+		//	scClientSocket, 
+		//	SOL_SOCKET, 
+		//	SO_UPDATE_ACCEPT_CONTEXT, 
+		//	(char *)&scServerSocket, 
+		//	sizeof (SOCKET)))
+		//{
+		//	m_pSocketPoolManager->CloseSpecSocket(scClientSocket);
+		//	m_pMemoryPoolManager->ReleaseKeyOverPire(pKeyOverPire);
 
-			return;
-		}
+		//	return;
+		//}
+		
 		
 		HANDLE hCompletion = NULL;
 		hCompletion = CreateIoCompletionPort((HANDLE)scClientSocket, m_hCompletionPort, (ULONG_PTR)&(pKeyOverPire->pireCompletionKey), 0);
 		if(hCompletion)
 		{
-			nError = WSARecv(
+			WSABUF wsaBuffer;
+			wsaBuffer.len = BUFFER_SIZE_TO_SOCKET;
+			wsaBuffer.buf = new char[4096];//(CHAR *)::HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, BUFFER_SIZE_TO_SOCKET);
+			//wsaBuffer.len = BUFFER_SIZE_TO_SOCKET;
+			//wsaBuffer.buf = new CHAR[BUFFER_SIZE_TO_SOCKET];
+			//wsaBuffer.buf = (CHAR *)pKeyOverPire->pireOverLappedex.wsaBuffer;
+			//pKeyOverPire->pireOverLappedex.wsaWSABuf.len = BUFFER_SIZE_TO_SOCKET;
+			//pKeyOverPire->pireOverLappedex.wsaWSABuf.buf = (CHAR *)pKeyOverPire->pireOverLappedex.wsaBuffer;
+
+			nErrorCode = WSARecv(
 				scClientSocket,
-				&(pKeyOverPire->pireOverLappedex.wsaWSABuf),
-				BUFFER_SIZE_TO_SOCKET,
+				&wsaBuffer,
+				4096,
 				&dwNumberOfBytesRecvd,
 				&dwFlags,
 				&(pKeyOverPire->pireOverLappedex.wsaOverlapped),
 				NULL
 				);
 
-			if(SOCKET_ERROR == nError)
+			if(SOCKET_ERROR == nErrorCode)
 			{
-				int nError = WSAGetLastError();
-				if(WSA_IO_PENDING != nError)
+				int nErrorCode = WSAGetLastError();
+				if(WSA_IO_PENDING != nErrorCode)
 				{
-					WriteLogInfo(LOG_INFO, _T("CSocketServerThread::DealAccpDate(), 投递WSARecv消息时出错,错误代码:%d"), nError);
+					WriteLogInfo(LOG_INFO, _T("CSocketServerThread::DealAccpDate(), 投递WSARecv消息时出错,错误代码:%d"), nErrorCode);
 
 					m_pSocketPoolManager->CloseSpecSocket(scClientSocket);
 					m_pMemoryPoolManager->ReleaseKeyOverPire(pKeyOverPire);	

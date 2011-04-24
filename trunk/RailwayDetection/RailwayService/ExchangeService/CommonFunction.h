@@ -2,9 +2,9 @@
 #include <WinSock2.h>
 
 
-#define BUFFER_SIZE_TO_SOCKET					3600									// 定义了socket缓冲区大小
+#define BUFFER_SIZE_TO_SOCKET					1024*4									// 定义了socket缓冲区大小
 #define BUFFER_SIZE_TO_ACCEPT					((sizeof (sockaddr_in) + 16) * 2)
-
+#define ADDRESS_LENGTH							(sizeof(sockaddr_in) + 16)
 // 完成操作类型
 enum CompletionType													
 {
@@ -30,8 +30,8 @@ typedef struct _WsaOverLappedEX
 	CompletionType wsaOptType;
 	SOCKET         wsaClientSocket;
 	WSABUF		   wsaWSABuf;
-	BYTE		   wsaBuffer[BUFFER_SIZE_TO_SOCKET];
-	BYTE		   wsaAcceptBuffer[BUFFER_SIZE_TO_ACCEPT];
+	CHAR		   wsaBuffer[BUFFER_SIZE_TO_SOCKET];
+	CHAR		   wsaAcceptBuffer[BUFFER_SIZE_TO_ACCEPT];
 }WsaOverLappedEX;
 
 typedef struct _KeyOverPire

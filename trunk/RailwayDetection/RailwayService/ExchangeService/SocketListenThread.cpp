@@ -22,7 +22,7 @@ unsigned int CSocketListenThread::ExecuteThread()
 	ASSERT(m_hJudgeEvent[0]);
 	ASSERT(m_hJudgeEvent[1]);
 
-	int nError = 0;
+	int nErrorCode = 0;
 	int nPostCount = 0;
 
 	CGobalConfig::POSTACCEPTMODE PostMode = CGobalConfig::GetGobalConfig().GetPostMode();
@@ -31,7 +31,8 @@ unsigned int CSocketListenThread::ExecuteThread()
 	else
 		nPostCount = CGobalConfig::GetGobalConfig().GetPostMaxSize();
 
-	for (int nIndex = 0; nIndex < nPostCount; ++nIndex)
+	//for (int nIndex = 0; nIndex < nPostCount; ++nIndex)
+	for (int nIndex = 0; nIndex < 1; ++nIndex)
 	{
 		if(!PostAcceptExMSG())
 		{
@@ -153,8 +154,8 @@ bool CSocketListenThread::InitListenThreadInstance()
 
 		if(SOCKET_ERROR == WSAEventSelect(m_BaseSocket.GetSocket(), m_hJudgeEvent[0], FD_ACCEPT))
 		{
-			int nError = WSAGetLastError();
-			WriteLogInfo(LOG_INFO, _T("CSocketListenThread::InitListenThreadInstance(), 注册FD_ACCEPT事件错误, 错误代码:%d"), nError);
+			int nErrorCode = WSAGetLastError();
+			WriteLogInfo(LOG_INFO, _T("CSocketListenThread::InitListenThreadInstance(), 注册FD_ACCEPT事件错误, 错误代码:%d"), nErrorCode);
 		}
 		else
 		{
@@ -169,8 +170,8 @@ bool CSocketListenThread::InitListenThreadInstance()
 	}
 	else
 	{
-		int nError = GetLastError();
-		WriteLogInfo(LOG_INFO, _T("CSocketListenThread::InitListenThreadInstance(), 绑定监听套接字到完成端口时出错,错误代码:%d"), nError);
+		int nErrorCode = GetLastError();
+		WriteLogInfo(LOG_INFO, _T("CSocketListenThread::InitListenThreadInstance(), 绑定监听套接字到完成端口时出错,错误代码:%d"), nErrorCode);
 	}
 	return false;
 }
@@ -188,8 +189,8 @@ bool CSocketListenThread::CreateIOCPHandle()
 		m_hCompletionPort = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0);
 		if(!m_hCompletionPort)
 		{
-			int nError = GetLastError();
-			WriteLogInfo(LOG_INFO, _T("CSocketListenThread::CreateIOCPHandle(), 创建完成端口出错，错误代码:%d"), nError);
+			int nErrorCode = GetLastError();
+			WriteLogInfo(LOG_INFO, _T("CSocketListenThread::CreateIOCPHandle(), 创建完成端口出错，错误代码:%d"), nErrorCode);
 			return false;
 		}
 
@@ -198,8 +199,8 @@ bool CSocketListenThread::CreateIOCPHandle()
 		m_hJudgeEvent[0] = WSACreateEvent();
 		if(WSA_INVALID_EVENT == m_hJudgeEvent[0])
 		{
-			int nError = WSAGetLastError();
-			WriteLogInfo(LOG_INFO, _T("CSocketListenThread::CreateIOCPHandle(), 创建事件选择模型的事件出错，错误代码:%d"), nError);
+			int nErrorCode = WSAGetLastError();
+			WriteLogInfo(LOG_INFO, _T("CSocketListenThread::CreateIOCPHandle(), 创建事件选择模型的事件出错，错误代码:%d"), nErrorCode);
 
 			CloseHandle(m_hCompletionPort);
 	
@@ -211,8 +212,8 @@ bool CSocketListenThread::CreateIOCPHandle()
 		m_hJudgeEvent[1] = CreateEvent(NULL, FALSE, FALSE, _T("Global\\Notify_Accept_Link"));
 		if(NULL == m_hJudgeEvent[1])
 		{
-			int nError = GetLastError();
-			WriteLogInfo(LOG_INFO, _T("CSocketListenThread::CreateIOCPHandle(), 创建通知接收到一个连接事件出错，错误代码:%d"), nError);
+			int nErrorCode = GetLastError();
+			WriteLogInfo(LOG_INFO, _T("CSocketListenThread::CreateIOCPHandle(), 创建通知接收到一个连接事件出错，错误代码:%d"), nErrorCode);
 
 			CloseHandle(m_hJudgeEvent[0]);
 			CloseHandle(m_hCompletionPort);
@@ -304,8 +305,11 @@ bool CSocketListenThread::PostAcceptExMSG()
 	if(scSocket != INVALID_SOCKET && pKeyOverPire != NULL)
 	{
 		pKeyOverPire->pireCompletionKey.keySocket = m_BaseSocket.GetSocket();
+
+		pKeyOverPire->pireOverLappedex.wsaWSABuf.len = BUFFER_SIZE_TO_SOCKET;
+		pKeyOverPire->pireOverLappedex.wsaWSABuf.buf = pKeyOverPire->pireOverLappedex.wsaBuffer;
+
 		pKeyOverPire->pireOverLappedex.wsaClientSocket = scSocket;
-		pKeyOverPire->pireOverLappedex.wsaWSABuf.buf = (CHAR *)pKeyOverPire->pireOverLappedex.wsaBuffer;
 		pKeyOverPire->pireOverLappedex.wsaOptType = CT_ACCP;
 
 		bTempTest = m_BaseSocket.AcceptEx(
@@ -313,19 +317,19 @@ bool CSocketListenThread::PostAcceptExMSG()
 			scSocket,
 			pKeyOverPire->pireOverLappedex.wsaAcceptBuffer,
 			0,
-			sizeof(sockaddr_in) + 16,
-			sizeof(sockaddr_in) + 16,
+			ADDRESS_LENGTH,
+			ADDRESS_LENGTH,
 			&(dReceviedSize),
 			&(pKeyOverPire->pireOverLappedex.wsaOverlapped)
 			);
 
 		if(!bTempTest)
 		{
-			int nError = WSAGetLastError();
-			if(ERROR_IO_PENDING == nError)
+			int nErrorCode = WSAGetLastError();
+			if(ERROR_IO_PENDING == nErrorCode)
 				return true;
 
-			WriteLogInfo(LOG_INFO, _T("CSocketListenThread::PostAcceptEx(), 监听套接字置为监听状态时出错，错误代码:%d"), nError);
+			WriteLogInfo(LOG_INFO, _T("CSocketListenThread::PostAcceptEx(), 监听套接字置为监听状态时出错，错误代码:%d"), nErrorCode);
 			return false;
 		}
 
