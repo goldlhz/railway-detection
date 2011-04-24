@@ -43,19 +43,25 @@ unsigned int CSocketServerThread::ExecuteThread()
 		if(FALSE == bTempTest)
 		{
 			int nError = WSAGetLastError();
-			WriteLogInfo(LOG_INFO, _T("网络上有一个SOCKET发生错误，错误代码:%d"), nError);
-			
-			if(pireOverLappedex)
+			if(ERROR_NETNAME_DELETED == nError)
+			{
+				WriteLogInfo(LOG_INFO, _T("CSocketServerThread::ExecuteThread(), 网络上有一个SOCKET发生错误，错误代码:%d"), nError);
+
+				if(pireCompletionKey)
+				{
+					m_pSocketPoolManager->CloseSpecSocket(pireCompletionKey->keySocket);
+				}
+				else
+				{
+					WriteLogInfo(LOG_INFO, _T("CSocketServerThread::ExecuteThread(), 监听套接字发生错误,服务器必须停止工作"));
+					return 0;
+				}
+
 				m_pMemoryPoolManager->ReleaseKeyOverPire((KeyOverPire *)pireOverLappedex);
+				continue;
+			}
 
-			if(pireCompletionKey)
-				m_pSocketPoolManager->CloseSpecSocket(pireCompletionKey->keySocket);
-
-			//else
-			//{
-			//	WriteLogInfo(LOG_INFO, _T("监听套接字发生错误,服务器必须停止工作"));
-			//	return 0;
-			//}
+			WriteLogInfo(LOG_INFO, _T("CSocketServerThread::ExecuteThread(), GetQueuedCompletionStatus返回一个未知错误,但此时套接字好像还可以用,暂时不关闭套接字"));
 			continue;
 		}
 
@@ -63,6 +69,16 @@ unsigned int CSocketServerThread::ExecuteThread()
 		{
 			WriteLogInfo(LOG_INFO, _T("CSocketServerThread::ExecuteThread(), 接收到退出线程的完成包,工作都线程退出"));
 			return 0;
+		}
+		else if(0 == dNumberOfBytes)
+		{
+			if(pireOverLappedex->wsaOptType == CT_REVC || pireOverLappedex->wsaOptType == CT_SEND)
+			{
+				m_pSocketPoolManager->CloseSpecSocket(pireCompletionKey->keySocket);
+				m_pMemoryPoolManager->ReleaseKeyOverPire((KeyOverPire *)pireOverLappedex);
+
+				continue;
+			}
 		}
 
 		switch(pireOverLappedex->wsaOptType)
@@ -86,7 +102,6 @@ unsigned int CSocketServerThread::ExecuteThread()
 		default:
 			break;
 		}
-
 	}
 	return 0;
 }
@@ -114,7 +129,15 @@ void CSocketServerThread::InitServerThreadInfo(
 
 void CSocketServerThread::DealRevcDate(DWORD dNumberOfBytes, KeyOverPire * pKeyOverPire)
 {
+	ASSERT(m_pBaseSocket);
+	ASSERT(m_hRevcSocket);
+	ASSERT(m_pSocketPoolManager);
+	ASSERT(m_pMemoryPoolManager);
 
+	if(pKeyOverPire)
+	{
+
+	}
 }
 
 void CSocketServerThread::DealSendDate(DWORD dNumberOfBytes, KeyOverPire * pKeyOverPire)
@@ -151,32 +174,62 @@ void CSocketServerThread::DealAccpDate(DWORD dNumberOfBytes, KeyOverPire * pKeyO
 
 		GetLocalTime(&(pKeyOverPire->pireCompletionKey.keyLinkTime));
 		memcpy(&(pKeyOverPire->pireCompletionKey.keyClientAddr), pRemoteAddr, nRmoteAddrLength);
+		pKeyOverPire->pireCompletionKey.keySocket = pKeyOverPire->pireOverLappedex.wsaClientSocket;
 
-		nError = WSARecv(
-			pKeyOverPire->pireOverLappedex.wsaClientSocket,
-			&(pKeyOverPire->pireOverLappedex.wsaWSABuf),
-			BUFFER_SIZE_TO_SOCKET,
-			&dwNumberOfBytesRecvd,
-			&dwFlags,
-			&(pKeyOverPire->pireOverLappedex.wsaOverlapped),
-			NULL
-			);
+		SOCKET scServerSocket = m_pBaseSocket->GetSocket();
+		SOCKET scClientSocket = pKeyOverPire->pireOverLappedex.wsaClientSocket;
 
-		if(SOCKET_ERROR == nError)
+		if (SOCKET_ERROR == setsockopt(
+			scClientSocket, 
+			SOL_SOCKET, 
+			SO_UPDATE_ACCEPT_CONTEXT, 
+			(char *)&scServerSocket, 
+			sizeof (SOCKET)))
 		{
-			int nError = WSAGetLastError();
-			if(WSA_IO_PENDING != nError)
-			{
-				WriteLogInfo(LOG_INFO, _T("CSocketServerThread::DealAccpDate(), 投递WSARecv消息时出错,错误代码:%d"), nError);
-			
-				m_pSocketPoolManager->CloseSpecSocket(pKeyOverPire->pireOverLappedex.wsaClientSocket);
-				m_pMemoryPoolManager->ReleaseKeyOverPire(pKeyOverPire);	
-				
-				return;
-			}
+			m_pSocketPoolManager->CloseSpecSocket(scClientSocket);
+			m_pMemoryPoolManager->ReleaseKeyOverPire(pKeyOverPire);
+
+			return;
 		}
 		
-		SetEvent(m_hRevcSocket);
+		HANDLE hCompletion = NULL;
+		hCompletion = CreateIoCompletionPort((HANDLE)scClientSocket, m_hCompletionPort, (ULONG_PTR)&(pKeyOverPire->pireCompletionKey), 0);
+		if(hCompletion)
+		{
+			nError = WSARecv(
+				scClientSocket,
+				&(pKeyOverPire->pireOverLappedex.wsaWSABuf),
+				BUFFER_SIZE_TO_SOCKET,
+				&dwNumberOfBytesRecvd,
+				&dwFlags,
+				&(pKeyOverPire->pireOverLappedex.wsaOverlapped),
+				NULL
+				);
+
+			if(SOCKET_ERROR == nError)
+			{
+				int nError = WSAGetLastError();
+				if(WSA_IO_PENDING != nError)
+				{
+					WriteLogInfo(LOG_INFO, _T("CSocketServerThread::DealAccpDate(), 投递WSARecv消息时出错,错误代码:%d"), nError);
+
+					m_pSocketPoolManager->CloseSpecSocket(scClientSocket);
+					m_pMemoryPoolManager->ReleaseKeyOverPire(pKeyOverPire);	
+
+					return;
+				}
+			}
+
+			SetEvent(m_hRevcSocket);
+			return;
+		}	
+		else
+		{
+			m_pSocketPoolManager->CloseSpecSocket(scClientSocket);
+			m_pMemoryPoolManager->ReleaseKeyOverPire(pKeyOverPire);
+
+			return;
+		}
 	}
 }
 
