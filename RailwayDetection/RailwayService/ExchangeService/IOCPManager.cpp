@@ -62,7 +62,7 @@ void CIOCPManager::UnInitGlobalEnvironment()
 bool CIOCPManager::InitGlobalEnvironment()
 {
 	// 初始化日志系统
-	InitLogPluginManager(_T("Info_Exchange_Plat"));
+	InitLogPluginManager(_T("RailwayService"));
 
 	CGobalConfig::GetGobalConfig().InitGoblaConfig();
 

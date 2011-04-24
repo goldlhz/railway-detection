@@ -76,7 +76,7 @@ unsigned int CSocketListenThread::ExecuteThread()
 							if(!PostAcceptExMSG())
 							{
 								DoWriteLogInfo(LOG_INFO, _T("CSocketListenThread::ExecuteThread(), AcceptEx不足时再投递AcceptEx出错,监听管理线程休息2秒后再投递"));
-								SleepEx(2000, TRUE);
+								SleepEx(100, TRUE);
 							}
 						}
 					}
@@ -87,6 +87,7 @@ unsigned int CSocketListenThread::ExecuteThread()
 					if(!PostAcceptExMSG())
 					{
 						DoWriteLogInfo(LOG_INFO, _T("CSocketListenThread::ExecuteThread(), 接收到新连接后再增加AcceptEx投递时出错"));
+						SleepEx(100, TRUE);
 					}
 				}
 				break;

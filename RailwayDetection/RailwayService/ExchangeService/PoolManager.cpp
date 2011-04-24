@@ -267,20 +267,23 @@ KeyOverPire * CMemoryPoolManager::GetNewKeyOverPire()
 
 void CMemoryPoolManager::ReleaseKeyOverPire(KeyOverPire * pPire)
 {
-	CListKeyOverPire::iterator iterTemp;
-	m_scMemoryCriticalSection.Lock();
-
-	for (iterTemp = m_vecUsedKeyOverPire.begin(); iterTemp != m_vecUsedKeyOverPire.end(); ++iterTemp)
+	if(pPire)
 	{
-		if(pPire == (*iterTemp))
-		{
-			m_vecUsedKeyOverPire.erase(iterTemp);
-			m_vecPrepKeyOverPire.push_back(pPire);
-			break;
-		}
-	}
+		CListKeyOverPire::iterator iterTemp;
+		m_scMemoryCriticalSection.Lock();
 
-	m_scMemoryCriticalSection.Unlock();
+		for (iterTemp = m_vecUsedKeyOverPire.begin(); iterTemp != m_vecUsedKeyOverPire.end(); ++iterTemp)
+		{
+			if(pPire == (*iterTemp))
+			{
+				m_vecUsedKeyOverPire.erase(iterTemp);
+				m_vecPrepKeyOverPire.push_back(pPire);
+				break;
+			}
+		}
+
+		m_scMemoryCriticalSection.Unlock();
+	}
 }
 
 bool CMemoryPoolManager::InitMemoryPool()
