@@ -50,12 +50,12 @@ bool CBaseThread::ForceTerminate()
 			return true;
 		}
 
-		int nError = GetLastError();
+		int nErrorCode = GetLastError();
 		CloseHandle(m_hThread);
 		m_hThread = NULL;
 		m_bIsTerminate = true;
 
-		WriteLogInfo(LOG_INFO, _T("CBaseThread::ForceTerminate(), 强制关闭线程出错,错误代码:%d"), nError);
+		WriteLogInfo(LOG_INFO, _T("CBaseThread::ForceTerminate(), 强制关闭线程出错,错误代码:%d"), nErrorCode);
 		return false;
 	}
 
@@ -66,15 +66,15 @@ DWORD CBaseThread::ResumeThread()
 {
 	if(m_hThread)
 	{
-		int nError = 0;
-		nError = ::ResumeThread(m_hThread);
-		if(-1 != nError)
+		int nErrorCode = 0;
+		nErrorCode = ::ResumeThread(m_hThread);
+		if(-1 != nErrorCode)
 		{
-			return nError;
+			return nErrorCode;
 		}
 
-		nError = GetLastError();
-		WriteLogInfo(LOG_INFO, _T("CBaseThread::ResumeThread(), 启动挂起的线程出错,错误代码:%d"), nError);
+		nErrorCode = GetLastError();
+		WriteLogInfo(LOG_INFO, _T("CBaseThread::ResumeThread(), 启动挂起的线程出错,错误代码:%d"), nErrorCode);
 	}
 
 	return -1;
@@ -84,15 +84,15 @@ DWORD CBaseThread::SuspendThread()
 {
 	if(m_hThread)
 	{
-		int nError = 0;
-		nError = ::SuspendThread(m_hThread);
-		if(-1 != nError)
+		int nErrorCode = 0;
+		nErrorCode = ::SuspendThread(m_hThread);
+		if(-1 != nErrorCode)
 		{
-			return nError;
+			return nErrorCode;
 		}
 
-		nError = GetLastError();
-		WriteLogInfo(LOG_INFO, _T("CBaseThread::SuspendThread(), 挂起正在运行的线程出错,错误代码:%d"), nError);
+		nErrorCode = GetLastError();
+		WriteLogInfo(LOG_INFO, _T("CBaseThread::SuspendThread(), 挂起正在运行的线程出错,错误代码:%d"), nErrorCode);
 	}
 
 	return -1;

@@ -22,8 +22,7 @@ SOCKET CSocketPoolManager::GetNewSocket()
 
 	if(SocketPoolAutoManage())
 	{
-		iterSocket = m_vecPrepSocket.end();
-		--iterSocket;
+		iterSocket = m_vecPrepSocket.begin();
 
 		scSocket = *iterSocket;
 		m_vecPrepSocket.erase(iterSocket);
@@ -54,11 +53,11 @@ void CSocketPoolManager::ReleaseSocket(SOCKET scSocket)
 
 void CSocketPoolManager::CloseSpecSocket(SOCKET scSocket)
 {
-	int nError = 0;
+	int nErrorCode = 0;
 	CListSocket::iterator iterSocket;
 	m_scSocketCriticalSection.Lock();
 
-	if(0 == nError)
+	if(0 == nErrorCode)
 	{
 		for (iterSocket = m_vecUsedSocket.begin(); iterSocket != m_vecUsedSocket.end(); ++iterSocket)
 		{
@@ -68,13 +67,13 @@ void CSocketPoolManager::CloseSpecSocket(SOCKET scSocket)
 				closesocket(scSocket);
 				m_vecUsedSocket.erase(iterSocket);
 
-				nError = 1;
+				nErrorCode = 1;
 				break;
 			}
 		}
 	}
 
-	if(0 == nError)
+	if(0 == nErrorCode)
 	{
 		for (iterSocket = m_vecPrepSocket.begin(); iterSocket != m_vecPrepSocket.end(); ++iterSocket)
 		{
@@ -144,37 +143,37 @@ void CSocketPoolManager::ClearSocketPool()
 SOCKET CSocketPoolManager::CreatePoolSocket()
 {
 	SOCKET scSocket;
-	int nError = 0;
+	int nErrorCode = 0;
 	int nSendSocketBufSize = BUFFER_SIZE_TO_SOCKET;
 	int nRevcSockerBufSize = BUFFER_SIZE_TO_SOCKET;
 
 	scSocket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
 	if(INVALID_SOCKET != scSocket)
 	{
-		nError = setsockopt(scSocket, SOL_SOCKET, SO_RCVBUF, (const char*)&nRevcSockerBufSize, sizeof(int));
-		if(SOCKET_ERROR  == nError)
-		{
-			nError = WSAGetLastError();
-			WriteLogInfo(LOG_INFO, _T("CSocketPoolManager::CreatePoolSocket(), 设置监听套接字接收缓冲大小时出错,错误代码:%d"), nError);
+		//nErrorCode = setsockopt(scSocket, SOL_SOCKET, SO_RCVBUF, (const char*)&nRevcSockerBufSize, sizeof(int));
+		//if(SOCKET_ERROR  == nErrorCode)
+		//{
+		//	nErrorCode = WSAGetLastError();
+		//	WriteLogInfo(LOG_INFO, _T("CSocketPoolManager::CreatePoolSocket(), 设置监听套接字接收缓冲大小时出错,错误代码:%d"), nErrorCode);
 
-			return INVALID_SOCKET;
-		}
+		//	return INVALID_SOCKET;
+		//}
 
-		nError = setsockopt(scSocket, SOL_SOCKET, SO_SNDBUF, (const char*)&nSendSocketBufSize, sizeof(int));
-		if(SOCKET_ERROR  == nError)
-		{
-			nError = WSAGetLastError();
-			WriteLogInfo(LOG_INFO, _T("CSocketPoolManager::CreatePoolSocket(), 设置监听套接字发送缓冲大小时出错,错误代码:%d"), nError);
+		//nErrorCode = setsockopt(scSocket, SOL_SOCKET, SO_SNDBUF, (const char*)&nSendSocketBufSize, sizeof(int));
+		//if(SOCKET_ERROR  == nErrorCode)
+		//{
+		//	nErrorCode = WSAGetLastError();
+		//	WriteLogInfo(LOG_INFO, _T("CSocketPoolManager::CreatePoolSocket(), 设置监听套接字发送缓冲大小时出错,错误代码:%d"), nErrorCode);
 
-			return INVALID_SOCKET;
-		}
+		//	return INVALID_SOCKET;
+		//}
 
 		return scSocket;
 	}
 
 	// 记录失败日志
-	nError = WSAGetLastError();
-	WriteLogInfo(LOG_INFO, _T("CSocketPoolManager::CreatePoolSocket(), 套接字池在生成套接字时出错，错误代码:%d"), nError);
+	nErrorCode = WSAGetLastError();
+	WriteLogInfo(LOG_INFO, _T("CSocketPoolManager::CreatePoolSocket(), 套接字池在生成套接字时出错，错误代码:%d"), nErrorCode);
 	return INVALID_SOCKET;
 }
 
@@ -253,8 +252,8 @@ KeyOverPire * CMemoryPoolManager::GetNewKeyOverPire()
 
 	if(MemoryPoolAutoManage())
 	{
-		iterBack = m_vecPrepKeyOverPire.end();
-		--iterBack;
+		iterBack = m_vecPrepKeyOverPire.begin();
+		//--iterBack;
 
 		pKeyOverPire = *iterBack;
 		m_vecPrepKeyOverPire.erase(iterBack);
@@ -301,7 +300,7 @@ bool CMemoryPoolManager::InitMemoryPool()
 			{
 				pPire->pireOverLappedex.wsaOptType = CT_UNKOWN;
 				pPire->pireOverLappedex.wsaWSABuf.len = BUFFER_SIZE_TO_SOCKET;
-				pPire->pireOverLappedex.wsaWSABuf.buf = (CHAR *)pPire->pireOverLappedex.wsaBuffer;
+				pPire->pireOverLappedex.wsaWSABuf.buf = pPire->pireOverLappedex.wsaBuffer;
 
 				m_vecPrepKeyOverPire.push_back(pPire);
 				continue;
@@ -365,7 +364,7 @@ bool CMemoryPoolManager::IncrementMemoryPoolSize(int nCurrentSize)
 		{
 			pPire->pireOverLappedex.wsaOptType = CT_UNKOWN;
 			pPire->pireOverLappedex.wsaWSABuf.len = BUFFER_SIZE_TO_SOCKET;
-			pPire->pireOverLappedex.wsaWSABuf.buf = (CHAR *)pPire->pireOverLappedex.wsaBuffer;
+			pPire->pireOverLappedex.wsaWSABuf.buf = pPire->pireOverLappedex.wsaBuffer;
 
 			m_vecPrepKeyOverPire.push_back(pPire);
 			continue;

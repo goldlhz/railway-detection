@@ -134,8 +134,8 @@ bool CBaseSocket::InitSocketLib()
 	}
 	else
 	{
-		int nError = WSAGetLastError();
-		WriteLogInfo(LOG_INFO, _T("CBaseSocket::InitSocketLib(), 初始化SOCKET库出错，错误代码:%d"), nError);
+		int nErrorCode = WSAGetLastError();
+		WriteLogInfo(LOG_INFO, _T("CBaseSocket::InitSocketLib(), 初始化SOCKET库出错，错误代码:%d"), nErrorCode);
 		return false;
 	}
 }
@@ -155,39 +155,39 @@ bool CBaseSocket::CreateSocketInstance()
 		m_scSocket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
 		if(INVALID_SOCKET != m_scSocket)
 		{
-			int  nError = 0;
+			int  nErrorCode = 0;
 			int  nRevcBufSize = BASESOCKET_REVCBUF_SIZE;
 			int  nSendBufSize = BASESOCKET_SENDBUF_SIZE;
 			BOOL bOpt = FALSE;
 
 			DoWriteLogInfo(LOG_DEBUG, _T("CBaseSocket::CreateSocketInstance(), 创建基本套接字成功"));
-			nError = setsockopt(m_scSocket, SOL_SOCKET, SO_RCVBUF, (const char*)&nRevcBufSize, sizeof(int));
-			if(SOCKET_ERROR  == nError)
+			nErrorCode = setsockopt(m_scSocket, SOL_SOCKET, SO_RCVBUF, (const char*)&nRevcBufSize, sizeof(int));
+			if(SOCKET_ERROR  == nErrorCode)
 			{
-				nError = WSAGetLastError();
-				WriteLogInfo(LOG_INFO, _T("CBaseSocket::CreateSocketInstance(), 设置监听套接字接收缓冲大小时出错,错误代码:%d"), nError);
+				nErrorCode = WSAGetLastError();
+				WriteLogInfo(LOG_INFO, _T("CBaseSocket::CreateSocketInstance(), 设置监听套接字接收缓冲大小时出错,错误代码:%d"), nErrorCode);
 				
 				closesocket(m_scSocket);
 				return false;
 			}
 
 			DoWriteLogInfo(LOG_DEBUG, _T("CBaseSocket::CreateSocketInstance(), 修改监听套接字接收缓冲大小成功"));
-			nError = setsockopt(m_scSocket, SOL_SOCKET, SO_SNDBUF, (const char*)&nSendBufSize, sizeof(int));
-			if(SOCKET_ERROR  == nError)
+			nErrorCode = setsockopt(m_scSocket, SOL_SOCKET, SO_SNDBUF, (const char*)&nSendBufSize, sizeof(int));
+			if(SOCKET_ERROR  == nErrorCode)
 			{
-				nError = WSAGetLastError();
-				WriteLogInfo(LOG_INFO, _T("CBaseSocket::CreateSocketInstance(), 设置监听套接字发送缓冲大小时出错,错误代码:%d"), nError);
+				nErrorCode = WSAGetLastError();
+				WriteLogInfo(LOG_INFO, _T("CBaseSocket::CreateSocketInstance(), 设置监听套接字发送缓冲大小时出错,错误代码:%d"), nErrorCode);
 			
 				closesocket(m_scSocket);
 				return false;
 			}
 
 			DoWriteLogInfo(LOG_DEBUG, _T("CBaseSocket::CreateSocketInstance(), 修改监听套接字发送缓冲大小成功"));
-			nError = setsockopt(m_scSocket, IPPROTO_TCP, TCP_NODELAY, (const char*)&bOpt, sizeof(BOOL));
-			if(SOCKET_ERROR  == nError)
+			nErrorCode = setsockopt(m_scSocket, IPPROTO_TCP, TCP_NODELAY, (const char*)&bOpt, sizeof(BOOL));
+			if(SOCKET_ERROR  == nErrorCode)
 			{
-				nError = WSAGetLastError();
-				WriteLogInfo(LOG_INFO, _T("CBaseSocket::CreateSocketInstance(), 设置监听套接字为取消延迟模式时出错,错误代码:%d"), nError);
+				nErrorCode = WSAGetLastError();
+				WriteLogInfo(LOG_INFO, _T("CBaseSocket::CreateSocketInstance(), 设置监听套接字为取消延迟模式时出错,错误代码:%d"), nErrorCode);
 			
 				closesocket(m_scSocket);
 				return false;
@@ -197,8 +197,8 @@ bool CBaseSocket::CreateSocketInstance()
 			return true;
 		}
 
-		int nError = WSAGetLastError();
-		WriteLogInfo(LOG_INFO, _T("CBaseSocket::CreateSocketInstance(), 创建监听套接字出错，错误代码:%d"), nError);
+		int nErrorCode = WSAGetLastError();
+		WriteLogInfo(LOG_INFO, _T("CBaseSocket::CreateSocketInstance(), 创建监听套接字出错，错误代码:%d"), nErrorCode);
 
 		return false;
 	}
@@ -210,33 +210,33 @@ bool CBaseSocket::BindListenSocket(int nPort)
 {
 	if(SOCKET_ERROR != m_scSocket)
 	{
-		int nError = 0;
+		int nErrorCode = 0;
 
 		m_scinTcpAddr.sin_family = AF_INET;
 		m_scinTcpAddr.sin_port   = htons(nPort);
 		m_scinTcpAddr.sin_addr.s_addr = htonl(INADDR_ANY);
 
-		nError = bind(m_scSocket, (SOCKADDR *)&m_scinTcpAddr, sizeof(m_scinTcpAddr));
-		if(0 == nError)
+		nErrorCode = bind(m_scSocket, (SOCKADDR *)&m_scinTcpAddr, sizeof(m_scinTcpAddr));
+		if(0 == nErrorCode)
 		{
 			WriteLogInfo(LOG_DEBUG, _T("CBaseSocket::BindListenSocket(%d), 邦定监听套接字成功"), nPort);
 
 			int nBackLog = CCommonFunction::GetBackLogCount();
-			nError = listen(m_scSocket, nBackLog);
-			if(0 == nError)
+			nErrorCode = listen(m_scSocket, nBackLog);
+			if(0 == nErrorCode)
 			{
 				WriteLogInfo(LOG_DEBUG, _T("CBaseSocket::BindListenSocket(%d), 监听套接字置为监听状态成功"), nPort);
 				return true;
 			}
 
-			nError = WSAGetLastError();
-			WriteLogInfo(LOG_INFO, _T("CBaseSocket::BindListenSocket(%d), 监听套接字置为监听状态时出错，错误代码:%d"), nPort, nError);
+			nErrorCode = WSAGetLastError();
+			WriteLogInfo(LOG_INFO, _T("CBaseSocket::BindListenSocket(%d), 监听套接字置为监听状态时出错，错误代码:%d"), nPort, nErrorCode);
 
 			return false;
 		}
 
-		nError = WSAGetLastError();
-		WriteLogInfo(LOG_INFO, _T("CBaseSocket::BindListenSocket(%d), 邦定监听套接字出错，错误代码:%d"), nPort, nError);
+		nErrorCode = WSAGetLastError();
+		WriteLogInfo(LOG_INFO, _T("CBaseSocket::BindListenSocket(%d), 邦定监听套接字出错，错误代码:%d"), nPort, nErrorCode);
 	}
 
 	return false;
@@ -261,11 +261,11 @@ bool CBaseSocket::GetAcceptExPointer()
 {
 	if(SOCKET_ERROR != m_scSocket)
 	{
-		int   nError = 0;
+		int   nErrorCode = 0;
 		DWORD dwBytes = 0;
 		GUID  GuidAcceptEx = WSAID_ACCEPTEX;
 
-		nError = WSAIoctl(
+		nErrorCode = WSAIoctl(
 			m_scSocket, 
 			SIO_GET_EXTENSION_FUNCTION_POINTER,
 			&GuidAcceptEx,   
@@ -276,10 +276,10 @@ bool CBaseSocket::GetAcceptExPointer()
 			NULL, 
 			NULL);
 
-		if(SOCKET_ERROR == nError)
+		if(SOCKET_ERROR == nErrorCode)
 		{
-			int nError = WSAGetLastError();
-			WriteLogInfo(LOG_INFO, _T("CBaseSocket::GetAcceptExPointer(), 动态获取AcceptEx指针出错，错误代码:%d"), nError);
+			int nErrorCode = WSAGetLastError();
+			WriteLogInfo(LOG_INFO, _T("CBaseSocket::GetAcceptExPointer(), 动态获取AcceptEx指针出错，错误代码:%d"), nErrorCode);
 
 			return false;
 		}
@@ -296,11 +296,11 @@ bool CBaseSocket::GetAcceptExSockaddrsPointer()
 {
 	if(SOCKET_ERROR != m_scSocket)
 	{
-		int   nError = 0;
+		int   nErrorCode = 0;
 		DWORD dwBytes = 0;
 		GUID  GuidGetAcceptExSockaddrs = WSAID_GETACCEPTEXSOCKADDRS;
 
-		nError = WSAIoctl(
+		nErrorCode = WSAIoctl(
 			m_scSocket,
 			SIO_GET_EXTENSION_FUNCTION_POINTER,
 			&GuidGetAcceptExSockaddrs,
@@ -312,10 +312,10 @@ bool CBaseSocket::GetAcceptExSockaddrsPointer()
 			NULL
 			);
 
-		if(SOCKET_ERROR == nError)
+		if(SOCKET_ERROR == nErrorCode)
 		{
-			int nError = WSAGetLastError();
-			WriteLogInfo(LOG_INFO, _T("CBaseSocket::GetAcceptExSockaddrsPointer(), 动态获取GetAcceptExSockaddrs指针出错，错误代码:%d"), nError);
+			int nErrorCode = WSAGetLastError();
+			WriteLogInfo(LOG_INFO, _T("CBaseSocket::GetAcceptExSockaddrsPointer(), 动态获取GetAcceptExSockaddrs指针出错，错误代码:%d"), nErrorCode);
 
 			return false;
 		}
