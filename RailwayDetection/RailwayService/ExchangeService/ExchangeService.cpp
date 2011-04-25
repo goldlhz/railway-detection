@@ -12,6 +12,6 @@ int APIENTRY wWinMain(HINSTANCE hInstance,
                       int       nCmdShow)
 {
 	CIOCPManager iocpManger;
-	iocpManger.RunService();
+	iocpManger.RunService(hInstance);
 	return 0;
 }

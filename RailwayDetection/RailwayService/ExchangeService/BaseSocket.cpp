@@ -155,45 +155,45 @@ bool CBaseSocket::CreateSocketInstance()
 		m_scSocket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
 		if(INVALID_SOCKET != m_scSocket)
 		{
-			int  nErrorCode = 0;
-			int  nRevcBufSize = BASESOCKET_REVCBUF_SIZE;
-			int  nSendBufSize = BASESOCKET_SENDBUF_SIZE;
-			BOOL bOpt = FALSE;
+			//int  nErrorCode = 0;
+			//int  nRevcBufSize = BASESOCKET_REVCBUF_SIZE;
+			//int  nSendBufSize = BASESOCKET_SENDBUF_SIZE;
+			//BOOL bOpt = FALSE;
 
-			DoWriteLogInfo(LOG_DEBUG, _T("CBaseSocket::CreateSocketInstance(), 创建基本套接字成功"));
-			nErrorCode = setsockopt(m_scSocket, SOL_SOCKET, SO_RCVBUF, (const char*)&nRevcBufSize, sizeof(int));
-			if(SOCKET_ERROR  == nErrorCode)
-			{
-				nErrorCode = WSAGetLastError();
-				WriteLogInfo(LOG_INFO, _T("CBaseSocket::CreateSocketInstance(), 设置监听套接字接收缓冲大小时出错,错误代码:%d"), nErrorCode);
-				
-				closesocket(m_scSocket);
-				return false;
-			}
+			//DoWriteLogInfo(LOG_DEBUG, _T("CBaseSocket::CreateSocketInstance(), 创建基本套接字成功"));
+			//nErrorCode = setsockopt(m_scSocket, SOL_SOCKET, SO_RCVBUF, (const char*)&nRevcBufSize, sizeof(int));
+			//if(SOCKET_ERROR  == nErrorCode)
+			//{
+			//	nErrorCode = WSAGetLastError();
+			//	WriteLogInfo(LOG_INFO, _T("CBaseSocket::CreateSocketInstance(), 设置监听套接字接收缓冲大小时出错,错误代码:%d"), nErrorCode);
+			//	
+			//	closesocket(m_scSocket);
+			//	return false;
+			//}
 
-			DoWriteLogInfo(LOG_DEBUG, _T("CBaseSocket::CreateSocketInstance(), 修改监听套接字接收缓冲大小成功"));
-			nErrorCode = setsockopt(m_scSocket, SOL_SOCKET, SO_SNDBUF, (const char*)&nSendBufSize, sizeof(int));
-			if(SOCKET_ERROR  == nErrorCode)
-			{
-				nErrorCode = WSAGetLastError();
-				WriteLogInfo(LOG_INFO, _T("CBaseSocket::CreateSocketInstance(), 设置监听套接字发送缓冲大小时出错,错误代码:%d"), nErrorCode);
-			
-				closesocket(m_scSocket);
-				return false;
-			}
+			//DoWriteLogInfo(LOG_DEBUG, _T("CBaseSocket::CreateSocketInstance(), 修改监听套接字接收缓冲大小成功"));
+			//nErrorCode = setsockopt(m_scSocket, SOL_SOCKET, SO_SNDBUF, (const char*)&nSendBufSize, sizeof(int));
+			//if(SOCKET_ERROR  == nErrorCode)
+			//{
+			//	nErrorCode = WSAGetLastError();
+			//	WriteLogInfo(LOG_INFO, _T("CBaseSocket::CreateSocketInstance(), 设置监听套接字发送缓冲大小时出错,错误代码:%d"), nErrorCode);
+			//
+			//	closesocket(m_scSocket);
+			//	return false;
+			//}
 
-			DoWriteLogInfo(LOG_DEBUG, _T("CBaseSocket::CreateSocketInstance(), 修改监听套接字发送缓冲大小成功"));
-			nErrorCode = setsockopt(m_scSocket, IPPROTO_TCP, TCP_NODELAY, (const char*)&bOpt, sizeof(BOOL));
-			if(SOCKET_ERROR  == nErrorCode)
-			{
-				nErrorCode = WSAGetLastError();
-				WriteLogInfo(LOG_INFO, _T("CBaseSocket::CreateSocketInstance(), 设置监听套接字为取消延迟模式时出错,错误代码:%d"), nErrorCode);
-			
-				closesocket(m_scSocket);
-				return false;
-			}
+			//DoWriteLogInfo(LOG_DEBUG, _T("CBaseSocket::CreateSocketInstance(), 修改监听套接字发送缓冲大小成功"));
+			//nErrorCode = setsockopt(m_scSocket, IPPROTO_TCP, TCP_NODELAY, (const char*)&bOpt, sizeof(BOOL));
+			//if(SOCKET_ERROR  == nErrorCode)
+			//{
+			//	nErrorCode = WSAGetLastError();
+			//	WriteLogInfo(LOG_INFO, _T("CBaseSocket::CreateSocketInstance(), 设置监听套接字为取消延迟模式时出错,错误代码:%d"), nErrorCode);
+			//
+			//	closesocket(m_scSocket);
+			//	return false;
+			//}
 
-			DoWriteLogInfo(LOG_DEBUG, _T("CBaseSocket::CreateSocketInstance(), 设置TCP_NODELAY套接字选项成功"));
+			//DoWriteLogInfo(LOG_DEBUG, _T("CBaseSocket::CreateSocketInstance(), 设置TCP_NODELAY套接字选项成功"));
 			return true;
 		}
 

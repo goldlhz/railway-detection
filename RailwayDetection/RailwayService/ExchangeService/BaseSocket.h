@@ -2,8 +2,8 @@
 #include <WinSock2.h>
 #include <MSWSock.h>
 
-#define BASESOCKET_SENDBUF_SIZE			65535
-#define BASESOCKET_REVCBUF_SIZE			65535
+#define BASESOCKET_SENDBUF_SIZE			65536
+#define BASESOCKET_REVCBUF_SIZE			65536
 
 class CBaseSocket
 {

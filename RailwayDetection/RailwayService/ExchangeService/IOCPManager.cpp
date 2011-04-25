@@ -5,15 +5,17 @@
 CIOCPManager::CIOCPManager(void)
 	: m_strGolbalEventName(_T("Global\\Info_ExchangeServer_Event"))
 {
+	m_hInstance = NULL;
 }
 
 CIOCPManager::~CIOCPManager(void)
 {
 }
 
-void CIOCPManager::RunService()
+void CIOCPManager::RunService(HINSTANCE hInstance)
 {
-	if(InitGlobalEnvironment())
+	m_hInstance = hInstance;
+	if(InitGlobalEnvironment(hInstance))
 	{
 		HANDLE hWaitEvent = NULL;
 
@@ -59,12 +61,12 @@ void CIOCPManager::UnInitGlobalEnvironment()
 	UnInitLogPluginManager();
 }
 
-bool CIOCPManager::InitGlobalEnvironment()
+bool CIOCPManager::InitGlobalEnvironment(HINSTANCE hInstance)
 {
 	// 初始化日志系统
 	InitLogPluginManager(_T("RailwayService"));
 
-	CGobalConfig::GetGobalConfig().InitGoblaConfig();
+	CGobalConfig::GetGobalConfig().InitGoblaConfig(hInstance);
 
 	return true;
 }

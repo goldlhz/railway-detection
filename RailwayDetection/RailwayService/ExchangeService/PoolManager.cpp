@@ -144,8 +144,8 @@ SOCKET CSocketPoolManager::CreatePoolSocket()
 {
 	SOCKET scSocket;
 	int nErrorCode = 0;
-	int nSendSocketBufSize = BUFFER_SIZE_TO_SOCKET;
-	int nRevcSockerBufSize = BUFFER_SIZE_TO_SOCKET;
+	int nSendSocketBufSize = 65536;
+	int nRevcSockerBufSize = 65536;
 
 	scSocket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
 	if(INVALID_SOCKET != scSocket)
@@ -300,7 +300,7 @@ bool CMemoryPoolManager::InitMemoryPool()
 			{
 				pPire->pireOverLappedex.wsaOptType = CT_UNKOWN;
 				pPire->pireOverLappedex.wsaWSABuf.len = BUFFER_SIZE_TO_SOCKET;
-				pPire->pireOverLappedex.wsaWSABuf.buf = pPire->pireOverLappedex.wsaBuffer;
+				//pPire->pireOverLappedex.wsaWSABuf.buf = pPire->pireOverLappedex.wsaBuffer;
 
 				m_vecPrepKeyOverPire.push_back(pPire);
 				continue;
@@ -364,7 +364,7 @@ bool CMemoryPoolManager::IncrementMemoryPoolSize(int nCurrentSize)
 		{
 			pPire->pireOverLappedex.wsaOptType = CT_UNKOWN;
 			pPire->pireOverLappedex.wsaWSABuf.len = BUFFER_SIZE_TO_SOCKET;
-			pPire->pireOverLappedex.wsaWSABuf.buf = pPire->pireOverLappedex.wsaBuffer;
+			//pPire->pireOverLappedex.wsaWSABuf.buf = pPire->pireOverLappedex.wsaBuffer;
 
 			m_vecPrepKeyOverPire.push_back(pPire);
 			continue;

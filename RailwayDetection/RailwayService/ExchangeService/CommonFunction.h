@@ -1,7 +1,6 @@
 #pragma once
 #include <WinSock2.h>
 
-
 #define BUFFER_SIZE_TO_SOCKET					1024*4									// 定义了socket缓冲区大小
 #define BUFFER_SIZE_TO_ACCEPT					((sizeof (sockaddr_in) + 16) * 2)
 #define ADDRESS_LENGTH							(sizeof(sockaddr_in) + 16)
@@ -27,11 +26,11 @@ typedef struct _CompletionKey
 typedef struct _WsaOverLappedEX
 {
 	WSAOVERLAPPED  wsaOverlapped;
+	WSABUF		   wsaWSABuf;
+	//CHAR		   wsaBuffer[BUFFER_SIZE_TO_SOCKET];
+	CHAR		   wsaAcceptBuffer[BUFFER_SIZE_TO_ACCEPT];
 	CompletionType wsaOptType;
 	SOCKET         wsaClientSocket;
-	WSABUF		   wsaWSABuf;
-	CHAR		   wsaBuffer[BUFFER_SIZE_TO_SOCKET];
-	CHAR		   wsaAcceptBuffer[BUFFER_SIZE_TO_ACCEPT];
 }WsaOverLappedEX;
 
 typedef struct _KeyOverPire
@@ -49,4 +48,5 @@ private:
 public:
 	static int GetCurrentKernalCount();								// 读取当前机器的CPU核个数
 	static int GetBackLogCount();									// 获得当前适合的监听队列长度
+	static wstring GetLogPluginPath(HMODULE hInstance);				// 获得当前路径
 };
