@@ -19,6 +19,7 @@
 
 #include <vector>
 #include <list>
+#include <string>
 using namespace std;
 
 #include "LogPluginManager.h"

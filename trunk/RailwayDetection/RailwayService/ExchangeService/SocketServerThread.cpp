@@ -141,7 +141,7 @@ void CSocketServerThread::DealRevcDate(DWORD dNumberOfBytes, KeyOverPire * pKeyO
 	{
 		USES_CONVERSION;
 
-		DoWriteLogInfo(LOG_INFO, CA2T(pKeyOverPire->pireOverLappedex.wsaBuffer));
+		//DoWriteLogInfo(LOG_INFO, CA2T(pKeyOverPire->pireOverLappedex.wsaBuffer));
 
 		SOCKET scClientSocket = pKeyOverPire->pireOverLappedex.wsaClientSocket;
 		WSARecv(
@@ -207,25 +207,21 @@ void CSocketServerThread::DealAccpDate(DWORD dNumberOfBytes, KeyOverPire * pKeyO
 
 		//	return;
 		//}
-		
+		//
 		
 		HANDLE hCompletion = NULL;
 		hCompletion = CreateIoCompletionPort((HANDLE)scClientSocket, m_hCompletionPort, (ULONG_PTR)&(pKeyOverPire->pireCompletionKey), 0);
 		if(hCompletion)
 		{
-			WSABUF wsaBuffer;
-			wsaBuffer.len = BUFFER_SIZE_TO_SOCKET;
-			wsaBuffer.buf = new char[4096];//(CHAR *)::HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, BUFFER_SIZE_TO_SOCKET);
-			//wsaBuffer.len = BUFFER_SIZE_TO_SOCKET;
-			//wsaBuffer.buf = new CHAR[BUFFER_SIZE_TO_SOCKET];
-			//wsaBuffer.buf = (CHAR *)pKeyOverPire->pireOverLappedex.wsaBuffer;
-			//pKeyOverPire->pireOverLappedex.wsaWSABuf.len = BUFFER_SIZE_TO_SOCKET;
-			//pKeyOverPire->pireOverLappedex.wsaWSABuf.buf = (CHAR *)pKeyOverPire->pireOverLappedex.wsaBuffer;
+			WSABUF wsaBuf;
+			wsaBuf.len = BUFFER_SIZE_TO_SOCKET;
+			wsaBuf.buf = new CHAR[BUFFER_SIZE_TO_SOCKET];//pKeyOverPire->pireOverLappedex.wsaBuffer;
+			pKeyOverPire->pireOverLappedex.wsaOptType = CT_REVC;
 
 			nErrorCode = WSARecv(
 				scClientSocket,
-				&wsaBuffer,
-				4096,
+				&(wsaBuf),
+				BUFFER_SIZE_TO_SOCKET,
 				&dwNumberOfBytesRecvd,
 				&dwFlags,
 				&(pKeyOverPire->pireOverLappedex.wsaOverlapped),

@@ -1,5 +1,6 @@
 #include "StdAfx.h"
 #include "GobalConfig.h"
+#include "CommonFunction.h"
 
 CGobalConfig CGobalConfig::m_gobalconfig;
 CGobalConfig::CGobalConfig(void)
@@ -19,10 +20,15 @@ CGobalConfig::CGobalConfig(void)
 	m_nServerPort = 9527;
 }
 
-bool CGobalConfig::InitGoblaConfig()
+bool CGobalConfig::InitGoblaConfig(HMODULE hInstance)
 {
 	int nTemp = 0;
-	wstring strIniPath = _T(".\\System.ini");
+	wstring strIniPath = CCommonFunction::GetLogPluginPath(hInstance);
+	
+	if(strIniPath.empty())
+		strIniPath = _T(".\\System.ini");
+
+	strIniPath += _T("\\System.ini");
 
 	// ƒ⁄¥Ê≥ÿ≈‰÷√
 	m_nMemoryDownLine = GetPrivateProfileInt(_T("MemoryPool"), _T("MemoryDownLine"), m_nMemoryDownLine, strIniPath.c_str());

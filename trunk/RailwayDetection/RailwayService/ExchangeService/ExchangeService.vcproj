@@ -90,7 +90,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy ..\ConfigFileLib\System.ini ..\Bin\BinD\System.ini&#x0D;&#x0A;copy ..\ConfigFileLib\loger.ini ..\Bin\BinD\LogPlugin\System.ini&#x0D;&#x0A;"
+				CommandLine="copy ..\ConfigFileLib\System.ini ..\Bin\BinD\System.ini&#x0D;&#x0A;copy ..\ConfigFileLib\loger.ini ..\Bin\BinD\LogPlugin\loger.ini&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -247,11 +247,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ExchangeService.ico"
+				RelativePath=".\res\ExchangeService.ico"
 				>
 			</File>
 			<File
-				RelativePath=".\res\ExchangeService.ico"
+				RelativePath=".\ExchangeService.ico"
 				>
 			</File>
 			<File

@@ -21,7 +21,7 @@ public:
 
 	int GetServerPort(){return m_nServerPort;};
 
-	bool InitGoblaConfig();
+	bool InitGoblaConfig(HMODULE hInstance);
 
 	static CGobalConfig& GetGobalConfig(){return m_gobalconfig;};
 

@@ -31,8 +31,7 @@ unsigned int CSocketListenThread::ExecuteThread()
 	else
 		nPostCount = CGobalConfig::GetGobalConfig().GetPostMaxSize();
 
-	//for (int nIndex = 0; nIndex < nPostCount; ++nIndex)
-	for (int nIndex = 0; nIndex < 1; ++nIndex)
+	for (int nIndex = 0; nIndex < nPostCount; ++nIndex)
 	{
 		if(!PostAcceptExMSG())
 		{
@@ -132,7 +131,6 @@ bool CSocketListenThread::InitListenThreadInstance()
 
 		return false;
 	}
-
 	DoWriteLogInfo(LOG_INFO, _T("CSocketListenThread::InitListenThreadInstance(), 初始化内存池成功"));
 
 	if(!m_SocketPoolManager.InitSocketPool())
@@ -143,36 +141,42 @@ bool CSocketListenThread::InitListenThreadInstance()
 		CloseIOCPHandle();
 
 		return false;
-	}
-				
+	}				
 	DoWriteLogInfo(LOG_INFO, _T("CSocketListenThread::InitListenThreadInstance(), 初始化套接字池成功"));
 
-	HANDLE hHandle = CreateIoCompletionPort((HANDLE)m_BaseSocket.GetSocket(), m_hCompletionPort, (ULONG_PTR)NULL, NULL);
-	if(hHandle)
+	if(SOCKET_ERROR == WSAEventSelect(m_BaseSocket.GetSocket(), m_hJudgeEvent[0], FD_ACCEPT))
 	{
-		DoWriteLogInfo(LOG_INFO, _T("CSocketListenThread::InitListenThreadInstance(), 绑定监听套接字到完成端口时成功"));
+		int nErrorCode = WSAGetLastError();
+		WriteLogInfo(LOG_INFO, _T("CSocketListenThread::InitListenThreadInstance(), 注册FD_ACCEPT事件错误, 错误代码:%d"), nErrorCode);
 
-		if(SOCKET_ERROR == WSAEventSelect(m_BaseSocket.GetSocket(), m_hJudgeEvent[0], FD_ACCEPT))
-		{
-			int nErrorCode = WSAGetLastError();
-			WriteLogInfo(LOG_INFO, _T("CSocketListenThread::InitListenThreadInstance(), 注册FD_ACCEPT事件错误, 错误代码:%d"), nErrorCode);
-		}
-		else
-		{
-			DoWriteLogInfo(LOG_INFO, _T("CSocketListenThread::InitListenThreadInstance(), 注册FD_ACCEPT事件成功"));
+		CloseServerSocket();
+		CloseIOCPHandle();
 
-			if(CreateServerThreadPool())
-			{
-				DoWriteLogInfo(LOG_INFO, _T("CSocketListenThread::InitListenThreadInstance(), 初始化监听线程完成"));
-				return true;
-			}
-		}
+		return false;
 	}
-	else
+	DoWriteLogInfo(LOG_INFO, _T("CSocketListenThread::InitListenThreadInstance(), 注册FD_ACCEPT事件成功"));
+
+	HANDLE hHandle = CreateIoCompletionPort((HANDLE)m_BaseSocket.GetSocket(), m_hCompletionPort, (ULONG_PTR)NULL, NULL);
+	if(!hHandle)
 	{
 		int nErrorCode = GetLastError();
 		WriteLogInfo(LOG_INFO, _T("CSocketListenThread::InitListenThreadInstance(), 绑定监听套接字到完成端口时出错,错误代码:%d"), nErrorCode);
+
+		CloseServerSocket();
+		CloseIOCPHandle();
+
+		return false;
 	}
+	DoWriteLogInfo(LOG_INFO, _T("CSocketListenThread::InitListenThreadInstance(), 绑定监听套接字到完成端口时成功"));
+
+	if(CreateServerThreadPool())
+	{
+		DoWriteLogInfo(LOG_INFO, _T("CSocketListenThread::InitListenThreadInstance(), 初始化监听线程完成"));
+		return true;
+	}
+
+	CloseServerSocket();
+	CloseIOCPHandle();
 	return false;
 }
 
