@@ -4,6 +4,7 @@
 
 #pragma once
 #include "MAPX.H"
+#include "Datadef.h"
 
 
 class CRWDSClientView : public CView
@@ -43,6 +44,8 @@ protected:
 	double	m_InitZoom;			//初始缩放比例0822
 	double	m_InitCenterX;
 	double	m_InitCenterY;
+	CPoint  m_RightClkPoint;
+	vector<LineInfo> m_Line;
 
 // 生成的消息映射函数
 protected:
@@ -60,6 +63,9 @@ public:
 	afx_msg void OnUpdateMapZoomin(CCmdUI *pCmdUI);
 	afx_msg void OnMapZoomout();
 	afx_msg void OnUpdateMapZoomout(CCmdUI *pCmdUI);
+	afx_msg void OnSymbolAdd();
+	afx_msg void OnSymbolDelete();
+	afx_msg void OnSetPoint();
 };
 
 #ifndef _DEBUG  // RWDSClientView.cpp 中的调试版本

@@ -200,6 +200,10 @@ void CRWDSClientApp::PreLoadState()
 	bNameValid = strName.LoadString(IDS_EXPLORER);
 	ASSERT(bNameValid);
 	GetContextMenuManager()->AddMenu(strName, IDR_POPUP_EXPLORER);
+
+	bNameValid = strName.LoadString(IDS_POPUP_MAPX);
+	ASSERT(bNameValid);
+	GetContextMenuManager()->AddMenu(strName, IDR_POPUP_MAPX);
 }
 
 void CRWDSClientApp::LoadCustomState()
