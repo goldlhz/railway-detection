@@ -141,6 +141,12 @@
     <ClInclude Include="MAPX.H">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Datadef.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="PointList.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RWDSClient.cpp">
@@ -174,6 +180,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="MAPX.CPP">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="PointList.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

@@ -11,6 +11,7 @@
 
 #include "RWDSClientDoc.h"
 #include "RWDSClientView.h"
+#include "PointList.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -43,6 +44,9 @@ ON_COMMAND(ID_MAP_ZOOMIN, &CRWDSClientView::OnMapZoomin)
 ON_UPDATE_COMMAND_UI(ID_MAP_ZOOMIN, &CRWDSClientView::OnUpdateMapZoomin)
 ON_COMMAND(ID_MAP_ZOOMOUT, &CRWDSClientView::OnMapZoomout)
 ON_UPDATE_COMMAND_UI(ID_MAP_ZOOMOUT, &CRWDSClientView::OnUpdateMapZoomout)
+ON_COMMAND(ID_SYMBOL_ADD, &CRWDSClientView::OnSymbolAdd)
+ON_COMMAND(ID_SYMBOL_DELETE, &CRWDSClientView::OnSymbolDelete)
+ON_COMMAND(ID_SET_POINT, &CRWDSClientView::OnSetPoint)
 END_MESSAGE_MAP()
 
 // CRWDSClientView 构造/析构
@@ -113,9 +117,11 @@ void CRWDSClientView::OnRButtonUp(UINT /* nFlags */, CPoint point)
 
 void CRWDSClientView::OnContextMenu(CWnd* /* pWnd */, CPoint point)
 {
-#ifndef SHARED_HANDLERS
-	theApp.GetContextMenuManager()->ShowPopupMenu(IDR_POPUP_EDIT, point.x, point.y, this, TRUE);
-#endif
+//#ifndef SHARED_HANDLERS
+	m_RightClkPoint = point;
+	BOOL bo = theApp.GetContextMenuManager()->ShowPopupMenu(IDR_POPUP_MAPX, point.x, point.y, this, TRUE);
+	//bo = theApp.GetContextMenuManager()->ShowPopupMenu(IDR_POPUP_EDIT, point.x, point.y, this, TRUE);
+//#endif
 }
 
 
@@ -320,4 +326,48 @@ void CRWDSClientView::OnUpdateMapZoomout(CCmdUI *pCmdUI)
 	else
 		bCheck=FALSE;
 	pCmdUI->SetCheck(bCheck);
+}
+
+void CRWDSClientView::OnSymbolAdd()
+{
+	// TODO: 在此添加命令处理程序代码
+}
+
+void CRWDSClientView::OnSymbolDelete()
+{
+	// TODO: 在此添加命令处理程序代码
+	CMapXLayer layer;
+	CMapXFeature Ftr;
+	CMapXFeatures Ftrs;
+	int iFtrNum;
+
+	try 
+	{
+		layer=m_MapX.GetLayers().Item(m_SymbolLayer);
+		Ftrs=layer.AllFeatures();
+		iFtrNum=Ftrs.GetCount();
+		for(int i=1; i<=iFtrNum; i++)
+		{
+			Ftr=Ftrs.Item(i);
+			layer.DeleteFeature(Ftr.GetFeatureKey());
+		}
+
+		m_MapX.Refresh();		//屏幕显示刷新
+	}
+	catch (COleDispatchException *e) {
+		e->ReportError();
+		e->Delete();
+	}
+	catch (COleException *e) {
+		e->ReportError();
+		e->Delete();
+	}
+}
+
+
+void CRWDSClientView::OnSetPoint()
+{
+	// TODO: 在此添加命令处理程序代码
+	CPointList setPoint;
+	setPoint.DoModal();
 }
