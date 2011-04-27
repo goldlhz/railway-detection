@@ -128,6 +128,7 @@
     <ClInclude Include="ClassView.h" />
     <ClInclude Include="Datadef.h" />
     <ClInclude Include="FileView.h" />
+    <ClInclude Include="LineList.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="MAPX.H" />
     <ClInclude Include="OutputWnd.h" />
@@ -144,6 +145,7 @@
   <ItemGroup>
     <ClCompile Include="ClassView.cpp" />
     <ClCompile Include="FileView.cpp" />
+    <ClCompile Include="LineList.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="MAPX.CPP" />
     <ClCompile Include="OutputWnd.cpp" />

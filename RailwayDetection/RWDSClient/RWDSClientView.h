@@ -45,6 +45,7 @@ protected:
 	double	m_InitCenterX;
 	double	m_InitCenterY;
 	CPoint  m_RightClkPoint;
+	vector<MapPoint> m_MapPoint;
 	vector<LineInfo> m_Line;
 
 // 生成的消息映射函数
@@ -66,6 +67,7 @@ public:
 	afx_msg void OnSymbolAdd();
 	afx_msg void OnSymbolDelete();
 	afx_msg void OnSetPoint();
+	afx_msg void OnSetLine();
 };
 
 #ifndef _DEBUG  // RWDSClientView.cpp 中的调试版本

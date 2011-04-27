@@ -12,14 +12,28 @@ enum DevState
 	KClosed = 2
 };
 
+enum LineDirect
+{
+	KDownLine = 1,
+	KUpLine = 2
+};
+
+typedef struct _MapPoint
+{
+	double iKM;
+	double iLon;
+	double iLat;
+	LineDirect iDirect;
+}MapPoint;
+
 typedef struct _Line	//线路
 {
 	int iLineID;
 	CString iLineName;
 	int iOrgID;
 	double iStartKm;
-	vector<CPoint> iUplineKmLonLat;	//上行每公里处经纬度
-	vector<CPoint> iDownlineKmLonLat;	//下行每公里处经纬度
+	vector<MapPoint> iUplineKmLonLat;	//上行每公里处经纬度
+	vector<MapPoint> iDownlineKmLonLat;	//下行每公里处经纬度
 }LineInfo;
 
 typedef struct _Device	//设备

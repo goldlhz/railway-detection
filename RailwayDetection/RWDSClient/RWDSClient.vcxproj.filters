@@ -147,6 +147,9 @@
     <ClInclude Include="PointList.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="LineList.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RWDSClient.cpp">
@@ -183,6 +186,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="PointList.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="LineList.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
