@@ -12,6 +12,7 @@
 #include "RWDSClientDoc.h"
 #include "RWDSClientView.h"
 #include "PointList.h"
+#include "LineList.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -47,6 +48,7 @@ ON_UPDATE_COMMAND_UI(ID_MAP_ZOOMOUT, &CRWDSClientView::OnUpdateMapZoomout)
 ON_COMMAND(ID_SYMBOL_ADD, &CRWDSClientView::OnSymbolAdd)
 ON_COMMAND(ID_SYMBOL_DELETE, &CRWDSClientView::OnSymbolDelete)
 ON_COMMAND(ID_SET_POINT, &CRWDSClientView::OnSetPoint)
+ON_COMMAND(ID_SET_LINE, &CRWDSClientView::OnSetLine)
 END_MESSAGE_MAP()
 
 // CRWDSClientView 构造/析构
@@ -190,6 +192,28 @@ int CRWDSClientView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	}
 
 	m_MapX.SetRedrawInterval(2000);
+
+	///////////////user data
+	MapPoint pt;
+	pt.iKM = 251;
+	pt.iLon = 103.114;
+	pt.iLat = 30.54741256;
+	pt.iDirect = KDownLine;
+	m_MapPoint.push_back(pt);
+	m_MapPoint.push_back(pt);
+	m_MapPoint.push_back(pt);
+	m_MapPoint.push_back(pt);
+
+	LineInfo line;
+	line.iLineID = 1;
+	line.iLineName = "defalt";
+	line.iStartKm = 251;
+	line.iDownlineKmLonLat = m_MapPoint;
+	line.iUplineKmLonLat = m_MapPoint;
+	m_Line.push_back(line);
+	m_Line.push_back(line);
+
+	/////////////
 	return 0;
 }
 
@@ -368,6 +392,18 @@ void CRWDSClientView::OnSymbolDelete()
 void CRWDSClientView::OnSetPoint()
 {
 	// TODO: 在此添加命令处理程序代码
+		
 	CPointList setPoint;
+	setPoint.SetPoint( m_MapPoint );
 	setPoint.DoModal();
+	m_MapPoint = setPoint.GetPoint();
+}
+
+void CRWDSClientView::OnSetLine()
+{
+	// TODO: 在此添加命令处理程序代码
+
+	CLineList lineList;
+	lineList.SetLine(m_Line);
+	lineList.DoModal();
 }
