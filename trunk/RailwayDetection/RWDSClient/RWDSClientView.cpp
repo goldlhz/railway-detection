@@ -193,27 +193,56 @@ int CRWDSClientView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	m_MapX.SetRedrawInterval(2000);
 
-	///////////////user data
-	MapPoint pt;
-	pt.iKM = 251;
-	pt.iLon = 103.114;
-	pt.iLat = 30.54741256;
-	pt.iDirect = KDownLine;
-	m_MapPoint.push_back(pt);
-	m_MapPoint.push_back(pt);
-	m_MapPoint.push_back(pt);
+	////////////////////////////////////////////////////user data
+	MapPoint *pt = new MapPoint;
+	pt->iRailLine = Baoji_Chengdu; 
+	pt->iKM = 251;
+	pt->iLon = 103.114;
+	pt->iLat = 30.54741256;
+	pt->iDirect = KDownLine;
 	m_MapPoint.push_back(pt);
 
-	LineInfo line;
-	line.iLineID = 1;
-	line.iLineName = "defalt";
-	line.iStartKm = 251;
-	line.iDownlineKmLonLat = m_MapPoint;
-	line.iUplineKmLonLat = m_MapPoint;
-	m_Line.push_back(line);
+	pt = new MapPoint;
+	pt->iRailLine = Chengdu_Chongqing; 
+	pt->iKM = 252;
+	pt->iLon = 103.114;
+	pt->iLat = 30.54741256;
+	pt->iDirect = KUpLine;
+	m_MapPoint.push_back(pt);
+
+	pt = new MapPoint;
+	pt->iRailLine = Baoji_Chengdu; 
+	pt->iKM = 253;
+	pt->iLon = 103.114;
+	pt->iLat = 30.54741256;
+	pt->iDirect = KDownLine;
+	m_MapPoint.push_back(pt);
+
+	pt = new MapPoint;
+	pt->iRailLine = Chengdu_Chongqing; 
+	pt->iKM = 254;
+	pt->iLon = 103.114;
+	pt->iLat = 30.54741256;
+	pt->iDirect = KUpLine;
+	m_MapPoint.push_back(pt);
+
+	LineInfo *line = new LineInfo;
+	line->iLineID = 1;
+	line->iLineName = _T("早班");
+	line->iStartKm = m_MapPoint[0]->iKM;
+	line->iLineKmLonLat.push_back(m_MapPoint[0]);
+	line->iLineKmLonLat.push_back(m_MapPoint[2]);
 	m_Line.push_back(line);
 
-	/////////////
+	line = new LineInfo;
+	line->iLineID = 1;
+	line->iLineName = _T("晚班");
+	line->iStartKm = m_MapPoint[1]->iKM;
+	line->iLineKmLonLat.push_back(m_MapPoint[1]);
+	line->iLineKmLonLat.push_back(m_MapPoint[3]);
+	m_Line.push_back(line);
+
+	//////////////////////////////////////////////////
 	return 0;
 }
 
@@ -393,17 +422,13 @@ void CRWDSClientView::OnSetPoint()
 {
 	// TODO: 在此添加命令处理程序代码
 		
-	CPointList setPoint;
-	setPoint.SetPoint( m_MapPoint );
+	CPointList setPoint(this);
 	setPoint.DoModal();
-	m_MapPoint = setPoint.GetPoint();
 }
 
 void CRWDSClientView::OnSetLine()
 {
 	// TODO: 在此添加命令处理程序代码
-
-	CLineList lineList;
-	lineList.SetLine(m_Line);
+	CLineList lineList(this);
 	lineList.DoModal();
 }
