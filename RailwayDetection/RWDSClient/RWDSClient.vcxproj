@@ -144,6 +144,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ClassView.cpp" />
+    <ClCompile Include="Datadef.cpp" />
     <ClCompile Include="FileView.cpp" />
     <ClCompile Include="LineList.cpp" />
     <ClCompile Include="MainFrm.cpp" />

@@ -6,9 +6,13 @@
 #include "MAPX.H"
 #include "Datadef.h"
 
+class CPointList;
+class CLineList;
 
 class CRWDSClientView : public CView
 {
+	friend class CPointList;
+	friend class CLineList;
 protected: // 仅从序列化创建
 	CRWDSClientView();
 	DECLARE_DYNCREATE(CRWDSClientView)
@@ -45,8 +49,8 @@ protected:
 	double	m_InitCenterX;
 	double	m_InitCenterY;
 	CPoint  m_RightClkPoint;
-	vector<MapPoint> m_MapPoint;
-	vector<LineInfo> m_Line;
+	vector<MapPoint*> m_MapPoint;
+	vector<LineInfo*> m_Line;
 
 // 生成的消息映射函数
 protected:
