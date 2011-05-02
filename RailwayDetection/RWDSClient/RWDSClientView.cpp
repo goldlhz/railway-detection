@@ -13,6 +13,7 @@
 #include "RWDSClientView.h"
 #include "PointList.h"
 #include "LineList.h"
+#include "Schedule.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -49,6 +50,7 @@ ON_COMMAND(ID_SYMBOL_ADD, &CRWDSClientView::OnSymbolAdd)
 ON_COMMAND(ID_SYMBOL_DELETE, &CRWDSClientView::OnSymbolDelete)
 ON_COMMAND(ID_SET_POINT, &CRWDSClientView::OnSetPoint)
 ON_COMMAND(ID_SET_LINE, &CRWDSClientView::OnSetLine)
+ON_COMMAND(ID_SET_SCHEDULE, &CRWDSClientView::OnSetSchedule)
 END_MESSAGE_MAP()
 
 // CRWDSClientView 构造/析构
@@ -228,19 +230,51 @@ int CRWDSClientView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	LineInfo *line = new LineInfo;
 	line->iLineID = 1;
-	line->iLineName = _T("早班");
+	line->iLineName = _T("成局1段");
 	line->iStartKm = m_MapPoint[0]->iKM;
 	line->iLineKmLonLat.push_back(m_MapPoint[0]);
 	line->iLineKmLonLat.push_back(m_MapPoint[2]);
 	m_Line.push_back(line);
 
 	line = new LineInfo;
-	line->iLineID = 1;
-	line->iLineName = _T("晚班");
+	line->iLineID = 2;
+	line->iLineName = _T("成局2段");
 	line->iStartKm = m_MapPoint[1]->iKM;
 	line->iLineKmLonLat.push_back(m_MapPoint[1]);
 	line->iLineKmLonLat.push_back(m_MapPoint[3]);
 	m_Line.push_back(line);
+
+
+
+	ScheduleLine* sc = new ScheduleLine;
+	sc->iScheduleID = 1;
+	sc->iLine = m_Line[0];
+	sc->iScheduleName = _T("1段早班");
+	sc->iULineKmTime.push_back(10545020);
+	sc->iULineKmTime.push_back(10554900);
+	Worker* wk = new Worker;
+	wk->iID = 1;
+	wk->iName = _T("职工1");
+	DeviceInfo* dv = new DeviceInfo;
+	dv->iDevID = 1254;
+	sc->iWorker = wk;
+	sc->iDevice = dv;
+	m_Schedule.push_back(sc);
+
+	sc = new ScheduleLine;
+	sc->iScheduleID = 1;
+	sc->iLine = m_Line[1];
+	sc->iScheduleName = _T("2段早班");
+	sc->iULineKmTime.push_back(10545020);
+	sc->iULineKmTime.push_back(10554900);
+	wk = new Worker;
+	wk->iID = 2;
+	wk->iName = _T("职工2");
+	dv = new DeviceInfo;
+	dv->iDevID = 1255;
+	sc->iWorker = wk;
+	sc->iDevice = dv;
+	m_Schedule.push_back(sc);
 
 	//////////////////////////////////////////////////
 	return 0;
@@ -431,4 +465,12 @@ void CRWDSClientView::OnSetLine()
 	// TODO: 在此添加命令处理程序代码
 	CLineList lineList(this);
 	lineList.DoModal();
+}
+
+
+void CRWDSClientView::OnSetSchedule()
+{
+	// TODO: 在此添加命令处理程序代码
+	CSchedule schedule(this);
+	schedule.DoModal();
 }

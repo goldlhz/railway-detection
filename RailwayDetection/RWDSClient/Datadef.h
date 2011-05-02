@@ -3,6 +3,7 @@
 #include <vector>
 #include <atltypes.h>
 #include <atlstr.h>
+#include <sys\timeb.h>
 
 using namespace std;
 
@@ -75,16 +76,22 @@ typedef struct _Device	//设备
 	double iCurrentLat;
 }DeviceInfo;
 
-typedef struct _Arrange	//排班表
+typedef struct _Worker
 {
-	int iArrangeID;
-	CString iArrangeName;
-	int iWorkerID;
+	int iID;
+	CString iName;
+}Worker;
+
+typedef struct _Schedule	//排班表
+{
+	int iScheduleID;
+	CString iScheduleName;
+	Worker* iWorker;
 	DeviceInfo* iDevice;
 	LineInfo* iLine;
-	vector<int> iUplineKmTime;	//上行每公里处时间, 与iLine->iUplineKmLonLat对应
-	vector<int> iDownlineKmTime;	//下行每公里处时间
-}ArrangeLine;
+	vector<time_t> iULineKmTime;	//上下行每公里处时间, 与iLine->iUplineKmLonLat对应
+	//vector<int> iDownlineKmTime;	//下行每公里处时间
+}ScheduleLine;
 
 typedef struct _OrgObj	//机构
 {
