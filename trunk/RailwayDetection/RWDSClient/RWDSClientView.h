@@ -8,11 +8,12 @@
 
 class CPointList;
 class CLineList;
-
+class CSchedule;
 class CRWDSClientView : public CView
 {
 	friend class CPointList;
 	friend class CLineList;
+	friend class CSchedule;
 protected: // 仅从序列化创建
 	CRWDSClientView();
 	DECLARE_DYNCREATE(CRWDSClientView)
@@ -51,6 +52,7 @@ protected:
 	CPoint  m_RightClkPoint;
 	vector<MapPoint*> m_MapPoint;
 	vector<LineInfo*> m_Line;
+	vector<ScheduleLine*> m_Schedule;
 
 // 生成的消息映射函数
 protected:
@@ -72,6 +74,7 @@ public:
 	afx_msg void OnSymbolDelete();
 	afx_msg void OnSetPoint();
 	afx_msg void OnSetLine();
+	afx_msg void OnSetSchedule();
 };
 
 #ifndef _DEBUG  // RWDSClientView.cpp 中的调试版本

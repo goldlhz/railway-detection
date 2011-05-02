@@ -36,6 +36,10 @@ BEGIN_MESSAGE_MAP(CLineList, CDialogEx)
 	ON_BN_CLICKED(IDC_BTN_LINEDELETE, &CLineList::OnClickedBtnLinedelete)
 	ON_BN_CLICKED(IDC_BTN_LINEOK, &CLineList::OnClickedBtnLineok)
 	ON_NOTIFY(LVN_ITEMCHANGED, IDC_LINELIST, &CLineList::OnLvnItemchangedLinelist)
+	ON_NOTIFY(NM_DBLCLK, IDC_LINELIST, &CLineList::OnNMDblclkLinelist)
+	ON_NOTIFY(LVN_ENDLABELEDIT, IDC_LINELIST, &CLineList::OnLvnEndlabeleditLinelist)
+	ON_BN_CLICKED(IDC_BTN_ADD1, &CLineList::OnBnClickedBtnAdd1)
+	ON_BN_CLICKED(IDC_BTN_REMOVE1, &CLineList::OnBnClickedBtnRemove1)
 END_MESSAGE_MAP()
 
 
@@ -50,8 +54,8 @@ BOOL CLineList::OnInitDialog()
 	m_ListCtrl.SetExtendedStyle(LVS_EX_FULLROWSELECT|LVS_EX_GRIDLINES);
 	CRect clientRect;
 	m_ListCtrl.GetClientRect(&clientRect);
-	m_ListCtrl.InsertColumn(0, _T("路线编号"), LVCFMT_LEFT, clientRect.Width()/4);
-	m_ListCtrl.InsertColumn(1, _T("路线名"), LVCFMT_LEFT, clientRect.Width()/4);
+	m_ListCtrl.InsertColumn(0, _T("路线名"), LVCFMT_LEFT, clientRect.Width()/4);
+	m_ListCtrl.InsertColumn(1, _T("路线编号"), LVCFMT_LEFT, clientRect.Width()/4);
 	m_ListCtrl.InsertColumn(2, _T("开始(KM)"), LVCFMT_LEFT, clientRect.Width()/4);
 	m_ListCtrl.InsertColumn(3, _T("结束(KM)"), LVCFMT_LEFT, clientRect.Width()/4);
 	//m_ListCtrl.InsertColumn(4, _T("终端"), LVCFMT_LEFT, clientRect.Width()/5);
@@ -69,8 +73,8 @@ BOOL CLineList::OnInitDialog()
 		endKm.Format(_T("%.0f"), m_CRWDSClientView->m_Line[i]->iLineKmLonLat[m_CRWDSClientView->m_Line[i]->iLineKmLonLat.size()-1]->iKM);
 		name = m_CRWDSClientView->m_Line[i]->iLineName;
 
-		m_ListCtrl.InsertItem(i, id);
-		m_ListCtrl.SetItemText(i, 1, name);
+		m_ListCtrl.InsertItem(i, name);
+		m_ListCtrl.SetItemText(i, 1, id);
 		m_ListCtrl.SetItemText(i, 2, startKm);
 		m_ListCtrl.SetItemText(i, 3, endKm);
 	}
@@ -116,8 +120,8 @@ void CLineList::OnBnClickedBtnLineadd()
 	endKm.Format(_T("%.0f"), line->iLineKmLonLat[line->iLineKmLonLat.size()-1]->iKM);
 	name = line->iLineName;
 
-	m_ListCtrl.InsertItem(count, id);
-	m_ListCtrl.SetItemText(count, 1, name);
+	m_ListCtrl.InsertItem(count, name);
+	m_ListCtrl.SetItemText(count, 1, id);
 	m_ListCtrl.SetItemText(count, 2, startKm);
 	m_ListCtrl.SetItemText(count, 3, endKm);
 }
@@ -125,7 +129,21 @@ void CLineList::OnBnClickedBtnLineadd()
 void CLineList::OnClickedBtnLinemodify()
 {
 	// TODO: 在此添加控件通知处理程序代码
-	int select = m_ListCtrl.GetSelectionMark();
+	POSITION pos;
+	pos = m_ListCtrl.GetFirstSelectedItemPosition();
+	int select = m_ListCtrl.GetNextSelectedItem(pos);  
+	if (select<0)
+	{
+		return;
+	}
+	LineInfo* line = m_CRWDSClientView->m_Line[select];
+	line->iLineName = m_ListCtrl.GetItemText(select, 0);
+	//line->iLineKmLonLat.clear();
+	//for (size_t i=0; i<m_Selected.size(); i++)
+	//{
+	//	line->iLineKmLonLat.push_back(m_Selected[i]);
+	//}
+	//AfxMessageBox(_T("保存成功"), MB_OK);
 }
 
 void CLineList::OnClickedBtnLinedelete()
@@ -153,9 +171,9 @@ void CLineList::OnLvnItemchangedLinelist(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
 	// TODO: 在此添加控件通知处理程序代码
+	// 得到项目索引
 	POSITION pos;
 	pos = m_ListCtrl.GetFirstSelectedItemPosition();
-	// 得到项目索引
 	int select = m_ListCtrl.GetNextSelectedItem(pos);  
 	if (select<0)
 	{
@@ -164,6 +182,8 @@ void CLineList::OnLvnItemchangedLinelist(NMHDR *pNMHDR, LRESULT *pResult)
 	CString str;
 	m_ListAllPoint.ResetContent();
 	m_ListSelectedPoint.ResetContent();
+	m_Selected.clear();
+	m_Unselected.clear();
 	for (size_t i=0; i<m_CRWDSClientView->m_MapPoint.size(); i++)
 	{
 		bool addSelect = FALSE;
@@ -189,4 +209,106 @@ void CLineList::OnLvnItemchangedLinelist(NMHDR *pNMHDR, LRESULT *pResult)
 	}
 
 	*pResult = 0;
+}
+
+
+void CLineList::OnNMDblclkLinelist(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+	// TODO: 在此添加控件通知处理程序代码
+
+	POSITION pos = m_ListCtrl.GetFirstSelectedItemPosition();
+	int tIndex = m_ListCtrl.GetNextSelectedItem(pos);
+
+	if ( tIndex >= 0 )
+	{
+		m_ListCtrl.SetFocus();
+		CEdit* pEdit = m_ListCtrl.EditLabel( tIndex );
+	}
+
+	*pResult = 0;
+}
+
+
+void CLineList::OnLvnEndlabeleditLinelist(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	NMLVDISPINFO *pDispInfo = reinterpret_cast<NMLVDISPINFO*>(pNMHDR);
+	// TODO: 在此添加控件通知处理程序代码
+	CString pName = pDispInfo->item.pszText;
+	int tIndex = pDispInfo->item.iItem;
+	m_ListCtrl.SetFocus();
+
+	if( ( ! pName.IsEmpty() ) && tIndex >= 0 )
+	{
+		m_ListCtrl.SetItemText( tIndex, 0, pName);
+	}
+	*pResult = 0;
+}
+
+
+void CLineList::OnBnClickedBtnAdd1()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	int index = m_ListAllPoint.GetCurSel();
+	if (index<0)
+		return;
+	MapPoint* point = m_Unselected[index];
+	m_Unselected.erase(m_Unselected.begin()+index);
+	m_Selected.push_back(point);
+
+	POSITION pos;
+	pos = m_ListCtrl.GetFirstSelectedItemPosition();
+	int select = m_ListCtrl.GetNextSelectedItem(pos);  
+	if (select<0)
+	{
+		return;
+	}
+	LineInfo* line = m_CRWDSClientView->m_Line[select];
+	line->iLineKmLonLat.push_back(point);
+
+	for (size_t i=0; i<m_CRWDSClientView->m_Schedule.size(); i++)
+	{
+		if(line == m_CRWDSClientView->m_Schedule[i]->iLine)
+			m_CRWDSClientView->m_Schedule[i]->iULineKmTime.push_back(0);
+	}
+
+	CString str;
+	ENCODERAILWAYFULLNAME(str, point->iRailLine, point->iKM, point->iDirect);
+	m_ListSelectedPoint.InsertString(m_ListSelectedPoint.GetCount(), str);
+	m_ListAllPoint.DeleteString(index);
+}
+
+
+void CLineList::OnBnClickedBtnRemove1()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	int index = m_ListSelectedPoint.GetCurSel();
+	if (index<0)
+		return;
+	MapPoint* point = m_Selected[index];
+	m_Selected.erase(m_Selected.begin()+index);
+	m_Unselected.push_back(point);
+
+	POSITION pos;
+	pos = m_ListCtrl.GetFirstSelectedItemPosition();
+	int select = m_ListCtrl.GetNextSelectedItem(pos);  
+	if (select<0)
+	{
+		return;
+	}
+	LineInfo* line = m_CRWDSClientView->m_Line[select];
+	line->iLineKmLonLat.erase(line->iLineKmLonLat.begin()+index);
+
+	for (size_t i=0; i<m_CRWDSClientView->m_Schedule.size(); i++)
+	{
+		if(line == m_CRWDSClientView->m_Schedule[i]->iLine)
+			m_CRWDSClientView->m_Schedule[i]->iULineKmTime.erase\
+			(m_CRWDSClientView->m_Schedule[i]->iULineKmTime.begin()+index);
+	}
+
+	CString str;
+	ENCODERAILWAYFULLNAME(str, point->iRailLine, point->iKM, point->iDirect);
+	m_ListAllPoint.InsertString(m_ListAllPoint.GetCount(), str);
+	m_ListSelectedPoint.DeleteString(index);
+
 }

@@ -138,6 +138,7 @@
     <ClInclude Include="RWDSClient.h" />
     <ClInclude Include="RWDSClientDoc.h" />
     <ClInclude Include="RWDSClientView.h" />
+    <ClInclude Include="Schedule.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="ViewTree.h" />
@@ -155,6 +156,7 @@
     <ClCompile Include="RWDSClient.cpp" />
     <ClCompile Include="RWDSClientDoc.cpp" />
     <ClCompile Include="RWDSClientView.cpp" />
+    <ClCompile Include="Schedule.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>

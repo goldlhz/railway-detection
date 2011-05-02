@@ -39,4 +39,8 @@ public:
 	afx_msg void OnClickedBtnLinedelete();
 	afx_msg void OnClickedBtnLineok();
 	afx_msg void OnLvnItemchangedLinelist(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnNMDblclkLinelist(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnLvnEndlabeleditLinelist(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnBnClickedBtnAdd1();
+	afx_msg void OnBnClickedBtnRemove1();
 };
