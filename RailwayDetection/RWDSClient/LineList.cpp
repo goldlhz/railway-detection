@@ -267,7 +267,7 @@ void CLineList::OnBnClickedBtnAdd1()
 	line->iLineKmLonLat.push_back(point);
 
 	for (size_t i=0; i<m_CRWDSClientView->m_Schedule.size(); i++)
-	{
+	{//更新schedule里面line的相应时间
 		if(line == m_CRWDSClientView->m_Schedule[i]->iLine)
 			m_CRWDSClientView->m_Schedule[i]->iULineKmTime.push_back(0);
 	}

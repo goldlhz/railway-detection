@@ -211,3 +211,10 @@ void CPointList::OnLvnItemchangedPointlist(NMHDR *pNMHDR, LRESULT *pResult)
 	*pResult = 0;
 }
 
+void CPointList::SetDefaltPoint( double aLon, double aLat )
+{
+	m_DefaultLon = aLon;
+	m_DefaultLat = aLat;
+	m_SetDefault = TRUE;
+}
+

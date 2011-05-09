@@ -10,6 +10,7 @@
 
 #include "RWDSClientDoc.h"
 #include "RWDSClientView.h"
+#include "Login.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -72,6 +73,9 @@ BOOL CRWDSClientApp::InitInstance()
 
 	CWinAppEx::InitInstance();
 
+	//CLogin login;
+	//if(login.DoModal() == IDCANCEL)
+	//	return FALSE;
 
 	// ≥ı ºªØ OLE ø‚
 	if (!AfxOleInit())

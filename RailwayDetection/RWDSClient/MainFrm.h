@@ -33,17 +33,20 @@ public:
 	virtual void AssertValid() const;
 	virtual void Dump(CDumpContext& dc) const;
 #endif
-
+public:
+	CFileView& GetFileView();
 protected:  // 控件条嵌入成员
 	CMFCMenuBar       m_wndMenuBar;
 	CMFCToolBar       m_wndToolBar;
 	CMFCToolBar       m_mapToolBar;
-	CMFCStatusBar     m_wndStatusBar;
+	//CMFCStatusBar     m_wndStatusBar;
 	CMFCToolBarImages m_UserImages;
 	CFileView         m_wndFileView;
 	CClassView        m_wndClassView;
 	COutputWnd        m_wndOutput;
 	CPropertiesWnd    m_wndProperties;
+public:
+	CMFCStatusBar     m_wndStatusBar;
 
 // 生成的消息映射函数
 protected:
