@@ -23,12 +23,18 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV Ö§³Ö
 
 	DECLARE_MESSAGE_MAP()
+
+public:
+	void SetDefaltPoint(double aLon, double aLat);
 protected:
 	bool m_Modifying;
 	CRWDSClientView* m_CRWDSClientView;
 	CListCtrl m_ListCtrl;
 	CComboBox m_ComboUpDown;
 	CComboBox m_ComboRailLine;
+	bool m_SetDefault;
+	double m_DefaultLon;
+	double m_DefaultLat;
 
 protected:
 	

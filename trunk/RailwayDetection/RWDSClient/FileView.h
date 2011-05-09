@@ -2,6 +2,8 @@
 #pragma once
 
 #include "ViewTree.h"
+#include "RWDSClientDoc.h"
+#include "RWDSClientView.h"
 
 class CFileViewToolBar : public CMFCToolBar
 {
@@ -20,7 +22,9 @@ public:
 	CFileView();
 
 	void AdjustLayout();
+	void FillFileView();
 	void OnChangeVisualStyle();
+	void SetRWDSClientView(CRWDSClientView* aRWDSClientView);
 
 // 特性
 protected:
@@ -28,9 +32,7 @@ protected:
 	CViewTree m_wndFileView;
 	CImageList m_FileViewImages;
 	CFileViewToolBar m_wndToolBar;
-
-protected:
-	void FillFileView();
+	CRWDSClientView* m_RWDSClientView;
 
 // 实现
 public:
@@ -49,6 +51,9 @@ protected:
 	afx_msg void OnEditClear();
 	afx_msg void OnPaint();
 	afx_msg void OnSetFocus(CWnd* pOldWnd);
+	afx_msg void OnNMDblclkFileView(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnTvnItemexpandedFileView(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnTvnItemexpandingFileView(NMHDR *pNMHDR, LRESULT *pResult);
 
 	DECLARE_MESSAGE_MAP()
 };
