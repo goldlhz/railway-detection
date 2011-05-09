@@ -1,0 +1,134 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="IOCP">
+      <UniqueIdentifier>{544a2257-43ad-4f84-b1da-557c50a6f553}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{ae6c16af-0e63-4394-bad3-a153060986d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataParse">
+      <UniqueIdentifier>{38ac5058-2529-469a-8a74-57e31d4ffca5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ReadMe.txt" />
+    <None Include="small.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="KellService.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="KellService.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ICOP\IOCPManager.h">
+      <Filter>IOCP</Filter>
+    </ClInclude>
+    <ClInclude Include="ICOP\BaseThread.h">
+      <Filter>IOCP</Filter>
+    </ClInclude>
+    <ClInclude Include="ICOP\MemoryPool.h">
+      <Filter>IOCP</Filter>
+    </ClInclude>
+    <ClInclude Include="ICOP\SocketPool.h">
+      <Filter>IOCP</Filter>
+    </ClInclude>
+    <ClInclude Include="ICOP\ListenThread.h">
+      <Filter>IOCP</Filter>
+    </ClInclude>
+    <ClInclude Include="ICOP\WorkThread.h">
+      <Filter>IOCP</Filter>
+    </ClInclude>
+    <ClInclude Include="ICOP\WorkThreadPool.h">
+      <Filter>IOCP</Filter>
+    </ClInclude>
+    <ClInclude Include="ICOP\IOCPDefine.h">
+      <Filter>IOCP</Filter>
+    </ClInclude>
+    <ClInclude Include="ICOP\CommonFunction.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="ICOP\GobalConfig.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="ICOP\BaseSocket.h">
+      <Filter>IOCP</Filter>
+    </ClInclude>
+    <ClInclude Include="DataParse\ProtocolDefine.h">
+      <Filter>DataParse</Filter>
+    </ClInclude>
+    <ClInclude Include="DataParse\DataPackParse.h">
+      <Filter>DataParse</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="KellService.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ICOP\IOCPManager.cpp">
+      <Filter>IOCP</Filter>
+    </ClCompile>
+    <ClCompile Include="ICOP\BaseThread.cpp">
+      <Filter>IOCP</Filter>
+    </ClCompile>
+    <ClCompile Include="ICOP\MemoryPool.cpp">
+      <Filter>IOCP</Filter>
+    </ClCompile>
+    <ClCompile Include="ICOP\SocketPool.cpp">
+      <Filter>IOCP</Filter>
+    </ClCompile>
+    <ClCompile Include="ICOP\ListenThread.cpp">
+      <Filter>IOCP</Filter>
+    </ClCompile>
+    <ClCompile Include="ICOP\WorkThread.cpp">
+      <Filter>IOCP</Filter>
+    </ClCompile>
+    <ClCompile Include="ICOP\WorkThreadPool.cpp">
+      <Filter>IOCP</Filter>
+    </ClCompile>
+    <ClCompile Include="ICOP\CommonFunction.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="ICOP\GobalConfig.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="ICOP\BaseSocket.cpp">
+      <Filter>IOCP</Filter>
+    </ClCompile>
+    <ClCompile Include="DataParse\DataPackParse.cpp">
+      <Filter>DataParse</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="KellService.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>
