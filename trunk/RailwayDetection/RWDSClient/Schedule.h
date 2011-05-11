@@ -2,6 +2,7 @@
 #include "afxcmn.h"
 #include "RWDSClientDoc.h"
 #include "RWDSClientView.h"
+#include "afxwin.h"
 
 
 // CSchedule ¶Ô»°¿ò
@@ -23,7 +24,8 @@ protected:
 	DECLARE_MESSAGE_MAP()
 protected:
 	CRWDSClientView* m_CRWDSClientView;
-	ScheduleLine* m_SelectedSchedule;
+	//ScheduleLine* m_SelectedSchedule;
+	LineInfo* m_SelectedLine;
 	CListCtrl m_ListCtrl;
 	CListCtrl m_ListArriveTime;
 public:
@@ -34,4 +36,6 @@ protected:
 public:
 	afx_msg void OnLvnItemchangedListarrivettime(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnBnClickedBtnModifytime();
+	afx_msg void OnBnClickedBtnModifycalender();
+	CComboBox m_ComboStartDay;
 };
