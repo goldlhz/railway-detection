@@ -45,6 +45,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)\output\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -141,6 +142,7 @@
     <ClInclude Include="RWDSClientDoc.h" />
     <ClInclude Include="RWDSClientView.h" />
     <ClInclude Include="Schedule.h" />
+    <ClInclude Include="StaticData.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="ViewTree.h" />
@@ -160,6 +162,7 @@
     <ClCompile Include="RWDSClientDoc.cpp" />
     <ClCompile Include="RWDSClientView.cpp" />
     <ClCompile Include="Schedule.cpp" />
+    <ClCompile Include="StaticData.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>

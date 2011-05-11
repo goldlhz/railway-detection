@@ -11,7 +11,7 @@
 
 IMPLEMENT_DYNAMIC(CSchedule, CDialogEx)
 
-CSchedule::CSchedule(CWnd* pParent /*=NULL*/)
+CSchedule::CSchedule(CWnd* pParent)
 	: CDialogEx(CSchedule::IDD, pParent)
 {
 	m_CRWDSClientView = static_cast<CRWDSClientView*>(pParent);
@@ -26,6 +26,7 @@ void CSchedule::DoDataExchange(CDataExchange* pDX)
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_SCHEDULELIST, m_ListCtrl);
 	DDX_Control(pDX, IDC_LISTARRIVETTIME, m_ListArriveTime);
+	DDX_Control(pDX, IDC_COMBO_STARTDAY, m_ComboStartDay);
 }
 
 
@@ -33,6 +34,7 @@ BEGIN_MESSAGE_MAP(CSchedule, CDialogEx)
 	ON_NOTIFY(LVN_ITEMCHANGED, IDC_SCHEDULELIST, &CSchedule::OnLvnItemchangedSchedulelist)
 	ON_NOTIFY(LVN_ITEMCHANGED, IDC_LISTARRIVETTIME, &CSchedule::OnLvnItemchangedListarrivettime)
 	ON_BN_CLICKED(IDC_BTN_MODIFYTIME, &CSchedule::OnBnClickedBtnModifytime)
+	ON_BN_CLICKED(IDC_BTN_MODIFYCALENDER, &CSchedule::OnBnClickedBtnModifycalender)
 END_MESSAGE_MAP()
 
 
@@ -52,10 +54,7 @@ BOOL CSchedule::OnInitDialog()
 	while(m_ListCtrl.DeleteColumn(0));
 
 	m_ListCtrl.InsertColumn(0, _T("编号"), LVCFMT_LEFT, clientRect.Width()/4);
-	//m_ListCtrl.InsertColumn(1, _T("排班名"), LVCFMT_LEFT, clientRect.Width()/7);
 	m_ListCtrl.InsertColumn(1, _T("线路名"), LVCFMT_LEFT, clientRect.Width()/4);
-	//m_ListCtrl.InsertColumn(3, _T("设备"), LVCFMT_LEFT, clientRect.Width()/7);
-	//m_ListCtrl.InsertColumn(4, _T("员工"), LVCFMT_LEFT, clientRect.Width()/7);
 	m_ListCtrl.InsertColumn(2, _T("开始时间"), LVCFMT_LEFT, clientRect.Width()/4);
 	m_ListCtrl.InsertColumn(3, _T("结束时间"), LVCFMT_LEFT, clientRect.Width()/4);
 
@@ -71,29 +70,44 @@ BOOL CSchedule::OnInitDialog()
 	CString wk;
 	CString beTime;
 	CString endTime;
-	ScheduleLine* sch = NULL;
-	int count = m_CRWDSClientView->m_Schedule.size();
+
+	LineInfo* line = NULL;
+	int count = m_CRWDSClientView->m_Line.size();
 	for (int i=0; i<count; i++)
 	{
-		sch = m_CRWDSClientView->m_Schedule[i];
-		id.Format(_T("%d"), sch->iScheduleID);
-		//schName = sch->iScheduleName;
-		lineName = sch->iLine->iLineName;
-		//dev.Format(_T("%d"), sch->iDevice->iDevID);
-		//wk = sch->iWorker->iName;
-		CTime tb(sch->iULineKmTime[0]);
-		CTime te(sch->iULineKmTime[sch->iULineKmTime.size()-1]);
-		beTime.Format(_T("%02d:%02d"), tb.GetHour(), tb.GetMinute());
-		endTime.Format(_T("%02d:%02d"), te.GetHour(), te.GetMinute());
+		line = m_CRWDSClientView->m_Line[i];
+		id.Format(_T("%d"), line->iLineID);
+		lineName = line->iLineName;
+
+		if(line->iLineKmTime.size()>0)
+		{
+			CTime tb(line->iLineKmTime[0]);
+			CTime te(line->iLineKmTime[line->iLineKmTime.size()-1]);
+			beTime.Format(_T("%02d:%02d"), tb.GetHour(), tb.GetMinute());
+			endTime.Format(_T("%02d:%02d"), te.GetHour(), te.GetMinute());
+		}
+		else
+		{
+			beTime = _T("");
+			endTime = _T("");
+		}
 
 		m_ListCtrl.InsertItem(i, id);
-		//m_ListCtrl.SetItemText(i, 1, schName);
 		m_ListCtrl.SetItemText(i, 1, lineName);
-		//m_ListCtrl.SetItemText(i, 3, dev);
-		//m_ListCtrl.SetItemText(i, 4, wk);
 		m_ListCtrl.SetItemText(i, 2, beTime);
 		m_ListCtrl.SetItemText(i, 3, endTime);
 	}
+
+	//初始化日程信息
+	m_ComboStartDay.ResetContent();
+	for (int i=0; i<StrStartNoCount; i++)
+	{
+		m_ComboStartDay.AddString(StrStartNo[i]);
+	}
+	CTime startTime(m_CRWDSClientView->m_Calendar->iStartDay);
+	int i = startTime.GetMonth();
+	int ii = startTime.GetDay();
+	((CDateTimeCtrl*)GetDlgItem(IDC_DATETIMEPICKER_STARTDAY))->SetTime(&startTime);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// 异常: OCX 属性页应返回 FALSE
@@ -111,17 +125,17 @@ void CSchedule::OnLvnItemchangedSchedulelist(NMHDR *pNMHDR, LRESULT *pResult)
 	{
 		return;
 	}
-	ScheduleLine* sch = m_CRWDSClientView->m_Schedule[select];
+	LineInfo* line = m_CRWDSClientView->m_Line[select];
 	CString km;
 	CString at;
 	m_ListArriveTime.DeleteAllItems();
-	for (size_t i=0; i<sch->iLine->iLineKmLonLat.size(); i++)
+	for (size_t i=0; i<line->iLineKmLonLat.size(); i++)
 	{
-		ENCODERAILWAYFULLNAME(km, sch->iLine->iLineKmLonLat[i]->iRailLine, 
-			sch->iLine->iLineKmLonLat[i]->iKM, sch->iLine->iLineKmLonLat[i]->iDirect);
-		if (i < sch->iULineKmTime.size())
+		ENCODERAILWAYFULLNAME(km, line->iLineKmLonLat[i]->iRailLine, 
+			line->iLineKmLonLat[i]->iKM, line->iLineKmLonLat[i]->iDirect);
+		if (i < line->iLineKmTime.size())
 		{
-			CTime t1(sch->iULineKmTime[i]);
+			CTime t1(line->iLineKmTime[i]);
 			at.Format(_T("%02d:%02d"), t1.GetHour(), t1.GetMinute());
 		}
 		else
@@ -131,7 +145,15 @@ void CSchedule::OnLvnItemchangedSchedulelist(NMHDR *pNMHDR, LRESULT *pResult)
 		m_ListArriveTime.InsertItem(i, km);
 		m_ListArriveTime.SetItemText(i, 1, at);
 	}
-	m_SelectedSchedule = sch;
+	m_SelectedLine = line;
+
+	//处理日程表
+	m_ComboStartDay.SetCurSel(line->iStartNo);
+	CTime startTime(m_CRWDSClientView->m_Calendar->iStartDay);
+	((CDateTimeCtrl*)GetDlgItem(IDC_DATETIMEPICKER_STARTDAY))->SetTime(&startTime);
+	CString str;
+	str.Format(_T("%d"), m_CRWDSClientView->m_Calendar->iPeriods);
+	GetDlgItem(IDC_EDIT_PERIODS)->SetWindowText(str);
 	*pResult = 0;
 }
 
@@ -147,7 +169,7 @@ void CSchedule::OnLvnItemchangedListarrivettime(NMHDR *pNMHDR, LRESULT *pResult)
 	{
 		return;
 	}
-	CTime t1(m_SelectedSchedule->iULineKmTime[select]);
+	CTime t1(m_SelectedLine->iLineKmTime[select]);
 	CString str;
 	str.Format(_T("%02d"), t1.GetHour());
 	GetDlgItem(IDC_EDIT_HOUR)->SetWindowTextW(str);
@@ -170,12 +192,13 @@ void CSchedule::OnBnClickedBtnModifytime()
 	//CTime t1(m_SelectedSchedule->iULineKmTime[select]);
 	CString strHour;
 	CString strMin;
-	struct tm* schTime = localtime(&m_SelectedSchedule->iULineKmTime[select]);
+	struct tm* schTime = NULL;
+	localtime_s(schTime, &m_SelectedLine->iLineKmTime[select]);
 	GetDlgItem(IDC_EDIT_HOUR)->GetWindowTextW(strHour);
 	schTime->tm_hour = _ttoi(strHour);
 	GetDlgItem(IDC_EDIT_MINUTE)->GetWindowTextW(strMin);
 	schTime->tm_min = _ttoi(strMin);
-	m_SelectedSchedule->iULineKmTime[select] = mktime(schTime);
+	m_SelectedLine->iLineKmTime[select] = mktime(schTime);
 	AfxMessageBox(_T("修改成功"));
 	CString str;
 	str.Format(_T("%02d:%02d"), schTime->tm_hour, schTime->tm_min);
@@ -196,4 +219,17 @@ void CSchedule::OnBnClickedBtnModifytime()
 	{
 		m_ListCtrl.SetItemText(ctrlIndex, 3, str);
 	}
+}
+
+void CSchedule::OnBnClickedBtnModifycalender()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	CTime startTime;
+	((CDateTimeCtrl*)GetDlgItem(IDC_DATETIMEPICKER_STARTDAY))->GetTime(startTime);
+	m_CRWDSClientView->m_Calendar->iStartDay = startTime.GetTime();
+	CString str;
+	GetDlgItem(IDC_EDIT_PERIODS)->GetWindowText(str);
+	m_CRWDSClientView->m_Calendar->iPeriods = _ttoi(str);
+	m_SelectedLine->iStartNo = static_cast<LineStartNo>(m_ComboStartDay.GetCurSel());
+
 }

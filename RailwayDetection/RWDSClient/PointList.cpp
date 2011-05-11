@@ -60,7 +60,7 @@ BOOL CPointList::OnInitDialog()
 	m_ComboUpDown.AddString(_T("下行"));
 
 	m_ComboRailLine.ResetContent();
-	for (int i=0; i<RailLineName->GetLength(); i++)
+	for (int i=0; i<RailLineNameCount; i++)
 	{
 		m_ComboRailLine.AddString(RailLineName[i]);
 	}
@@ -126,8 +126,16 @@ void CPointList::OnBnClickedBtnPointadd()
 void CPointList::OnBnClickedBtnPointmodify()
 {
 	// TODO: 在此添加控件通知处理程序代码
-	int select = m_ListCtrl.GetSelectionMark();
-	if (select < 0)
+	//int select = m_ListCtrl.GetSelectionMark();
+	//if (select < 0)
+	//{
+	//	return;
+	//}
+
+	POSITION pos;
+	pos = m_ListCtrl.GetFirstSelectedItemPosition();
+	int select = m_ListCtrl.GetNextSelectedItem(pos);  
+	if (select<0)
 	{
 		return;
 	}
@@ -163,13 +171,31 @@ void CPointList::OnBnClickedBtnPointmodify()
 void CPointList::OnBnClickedBtnPointdelete()
 {
 	// TODO: 在此添加控件通知处理程序代码
-	int select = m_ListCtrl.GetSelectionMark();
-	if (select < 0)
+	//int select = m_ListCtrl.GetSelectionMark();
+	//if (select < 0)
+	//{
+	//	return;
+	//}
+	POSITION pos;
+	pos = m_ListCtrl.GetFirstSelectedItemPosition();
+	int select = m_ListCtrl.GetNextSelectedItem(pos);  
+	if (select<0)
 	{
 		return;
 	}
 	MapPoint* point = m_CRWDSClientView->m_MapPoint[select];
 	m_CRWDSClientView->m_MapPoint.erase(m_CRWDSClientView->m_MapPoint.begin()+select);
+	for(size_t i=0; i<m_CRWDSClientView->m_Line.size(); i++)
+	{
+		for (size_t j=0; j<m_CRWDSClientView->m_Line[i]->iLineKmLonLat.size(); j++)
+		{
+			if(point == m_CRWDSClientView->m_Line[i]->iLineKmLonLat[j])
+			{//删除线中设置的点
+				m_CRWDSClientView->m_Line[i]->iLineKmLonLat.erase(m_CRWDSClientView->m_Line[i]->iLineKmLonLat.begin()+j);
+				break;
+			}
+		}
+	}
 	delete point;
 
 	m_ListCtrl.DeleteItem(select);
@@ -197,8 +223,9 @@ void CPointList::OnLvnItemchangedPointlist(NMHDR *pNMHDR, LRESULT *pResult)
 	// 得到项目索引
 	int select = m_ListCtrl.GetNextSelectedItem(pos);  
 	if (select<0)
+	{
 		return;
-
+	}
 	m_ComboRailLine.SetCurSel(m_CRWDSClientView->m_MapPoint[select]->iRailLine);
 	GetDlgItem(IDC_EDIT_KM)->SetWindowText(m_ListCtrl.GetItemText(select, 1));
 	GetDlgItem(IDC_EDIT_LON)->SetWindowText(m_ListCtrl.GetItemText(select, 2));

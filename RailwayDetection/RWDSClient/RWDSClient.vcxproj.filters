@@ -156,6 +156,9 @@
     <ClInclude Include="Login.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="StaticData.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RWDSClient.cpp">
@@ -204,6 +207,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Login.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="StaticData.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

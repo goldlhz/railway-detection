@@ -69,9 +69,17 @@ BOOL CLineList::OnInitDialog()
 	for (int i=0; i<count; i++)
 	{
 		id.Format(_T("%d"), m_CRWDSClientView->m_Line[i]->iLineID);
-		startKm.Format(_T("%.0f"), m_CRWDSClientView->m_Line[i]->iStartKm);
-		endKm.Format(_T("%.0f"), m_CRWDSClientView->m_Line[i]->iLineKmLonLat[m_CRWDSClientView->m_Line[i]->iLineKmLonLat.size()-1]->iKM);
 		name = m_CRWDSClientView->m_Line[i]->iLineName;
+		if (m_CRWDSClientView->m_Line[i]->iLineKmLonLat.size() > 0)
+		{
+			startKm.Format(_T("%.0f"), m_CRWDSClientView->m_Line[i]->iLineKmLonLat[0]->iKM);
+			endKm.Format(_T("%.0f"), m_CRWDSClientView->m_Line[i]->iLineKmLonLat[m_CRWDSClientView->m_Line[i]->iLineKmLonLat.size()-1]->iKM);
+		}
+		else
+		{
+			startKm = _T("");
+			endKm = _T("");
+		}
 
 		m_ListCtrl.InsertItem(i, name);
 		m_ListCtrl.SetItemText(i, 1, id);
@@ -86,7 +94,7 @@ BOOL CLineList::OnInitDialog()
 void CLineList::StrLineKmToLineKm( CString aStrLine, RailLine& aRailLine, double& aKm )
 {//宝成线100公里转换成RailLine与Km格式
 	aStrLine.Delete(aStrLine.GetLength()-StrKm.GetLength(), StrKm.GetLength());
-	for (int i=0; i<RailLineName->GetLength(); i++)
+	for (int i=0; i<RailLineNameCount; i++)
 	{
 		if(aStrLine.Find(RailLineName[i]) == 0)
 		{
@@ -106,7 +114,8 @@ void CLineList::OnBnClickedBtnLineadd()
 	line->iLineName = _T("线路");
 	line->iStartKm = m_CRWDSClientView->m_MapPoint[0]->iKM;
 	line->iLineKmLonLat.push_back(m_CRWDSClientView->m_MapPoint[0]);
-	line->iLineKmLonLat.push_back(m_CRWDSClientView->m_MapPoint[0]);
+	line->iLineKmTime.push_back(0);
+	line->iStartNo = KFirstDay;
 	m_CRWDSClientView->m_Line.push_back(line);
 
 	CString id;
@@ -265,17 +274,17 @@ void CLineList::OnBnClickedBtnAdd1()
 	}
 	LineInfo* line = m_CRWDSClientView->m_Line[select];
 	line->iLineKmLonLat.push_back(point);
-
-	for (size_t i=0; i<m_CRWDSClientView->m_Schedule.size(); i++)
-	{//更新schedule里面line的相应时间
-		if(line == m_CRWDSClientView->m_Schedule[i]->iLine)
-			m_CRWDSClientView->m_Schedule[i]->iULineKmTime.push_back(0);
-	}
+	line->iLineKmTime.push_back(0);//为新加点设置时间
 
 	CString str;
 	ENCODERAILWAYFULLNAME(str, point->iRailLine, point->iKM, point->iDirect);
 	m_ListSelectedPoint.InsertString(m_ListSelectedPoint.GetCount(), str);
 	m_ListAllPoint.DeleteString(index);
+
+	str.Format(_T("%.0f"), line->iLineKmLonLat[0]->iKM);
+	m_ListCtrl.SetItemText(select, 2, str);
+	str.Format(_T("%.0f"), point->iKM);
+	m_ListCtrl.SetItemText(select, 3, str);
 }
 
 
@@ -298,15 +307,22 @@ void CLineList::OnBnClickedBtnRemove1()
 	}
 	LineInfo* line = m_CRWDSClientView->m_Line[select];
 	line->iLineKmLonLat.erase(line->iLineKmLonLat.begin()+index);
-
-	for (size_t i=0; i<m_CRWDSClientView->m_Schedule.size(); i++)
-	{
-		if(line == m_CRWDSClientView->m_Schedule[i]->iLine)
-			m_CRWDSClientView->m_Schedule[i]->iULineKmTime.erase\
-			(m_CRWDSClientView->m_Schedule[i]->iULineKmTime.begin()+index);
-	}
+	line->iLineKmTime.erase(line->iLineKmTime.begin()+index);
 
 	CString str;
+	if (line->iLineKmLonLat.size() != 0)
+	{
+		str.Format(_T("%.0f"), line->iLineKmLonLat[0]->iKM);
+		m_ListCtrl.SetItemText(select, 2, str);
+		str.Format(_T("%.0f"), line->iLineKmLonLat[line->iLineKmLonLat.size()-1]->iKM);
+		m_ListCtrl.SetItemText(select, 3, str);
+	}
+	else
+	{
+		m_ListCtrl.SetItemText(select, 2, _T(""));
+		m_ListCtrl.SetItemText(select, 3, _T(""));
+	}
+
 	ENCODERAILWAYFULLNAME(str, point->iRailLine, point->iKM, point->iDirect);
 	m_ListAllPoint.InsertString(m_ListAllPoint.GetCount(), str);
 	m_ListSelectedPoint.DeleteString(index);

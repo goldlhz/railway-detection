@@ -6,9 +6,8 @@
 #include "MAPX.H"
 #include "Datadef.h"
 
-//class CPointList;
-//class CLineList;
-//class CSchedule;
+#define TIMERNEWPOSITION 1
+
 class CFileView;
 class CRWDSClientView : public CView
 {
@@ -48,13 +47,14 @@ public:
 	void DecimalGeoToStandardGeo(double dX, double dY, int *iXd, int *iXm, int *iXs, int *iYd, int *iYm, int *iYs);
 	void MapxDrawCircle(double aMapLon, double aMapLat);
 	void MapxDrawLine(double aMapLon1, double aMapLat1, double aMapLon2, double aMapLat2);
+	void MapxSetText(double aMapLon, double aMapLat, CString aText);
 	void MapxCleanAllFeature();
 protected:
 	bool m_SymbolMove;
 	CMapX m_MapX;
 	CString m_SymbolLayer;
 	CString m_MapName;
-	double	m_InitZoom;			//初始缩放比例0822
+	double	m_InitZoom;			//初始缩放比例
 	double	m_InitCenterX;
 	double	m_InitCenterY;
 	double  m_MouseLon;
@@ -62,9 +62,9 @@ protected:
 	CPoint  m_RightClkPoint;
 	vector<MapPoint*> m_MapPoint;
 	vector<LineInfo*> m_Line;
-	vector<ScheduleLine*> m_Schedule;
 	vector<OrganizationInfo*> m_Org;
-	vector<CalendarSchedule*> m_Calendar;
+	CalendarSchedule* m_Calendar;
+	vector<LineInfo*> m_CurrentLinePosition;
 	CFileView* m_FileView;
 // 生成的消息映射函数
 protected:
@@ -91,8 +91,7 @@ public:
 	afx_msg void OnSetLine();
 	afx_msg void OnSetSchedule();
 	afx_msg void OnMapViewChangedMap();
-
-
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 };
 extern CRWDSClientView* gClientView;
 

@@ -274,7 +274,7 @@ void CFileView::OnNMDblclkFileView(NMHDR *pNMHDR, LRESULT *pResult)
 	}
 	m_RWDSClientView->MapxCleanAllFeature();
 	LineInfo* line = (LineInfo*)m_wndFileView.GetItemData(curItem);
-	for (int i=0; i<line->iLineKmLonLat.size(); i++)
+	for (size_t i=0; i<line->iLineKmLonLat.size(); i++)
 	{
 		m_RWDSClientView->MapxDrawCircle(line->iLineKmLonLat[i]->iLon, line->iLineKmLonLat[i]->iLat);
 		if (i>0)
@@ -282,6 +282,10 @@ void CFileView::OnNMDblclkFileView(NMHDR *pNMHDR, LRESULT *pResult)
 			m_RWDSClientView->MapxDrawLine(line->iLineKmLonLat[i-1]->iLon, line->iLineKmLonLat[i-1]->iLat,
 										   line->iLineKmLonLat[i]->iLon, line->iLineKmLonLat[i]->iLat);
 		}
+		CString str;
+		CTime arrTime(line->iLineKmTime[i]);
+		str.Format(_T("%02d:%02d"), arrTime.GetHour(), arrTime.GetMinute());
+		m_RWDSClientView->MapxSetText(line->iLineKmLonLat[i]->iLon, line->iLineKmLonLat[i]->iLat-0.0012, str);
 	}
 	int centerPoint = line->iLineKmLonLat.size()/2;
 	m_RWDSClientView->m_MapX.SetCenterX(line->iLineKmLonLat[centerPoint]->iLon);
