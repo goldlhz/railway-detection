@@ -53,7 +53,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\LogPluginManager\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\DataParse;.\Common;.\iocp\;..\LogPluginManager\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -74,7 +74,7 @@ copy ..\ConfigFileLib\loger.ini ..\Bin\BinD\LogPlugin\loger.ini</Command>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\LogPluginManager\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\DataParse;.\Common;.\iocp\;..\LogPluginManager\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -95,36 +95,36 @@ copy ..\ConfigFileLib\loger.ini ..\Bin\BinR\LogPlugin\loger.ini</Command>
     <None Include="small.ico" />
   </ItemGroup>
   <ItemGroup>
+ 	<ClInclude Include="Common\CommonFunction.h" /> 
+    <ClInclude Include="Common\GobalConfig.h" />
     <ClInclude Include="DataParse\DataPackParse.h" />
     <ClInclude Include="DataParse\ProtocolDefine.h" />
-    <ClInclude Include="ICOP\BaseSocket.h" />
-    <ClInclude Include="ICOP\BaseThread.h" />
-    <ClInclude Include="ICOP\CommonFunction.h" />
-    <ClInclude Include="ICOP\GobalConfig.h" />
-    <ClInclude Include="ICOP\IOCPDefine.h" />
-    <ClInclude Include="ICOP\IOCPManager.h" />
-    <ClInclude Include="ICOP\ListenThread.h" />
-    <ClInclude Include="ICOP\MemoryPool.h" />
-    <ClInclude Include="ICOP\SocketPool.h" />
-    <ClInclude Include="ICOP\WorkThread.h" />
-    <ClInclude Include="ICOP\WorkThreadPool.h" />
+    <ClInclude Include="IOCP\BaseSocket.h" />
+    <ClInclude Include="IOCP\BaseThread.h" />
+    <ClInclude Include="IOCP\IOCPDefine.h" />
+    <ClInclude Include="IOCP\IOCPManager.h" />
+    <ClInclude Include="IOCP\ListenThread.h" />
+    <ClInclude Include="IOCP\MemoryPool.h" />
+    <ClInclude Include="IOCP\SocketPool.h" />
+    <ClInclude Include="IOCP\WorkThread.h" />
+    <ClInclude Include="IOCP\WorkThreadPool.h" />
     <ClInclude Include="KellService.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="DataParse\DataPackParse.cpp" />
-    <ClCompile Include="ICOP\BaseSocket.cpp" />
-    <ClCompile Include="ICOP\BaseThread.cpp" />
-    <ClCompile Include="ICOP\CommonFunction.cpp" />
-    <ClCompile Include="ICOP\GobalConfig.cpp" />
-    <ClCompile Include="ICOP\IOCPManager.cpp" />
-    <ClCompile Include="ICOP\ListenThread.cpp" />
-    <ClCompile Include="ICOP\MemoryPool.cpp" />
-    <ClCompile Include="ICOP\SocketPool.cpp" />
-    <ClCompile Include="ICOP\WorkThread.cpp" />
-    <ClCompile Include="ICOP\WorkThreadPool.cpp" />
+    <ClCompile Include="Common\CommonFunction.cpp" />  
+    <ClCompile Include="Common\GobalConfig.cpp" />	
+	<ClCompile Include="DataParse\DataPackParse.cpp" />
+    <ClCompile Include="IOCP\BaseSocket.cpp" />
+    <ClCompile Include="IOCP\BaseThread.cpp" />
+    <ClCompile Include="IOCP\IOCPManager.cpp" />
+    <ClCompile Include="IOCP\ListenThread.cpp" />
+    <ClCompile Include="IOCP\MemoryPool.cpp" />
+    <ClCompile Include="IOCP\SocketPool.cpp" />
+    <ClCompile Include="IOCP\WorkThread.cpp" />
+    <ClCompile Include="IOCP\WorkThreadPool.cpp" />
     <ClCompile Include="KellService.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

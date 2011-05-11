@@ -42,47 +42,47 @@
     <ClInclude Include="Resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="KellService.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ICOP\IOCPManager.h">
-      <Filter>IOCP</Filter>
-    </ClInclude>
-    <ClInclude Include="ICOP\BaseThread.h">
-      <Filter>IOCP</Filter>
-    </ClInclude>
-    <ClInclude Include="ICOP\MemoryPool.h">
-      <Filter>IOCP</Filter>
-    </ClInclude>
-    <ClInclude Include="ICOP\SocketPool.h">
-      <Filter>IOCP</Filter>
-    </ClInclude>
-    <ClInclude Include="ICOP\ListenThread.h">
-      <Filter>IOCP</Filter>
-    </ClInclude>
-    <ClInclude Include="ICOP\WorkThread.h">
-      <Filter>IOCP</Filter>
-    </ClInclude>
-    <ClInclude Include="ICOP\WorkThreadPool.h">
-      <Filter>IOCP</Filter>
-    </ClInclude>
-    <ClInclude Include="ICOP\IOCPDefine.h">
-      <Filter>IOCP</Filter>
-    </ClInclude>
-    <ClInclude Include="ICOP\CommonFunction.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="ICOP\GobalConfig.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="ICOP\BaseSocket.h">
-      <Filter>IOCP</Filter>
-    </ClInclude>
     <ClInclude Include="DataParse\ProtocolDefine.h">
       <Filter>DataParse</Filter>
     </ClInclude>
     <ClInclude Include="DataParse\DataPackParse.h">
       <Filter>DataParse</Filter>
+    </ClInclude>
+    <ClInclude Include="IOCP\BaseSocket.h">
+      <Filter>IOCP</Filter>
+    </ClInclude>
+    <ClInclude Include="IOCP\WorkThreadPool.h">
+      <Filter>IOCP</Filter>
+    </ClInclude>
+    <ClInclude Include="IOCP\BaseThread.h">
+      <Filter>IOCP</Filter>
+    </ClInclude>
+    <ClInclude Include="IOCP\IOCPDefine.h">
+      <Filter>IOCP</Filter>
+    </ClInclude>
+    <ClInclude Include="IOCP\IOCPManager.h">
+      <Filter>IOCP</Filter>
+    </ClInclude>
+    <ClInclude Include="IOCP\ListenThread.h">
+      <Filter>IOCP</Filter>
+    </ClInclude>
+    <ClInclude Include="IOCP\MemoryPool.h">
+      <Filter>IOCP</Filter>
+    </ClInclude>
+    <ClInclude Include="IOCP\SocketPool.h">
+      <Filter>IOCP</Filter>
+    </ClInclude>
+    <ClInclude Include="IOCP\WorkThread.h">
+      <Filter>IOCP</Filter>
+    </ClInclude>
+    <ClInclude Include="KellService.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\CommonFunction.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\GobalConfig.h">
+      <Filter>Common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -92,38 +92,38 @@
     <ClCompile Include="KellService.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ICOP\IOCPManager.cpp">
-      <Filter>IOCP</Filter>
-    </ClCompile>
-    <ClCompile Include="ICOP\BaseThread.cpp">
-      <Filter>IOCP</Filter>
-    </ClCompile>
-    <ClCompile Include="ICOP\MemoryPool.cpp">
-      <Filter>IOCP</Filter>
-    </ClCompile>
-    <ClCompile Include="ICOP\SocketPool.cpp">
-      <Filter>IOCP</Filter>
-    </ClCompile>
-    <ClCompile Include="ICOP\ListenThread.cpp">
-      <Filter>IOCP</Filter>
-    </ClCompile>
-    <ClCompile Include="ICOP\WorkThread.cpp">
-      <Filter>IOCP</Filter>
-    </ClCompile>
-    <ClCompile Include="ICOP\WorkThreadPool.cpp">
-      <Filter>IOCP</Filter>
-    </ClCompile>
-    <ClCompile Include="ICOP\CommonFunction.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
-    <ClCompile Include="ICOP\GobalConfig.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
-    <ClCompile Include="ICOP\BaseSocket.cpp">
-      <Filter>IOCP</Filter>
-    </ClCompile>
     <ClCompile Include="DataParse\DataPackParse.cpp">
       <Filter>DataParse</Filter>
+    </ClCompile>
+    <ClCompile Include="IOCP\BaseSocket.cpp">
+      <Filter>IOCP</Filter>
+    </ClCompile>
+    <ClCompile Include="IOCP\WorkThreadPool.cpp">
+      <Filter>IOCP</Filter>
+    </ClCompile>
+    <ClCompile Include="IOCP\BaseThread.cpp">
+      <Filter>IOCP</Filter>
+    </ClCompile>
+    <ClCompile Include="IOCP\IOCPManager.cpp">
+      <Filter>IOCP</Filter>
+    </ClCompile>
+    <ClCompile Include="IOCP\ListenThread.cpp">
+      <Filter>IOCP</Filter>
+    </ClCompile>
+    <ClCompile Include="IOCP\MemoryPool.cpp">
+      <Filter>IOCP</Filter>
+    </ClCompile>
+    <ClCompile Include="IOCP\SocketPool.cpp">
+      <Filter>IOCP</Filter>
+    </ClCompile>
+    <ClCompile Include="IOCP\WorkThread.cpp">
+      <Filter>IOCP</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\CommonFunction.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\GobalConfig.cpp">
+      <Filter>Common</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

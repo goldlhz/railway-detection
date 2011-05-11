@@ -3,7 +3,7 @@
 
 #include "stdafx.h"
 #include "KellService.h"
-#include "icop/IOCPManager.h"
+#include "IOCPManager.h"
 
 
 int APIENTRY _tWinMain(	

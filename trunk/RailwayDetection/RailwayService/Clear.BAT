@@ -30,4 +30,5 @@ del /S /Q *.sdf
 for /r . %%a in (.) do @if exist "%%a\Debug" rd /s /q "%%a\Debug"
 for /r . %%a in (.) do @if exist "%%a\Release" rd /s /q "%%a\Release"
 for /r . %%a in (.) do @if exist "%%a\Bin" rd /s /q "%%a\Bin  
+for /r . %%a in (.) do @if exist "%%a\ipch" rd /s /q "%%a\ipch  
 pause
