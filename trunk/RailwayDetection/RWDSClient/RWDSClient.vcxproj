@@ -129,11 +129,13 @@
   <ItemGroup>
     <ClInclude Include="ClassView.h" />
     <ClInclude Include="Datadef.h" />
+    <ClInclude Include="EmergencyTask.h" />
     <ClInclude Include="FileView.h" />
     <ClInclude Include="LineList.h" />
     <ClInclude Include="Login.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="MAPX.H" />
+    <ClInclude Include="ModifyPassword.h" />
     <ClInclude Include="OutputWnd.h" />
     <ClInclude Include="PointList.h" />
     <ClInclude Include="PropertiesWnd.h" />
@@ -142,6 +144,7 @@
     <ClInclude Include="RWDSClientDoc.h" />
     <ClInclude Include="RWDSClientView.h" />
     <ClInclude Include="Schedule.h" />
+    <ClInclude Include="StaffList.h" />
     <ClInclude Include="StaticData.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -150,11 +153,13 @@
   <ItemGroup>
     <ClCompile Include="ClassView.cpp" />
     <ClCompile Include="Datadef.cpp" />
+    <ClCompile Include="EmergencyTask.cpp" />
     <ClCompile Include="FileView.cpp" />
     <ClCompile Include="LineList.cpp" />
     <ClCompile Include="Login.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="MAPX.CPP" />
+    <ClCompile Include="ModifyPassword.cpp" />
     <ClCompile Include="OutputWnd.cpp" />
     <ClCompile Include="PointList.cpp" />
     <ClCompile Include="PropertiesWnd.cpp" />
@@ -162,6 +167,7 @@
     <ClCompile Include="RWDSClientDoc.cpp" />
     <ClCompile Include="RWDSClientView.cpp" />
     <ClCompile Include="Schedule.cpp" />
+    <ClCompile Include="StaffList.cpp" />
     <ClCompile Include="StaticData.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

@@ -28,6 +28,11 @@ protected:
 	LineInfo* m_SelectedLine;
 	CListCtrl m_ListCtrl;
 	CListCtrl m_ListArriveTime;
+    CComboBox m_ComboStartDay;
+    CListBox m_ListStaffSelected;
+    CListBox m_ListStaffUnselected;
+    vector<StaffInfo*> m_StaffSeleted;
+    vector<StaffInfo*> m_StaffUnseleted;//选择的线有哪些员工可以走
 public:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnLvnItemchangedSchedulelist(NMHDR *pNMHDR, LRESULT *pResult);
@@ -37,5 +42,7 @@ public:
 	afx_msg void OnLvnItemchangedListarrivettime(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnBnClickedBtnModifytime();
 	afx_msg void OnBnClickedBtnModifycalender();
-	CComboBox m_ComboStartDay;
+    afx_msg void OnBnClickedBtnCleanstaff();
+    afx_msg void OnBnClickedBtnAddliststaff();
+    afx_msg void OnBnClickedBtnRemoveliststaff();
 };

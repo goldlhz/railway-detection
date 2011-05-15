@@ -159,6 +159,15 @@
     <ClInclude Include="StaticData.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="StaffList.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ModifyPassword.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="EmergencyTask.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RWDSClient.cpp">
@@ -210,6 +219,15 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="StaticData.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="StaffList.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ModifyPassword.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="EmergencyTask.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

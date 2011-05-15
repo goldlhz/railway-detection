@@ -6,7 +6,7 @@
 #include "MAPX.H"
 #include "Datadef.h"
 
-#define TIMERNEWPOSITION 1
+#define TIMERNTRACK 1
 
 class CFileView;
 class CRWDSClientView : public CView
@@ -15,6 +15,8 @@ class CRWDSClientView : public CView
 	friend class CLineList;
 	friend class CSchedule;
 	friend class CFileView;
+    friend class CStaffList;
+    friend class CEmergencyTask;
 protected: // 仅从序列化创建
 	CRWDSClientView();
 	DECLARE_DYNCREATE(CRWDSClientView)
@@ -45,14 +47,15 @@ public:
 public:
 	CString GetModulePath();
 	void DecimalGeoToStandardGeo(double dX, double dY, int *iXd, int *iXm, int *iXs, int *iYd, int *iYm, int *iYs);
-	void MapxDrawCircle(double aMapLon, double aMapLat);
+	void MapxDrawCircle(double aMapLon, double aMapLat, CString aLayerName, ColorConstants aColor = miColorRed);
 	void MapxDrawLine(double aMapLon1, double aMapLat1, double aMapLon2, double aMapLat2);
 	void MapxSetText(double aMapLon, double aMapLat, CString aText);
-	void MapxCleanAllFeature();
+	void MapxCleanAllFeature(CString aLayerName);
 protected:
 	bool m_SymbolMove;
 	CMapX m_MapX;
 	CString m_SymbolLayer;
+	CString m_TrackLayer;
 	CString m_MapName;
 	double	m_InitZoom;			//初始缩放比例
 	double	m_InitCenterX;
@@ -65,6 +68,8 @@ protected:
 	vector<OrganizationInfo*> m_Org;
 	CalendarSchedule* m_Calendar;
 	vector<LineInfo*> m_CurrentLinePosition;
+	vector<StaffInfo*> m_Staff;
+    vector<EmergencyTaskInfo*> m_Emergency;
 	CFileView* m_FileView;
 // 生成的消息映射函数
 protected:
@@ -92,6 +97,7 @@ public:
 	afx_msg void OnSetSchedule();
 	afx_msg void OnMapViewChangedMap();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+    afx_msg void OnSetStaff();
 };
 extern CRWDSClientView* gClientView;
 

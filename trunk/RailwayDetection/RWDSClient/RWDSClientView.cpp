@@ -16,6 +16,7 @@
 #include "Schedule.h"
 #include "MainFrm.h"
 #include "StaticData.h"
+#include "StaffList.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -54,6 +55,7 @@ BEGIN_MESSAGE_MAP(CRWDSClientView, CView)
 	ON_COMMAND(ID_SET_LINE, &CRWDSClientView::OnSetLine)
 	ON_COMMAND(ID_SET_SCHEDULE, &CRWDSClientView::OnSetSchedule)
 	ON_WM_TIMER()
+    ON_COMMAND(ID_SET_STAFF, &CRWDSClientView::OnSetStaff)
 END_MESSAGE_MAP()
 
 BEGIN_EVENTSINK_MAP(CRWDSClientView, CView)
@@ -71,6 +73,7 @@ CRWDSClientView::CRWDSClientView()
 {
 	// TODO: 在此处添加构造代码
 	m_SymbolLayer = "SymbolLayer";
+	m_TrackLayer = "TrackLayer";
 	m_MapName = "RailwayMap.GST";
 	m_Calendar = new CalendarSchedule;
 	m_Calendar->iDateSchedule = &m_Line;
@@ -196,29 +199,46 @@ int CRWDSClientView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		//m_MapX.geoset(_T(".\\map"));
 		m_MapX.SetGeoSet(mapPath);		//指定地图集
 		m_MapX.SetTitleText(_T(""));
+		m_MapX.SetPanAnimationLayer(TRUE); 
 
 		CMapXLayers layers=m_MapX.GetLayers();
 		CMapXLayer layer;
-		BOOL Flag=false;
-		int layerIndex = 0;
-		for(layerIndex=0; layerIndex<layers.GetCount(); layerIndex++)
+		BOOL flagSymbol=FALSE;
+		BOOL flagTrack = FALSE;
+		int layerSymbolIndex = 0;
+		int layerTrackIndex = 0;
+		for(int i=0; i<layers.GetCount(); i++)
 		{
-			layer=layers.Item(layerIndex+1);
+			layer=layers.Item(i+1);
 			if(layer.GetName() == m_SymbolLayer) 
 			{
-				Flag=true;  
-				break;
+				flagSymbol=TRUE; 
+				layerSymbolIndex = i;
+				//break;
+			}
+			else if (layer.GetName() == m_TrackLayer)
+			{
+				flagTrack = TRUE;
+				layerTrackIndex = i;
 			}
 		}
 		//没有tempLayer图层，就新建
-		if (Flag==false)
+		if (!flagSymbol)
 		{
 			layer=m_MapX.GetLayers().CreateLayer(m_SymbolLayer);
 			m_MapX.GetLayers().SetAnimationLayer(layer); //设为动态图层  
-			layerIndex = 0;
+			layerSymbolIndex = 0;
 		}
 
-		m_MapX.GetLayers().Move(layerIndex+1, 1);
+		m_MapX.GetLayers().Move(layerSymbolIndex+1, 1);
+
+		if (!flagTrack)
+		{
+			layer=m_MapX.GetLayers().CreateLayer(m_TrackLayer);
+			m_MapX.GetLayers().SetAnimationLayer(layer); //设为动态图层  
+			layerTrackIndex = 0;
+		}
+		m_MapX.GetLayers().Move(layerTrackIndex+1, 1);
 
 		m_InitCenterX=m_MapX.GetCenterX();
 		m_InitCenterY=m_MapX.GetCenterY();
@@ -252,7 +272,9 @@ int CRWDSClientView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	//m_FileView->SetRWDSClientView(this);
 	//m_FileView->FillFileView();
 
-	SetTimer(TIMERNEWPOSITION, 60000, NULL);
+	//SetTimer(TIMERNTRACK, 500, NULL);
+
+
 	////////////////////////////////////////////////////user data
 	MapPoint *pt = new MapPoint;
 	pt->iRailLine = Chengdu_Chongqing; 
@@ -292,18 +314,14 @@ int CRWDSClientView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	line->iStartKm = m_MapPoint[0]->iKM;
 	line->iStartNo = KFirstDay;
 	line->iLineKmLonLat.push_back(m_MapPoint[0]);
-	line->iLineKmTime.push_back(0);
+	line->iLineKmTime.push_back(100);
 	line->iLineKmLonLat.push_back(m_MapPoint[1]);
-	line->iLineKmTime.push_back(0);
+	line->iLineKmTime.push_back(100);
 	line->iLineKmLonLat.push_back(m_MapPoint[2]);
-	line->iLineKmTime.push_back(0);
+	line->iLineKmTime.push_back(100);
 	line->iLineKmLonLat.push_back(m_MapPoint[3]);
-	line->iLineKmTime.push_back(0);
+	line->iLineKmTime.push_back(100);
 	m_Line.push_back(line);
-    
-	//LineInfo *curLine = new LineInfo;
-	//CStaticData::CopyLineInfoWithoutTime(line, curLine);
-	//m_CurrentLinePosition.push_back(curLine);
 
 	line = new LineInfo;
 	line->iLineID = 2;
@@ -316,51 +334,39 @@ int CRWDSClientView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	line->iLineKmTime.push_back(0);
 	m_Line.push_back(line);
 
-	//curLine = new LineInfo;
-	//CStaticData::CopyLineInfoWithoutTime(line, curLine);
-	//m_CurrentLinePosition.push_back(curLine);
-
-	//ScheduleLine* sc = new ScheduleLine;
-	//sc->iScheduleID = 1;
-	//sc->iLine = m_Line[0];
-	////sc->iScheduleName = _T("1段早班");
-	//sc->iULineKmTime.push_back(10545020);
-	//sc->iULineKmTime.push_back(10554900);
-	////Worker* wk = new Worker;
-	////wk->iID = 1;
-	////wk->iName = _T("职工1");
-	////DeviceInfo* dv = new DeviceInfo;
-	////dv->iDevID = 1254;
-	////sc->iWorker = wk;
-	////sc->iDevice = dv;
-	//m_Schedule.push_back(sc);
-	//m_Line[0]->iSchedule = sc;
-
-	//sc = new ScheduleLine;
-	//sc->iScheduleID = 1;
-	//sc->iLine = m_Line[1];
-	////sc->iScheduleName = _T("2段早班");
-	//sc->iULineKmTime.push_back(10545020);
-	//sc->iULineKmTime.push_back(10554900);
-	////wk = new Worker;
-	////wk->iID = 2;
-	////wk->iName = _T("职工2");
-	////dv = new DeviceInfo;
-	////dv->iDevID = 1255;
-	////sc->iWorker = wk;
-	////sc->iDevice = dv;
-	//m_Schedule.push_back(sc);
-	//m_Line[1]->iSchedule = sc;
-
 	OrganizationInfo* org = new OrganizationInfo;
 	org->iOrgName = _T("Admin");
 	org->iParentOrg = NULL;
 	org->iOrgID = 1;
 	org->iChildID.push_back(2);
 	m_Org.push_back(org);
+
+    StaffInfo* staff = new StaffInfo;
+    staff->iID = 1;
+    staff->iOrgID = 1;
+    staff->iPassword = _T("111");
+    staff->iLoginPermission = TRUE;
+    staff->iName = _T("张三");
+    m_Staff.push_back(staff);
+
+    staff = new StaffInfo;
+    staff->iID = 2;
+    staff->iOrgID = 1;
+    staff->iPassword = _T("");
+    staff->iLoginPermission = FALSE;
+    staff->iName = _T("李四");
+    m_Staff.push_back(staff);
+
+    staff = new StaffInfo;
+    staff->iID = 3;
+    staff->iOrgID = 1;
+    staff->iName = _T("王五");
+    staff->iPassword = _T("");
+    staff->iLoginPermission = FALSE;
+    m_Staff.push_back(staff);
 	//////////////////////////////////////////////////
 
-	MapxCleanAllFeature();
+	MapxCleanAllFeature(m_SymbolLayer);
 	return 0;
 }
 
@@ -524,18 +530,18 @@ void CRWDSClientView::DecimalGeoToStandardGeo(double dX, double dY, int *iXd, in
 	*iYs=int((dTemp*60-int(dTemp*60))*60);
 }
 
-void CRWDSClientView::MapxDrawCircle(double aMapLon, double aMapLat)
+void CRWDSClientView::MapxDrawCircle(double aMapLon, double aMapLat, CString aLayerName, ColorConstants aColor)
 {
 	CMapXPoint point;
 	point.CreateDispatch(point.GetClsid());
 	point.Set(aMapLon, aMapLat);
 	CMapXFeature ft;
-	ft=m_MapX.GetFeatureFactory().CreateCircularRegion(miCircleTypeScreen, point, 0.0005, miUnitDegree,100);
+	ft=m_MapX.GetFeatureFactory().CreateCircularRegion(miCircleTypeScreen, point, 0.0003, miUnitDegree,100);
 	CMapXStyle style;
 	style = ft.GetStyle();
-	style.SetRegionColor(miColorRed);
+	style.SetRegionColor(aColor);
 	style.SetRegionBorderStyle(0);//无边框
-	m_MapX.GetLayers().Item(m_SymbolLayer).AddFeature(ft);
+	m_MapX.GetLayers().Item(aLayerName).AddFeature(ft);
 }
 
 void CRWDSClientView::MapxDrawLine(double aMapLon1, double aMapLat1, double aMapLon2, double aMapLat2)
@@ -613,14 +619,14 @@ void CRWDSClientView::MapxSetText(double aMapLon, double aMapLat, CString aText)
 	}
 }
 
-void CRWDSClientView::MapxCleanAllFeature()
+void CRWDSClientView::MapxCleanAllFeature(CString aLayerName)
 {
 	CMapXLayer layer;
 	CMapXFeature Ftr;
 	CMapXFeatures Ftrs;
 	int featureCount;
 
-	layer = m_MapX.GetLayers().Item(m_SymbolLayer);
+	layer = m_MapX.GetLayers().Item(aLayerName);
 	Ftrs = layer.AllFeatures();
 	featureCount = layer.AllFeatures().GetCount();
 
@@ -790,17 +796,47 @@ void CRWDSClientView::OnSetSchedule()
 void CRWDSClientView::OnTimer(UINT_PTR nIDEvent)
 {
 	// TODO: 在此添加命令处理程序代码
+	static BOOL displayLastPoint = TRUE;
 	switch(nIDEvent)
 	{
-	case TIMERNEWPOSITION:
+	case TIMERNTRACK:
 		//获取线路的当前巡查位置
-		for(size_t i=0; i<m_CurrentLinePosition.size(); i++)
+		//for(size_t i=0; i<m_CurrentLinePosition.size(); i++)
+		//{
+		//	//GetCurrentPosition(m_CurrentLinePosition[i]->iLineID, m_CurrentLinePosition[i]);
+		//}
+		if (m_MapPoint.size() == 0)
 		{
-			//GetCurrentPosition(m_CurrentLinePosition[i]->iLineID, m_CurrentLinePosition[i]);
+			break;
 		}
+		MapPoint* point;
+		
+		MapxCleanAllFeature(m_TrackLayer);
+		size_t i;
+		for (i=0; i<m_MapPoint.size()-1; i++)
+		{
+			point =m_MapPoint[i];
+			MapxDrawCircle(point->iLon-0.001, point->iLat-0.001, m_TrackLayer, miColorYellow);
+		}
+		if (displayLastPoint)
+		{
+			point = m_MapPoint[i];
+			MapxDrawCircle(point->iLon-0.001, point->iLat-0.001, m_TrackLayer, miColorYellow);
+			displayLastPoint = FALSE;
+		}
+		else
+			displayLastPoint = TRUE;
 		break;
 	default:
 		break;
 	}
 	CView::OnTimer(nIDEvent);
+}
+
+
+void CRWDSClientView::OnSetStaff()
+{
+    // TODO: 在此添加命令处理程序代码
+    CStaffList setStaff(this);
+    setStaff.DoModal();
 }
