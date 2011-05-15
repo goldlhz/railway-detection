@@ -23,10 +23,12 @@ CSchedule::~CSchedule()
 
 void CSchedule::DoDataExchange(CDataExchange* pDX)
 {
-	CDialogEx::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_SCHEDULELIST, m_ListCtrl);
-	DDX_Control(pDX, IDC_LISTARRIVETTIME, m_ListArriveTime);
-	DDX_Control(pDX, IDC_COMBO_STARTDAY, m_ComboStartDay);
+    CDialogEx::DoDataExchange(pDX);
+    DDX_Control(pDX, IDC_SCHEDULELIST, m_ListCtrl);
+    DDX_Control(pDX, IDC_LISTARRIVETTIME, m_ListArriveTime);
+    DDX_Control(pDX, IDC_COMBO_STARTDAY, m_ComboStartDay);
+    DDX_Control(pDX, IDC_LIST_SELECTEDSTAFF, m_ListStaffSelected);
+    DDX_Control(pDX, IDC_LIST_UNSELECTSTAFF, m_ListStaffUnselected);
 }
 
 
@@ -35,6 +37,9 @@ BEGIN_MESSAGE_MAP(CSchedule, CDialogEx)
 	ON_NOTIFY(LVN_ITEMCHANGED, IDC_LISTARRIVETTIME, &CSchedule::OnLvnItemchangedListarrivettime)
 	ON_BN_CLICKED(IDC_BTN_MODIFYTIME, &CSchedule::OnBnClickedBtnModifytime)
 	ON_BN_CLICKED(IDC_BTN_MODIFYCALENDER, &CSchedule::OnBnClickedBtnModifycalender)
+    ON_BN_CLICKED(IDC_BTN_CLEANSTAFF, &CSchedule::OnBnClickedBtnCleanstaff)
+    ON_BN_CLICKED(IDC_BTN_ADDLISTSTAFF, &CSchedule::OnBnClickedBtnAddliststaff)
+    ON_BN_CLICKED(IDC_BTN_REMOVELISTSTAFF, &CSchedule::OnBnClickedBtnRemoveliststaff)
 END_MESSAGE_MAP()
 
 
@@ -148,12 +153,61 @@ void CSchedule::OnLvnItemchangedSchedulelist(NMHDR *pNMHDR, LRESULT *pResult)
 	m_SelectedLine = line;
 
 	//处理日程表
-	m_ComboStartDay.SetCurSel(line->iStartNo);
+	
 	CTime startTime(m_CRWDSClientView->m_Calendar->iStartDay);
 	((CDateTimeCtrl*)GetDlgItem(IDC_DATETIMEPICKER_STARTDAY))->SetTime(&startTime);
 	CString str;
 	str.Format(_T("%d"), m_CRWDSClientView->m_Calendar->iPeriods);
 	GetDlgItem(IDC_EDIT_PERIODS)->SetWindowText(str);
+	//按周期显示天数
+	m_ComboStartDay.ResetContent();
+	for (int i=0; i<m_CRWDSClientView->m_Calendar->iPeriods && i<StrStartNoCount; i++)
+	{
+		m_ComboStartDay.AddString(StrStartNo[i]);
+	}
+	int curSel = static_cast<int>(line->iStartNo);
+	if (line->iStartNo >= m_ComboStartDay.GetCount())
+	{
+		curSel = -1;
+	}
+	m_ComboStartDay.SetCurSel(curSel);
+	
+    //选择员工
+    m_ListStaffSelected.ResetContent();
+    m_ListStaffUnselected.ResetContent();
+    m_StaffSeleted.clear();
+    m_StaffUnseleted.clear();
+    StaffInfo* staffSeleted;
+    StaffInfo* staffUnseleted;
+
+    for (size_t i=0; i<m_SelectedLine->iArrangeStaff.size(); i++)
+    {
+        staffSeleted = m_SelectedLine->iArrangeStaff[i];
+        m_StaffSeleted.push_back(staffSeleted);
+        m_ListStaffSelected.AddString(staffSeleted->iName);
+    }
+
+    BOOL addStaff = TRUE;
+    for (size_t i=0; i<m_CRWDSClientView->m_Staff.size(); i++)
+    {
+        addStaff = TRUE;
+        staffUnseleted = m_CRWDSClientView->m_Staff[i];
+        for (size_t j=0; j<m_SelectedLine->iArrangeStaff.size(); j++)
+        {//添加已选员工
+            staffSeleted = m_SelectedLine->iArrangeStaff[j];
+            if (staffSeleted == staffUnseleted)
+            {//该员工已选择该线路
+                addStaff = FALSE;
+                break;
+            }
+        }
+        if (addStaff)
+        {
+            int ii= m_ListStaffUnselected.GetCount();
+            m_StaffUnseleted.push_back(staffUnseleted);
+            m_ListStaffUnselected.AddString(staffUnseleted->iName);
+        }
+    }
 	*pResult = 0;
 }
 
@@ -192,8 +246,7 @@ void CSchedule::OnBnClickedBtnModifytime()
 	//CTime t1(m_SelectedSchedule->iULineKmTime[select]);
 	CString strHour;
 	CString strMin;
-	struct tm* schTime = NULL;
-	localtime_s(schTime, &m_SelectedLine->iLineKmTime[select]);
+	struct tm* schTime = localtime(&m_SelectedLine->iLineKmTime[select]);
 	GetDlgItem(IDC_EDIT_HOUR)->GetWindowTextW(strHour);
 	schTime->tm_hour = _ttoi(strHour);
 	GetDlgItem(IDC_EDIT_MINUTE)->GetWindowTextW(strMin);
@@ -225,11 +278,90 @@ void CSchedule::OnBnClickedBtnModifycalender()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	CTime startTime;
-	((CDateTimeCtrl*)GetDlgItem(IDC_DATETIMEPICKER_STARTDAY))->GetTime(startTime);
-	m_CRWDSClientView->m_Calendar->iStartDay = startTime.GetTime();
+
 	CString str;
 	GetDlgItem(IDC_EDIT_PERIODS)->GetWindowText(str);
+	int periods = _ttoi(str);
+	if (periods<1)
+	{
+		AfxMessageBox(_T("排班周期必须要大于或者等于1"));
+		return;
+	}
+	if (m_ComboStartDay.GetCurSel() < 0)
+	{
+		AfxMessageBox(_T("请选择开始日期"));
+		return;
+	}
 	m_CRWDSClientView->m_Calendar->iPeriods = _ttoi(str);
+	((CDateTimeCtrl*)GetDlgItem(IDC_DATETIMEPICKER_STARTDAY))->GetTime(startTime);
+	m_CRWDSClientView->m_Calendar->iStartDay = startTime.GetTime();
 	m_SelectedLine->iStartNo = static_cast<LineStartNo>(m_ComboStartDay.GetCurSel());
+	m_ComboStartDay.ResetContent();
+	for (int i=0; i<m_CRWDSClientView->m_Calendar->iPeriods && i<StrStartNoCount; i++)
+	{
+		m_ComboStartDay.AddString(StrStartNo[i]);
+	}
+	if (m_SelectedLine->iStartNo >= m_ComboStartDay.GetCount())
+	{
+		m_SelectedLine->iStartNo = KUndefine;
+	}
+	m_ComboStartDay.SetCurSel(m_SelectedLine->iStartNo);
+	AfxMessageBox(_T("修改成功"));
+	
+}
+
+
+void CSchedule::OnBnClickedBtnCleanstaff()
+{
+    // TODO: 在此添加控件通知处理程序代码
+}
+
+
+void CSchedule::OnBnClickedBtnAddliststaff()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    int curStaffIndex = m_ListStaffUnselected.GetCurSel();
+    if (curStaffIndex<0)
+    {
+        return;
+    }
+    StaffInfo* curStaff = m_StaffUnseleted[curStaffIndex];
+    //把员工添加到当前选择的路线
+    m_SelectedLine->iArrangeStaff.push_back(curStaff);
+
+    //更改状态
+    m_ListStaffUnselected.DeleteString(curStaffIndex);
+    m_ListStaffSelected.AddString(curStaff->iName);
+    m_StaffUnseleted.erase(m_StaffUnseleted.begin()+curStaffIndex);
+    m_StaffSeleted.push_back(curStaff);
+    curStaff->iArrangeLine.push_back(m_SelectedLine);
+}
+
+
+void CSchedule::OnBnClickedBtnRemoveliststaff()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    int curStaffIndex = m_ListStaffSelected.GetCurSel();
+    if (curStaffIndex<0)
+    {
+        return;
+    }
+    StaffInfo* curStaff = m_StaffSeleted[curStaffIndex];
+    //把员工移除当前选择的路线
+    m_SelectedLine->iArrangeStaff.erase(m_SelectedLine->iArrangeStaff.begin()+curStaffIndex);
+
+    //更改状态
+    m_ListStaffSelected.DeleteString(curStaffIndex);
+    m_ListStaffUnselected.AddString(curStaff->iName);
+    m_StaffSeleted.erase(m_StaffSeleted.begin()+curStaffIndex);
+    m_StaffUnseleted.push_back(curStaff);
+    for (size_t i=0; i<curStaff->iArrangeLine.size(); i++)
+    {
+        if (m_SelectedLine == curStaff->iArrangeLine[i])
+        {
+            curStaff->iArrangeLine.erase(curStaff->iArrangeLine.begin()+i);
+            break;
+        }
+    }
 
 }

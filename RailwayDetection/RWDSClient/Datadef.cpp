@@ -20,7 +20,7 @@ extern const int DirectNameCount = 3;
 const CString StrKm = _T("公里");
 
 const CString StrStartNo[] = {
-							  _T("当天"),
+							  _T("第一天"),
 							  _T("第二天"),
 							  _T("第三天"),
 							  _T("第四天"),
@@ -29,3 +29,4 @@ const CString StrStartNo[] = {
 							  _T("第七天")
 							 };
 extern const int StrStartNoCount = 7;
+extern const CString StrClientCaption = _T("铁路巡查系统");

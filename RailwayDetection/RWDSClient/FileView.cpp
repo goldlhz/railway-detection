@@ -128,9 +128,9 @@ void CFileView::FillFileView()
 
 
 	OrganizationInfo* org = m_RWDSClientView->m_Org[0];
-	HTREEITEM hRoot = m_wndFileView.InsertItem(org->iOrgName, 0, 0);
+	HTREEITEM hRoot = m_wndFileView.InsertItem(org->iOrgName, 8, 8);
 	m_wndFileView.SetItemData(hRoot, (DWORD_PTR)org);
-	m_wndFileView.InsertItem(_T(""), 0, 0, hRoot);//为了显示+号
+	m_wndFileView.InsertItem(_T(""), 8, 8, hRoot);//为了显示+号
 }
 
 void CFileView::OnContextMenu(CWnd* pWnd, CPoint point)
@@ -272,11 +272,11 @@ void CFileView::OnNMDblclkFileView(NMHDR *pNMHDR, LRESULT *pResult)
 		*pResult = 0;
 		return;
 	}
-	m_RWDSClientView->MapxCleanAllFeature();
+	m_RWDSClientView->MapxCleanAllFeature(m_RWDSClientView->m_SymbolLayer);
 	LineInfo* line = (LineInfo*)m_wndFileView.GetItemData(curItem);
 	for (size_t i=0; i<line->iLineKmLonLat.size(); i++)
-	{
-		m_RWDSClientView->MapxDrawCircle(line->iLineKmLonLat[i]->iLon, line->iLineKmLonLat[i]->iLat);
+	{//在地图上绘制点线
+		m_RWDSClientView->MapxDrawCircle(line->iLineKmLonLat[i]->iLon, line->iLineKmLonLat[i]->iLat, m_RWDSClientView->m_SymbolLayer);
 		if (i>0)
 		{
 			m_RWDSClientView->MapxDrawLine(line->iLineKmLonLat[i-1]->iLon, line->iLineKmLonLat[i-1]->iLat,
@@ -285,7 +285,7 @@ void CFileView::OnNMDblclkFileView(NMHDR *pNMHDR, LRESULT *pResult)
 		CString str;
 		CTime arrTime(line->iLineKmTime[i]);
 		str.Format(_T("%02d:%02d"), arrTime.GetHour(), arrTime.GetMinute());
-		m_RWDSClientView->MapxSetText(line->iLineKmLonLat[i]->iLon, line->iLineKmLonLat[i]->iLat-0.0012, str);
+		m_RWDSClientView->MapxSetText(line->iLineKmLonLat[i]->iLon-0.0001, line->iLineKmLonLat[i]->iLat-0.0005, str);
 	}
 	int centerPoint = line->iLineKmLonLat.size()/2;
 	m_RWDSClientView->m_MapX.SetCenterX(line->iLineKmLonLat[centerPoint]->iLon);
@@ -320,9 +320,9 @@ void CFileView::OnTvnItemexpandedFileView(NMHDR *pNMHDR, LRESULT *pResult)
 			for(size_t i=0; i<curOrg->iChildOrg.size(); i++)
 			{
 				org = curOrg->iChildOrg[i];
-				tmpChild = m_wndFileView.InsertItem(org->iOrgName, 0, 0, curItem);
+				tmpChild = m_wndFileView.InsertItem(org->iOrgName, 8, 8, curItem);
 				m_wndFileView.SetItemData(tmpChild, (DWORD_PTR)org);
-				m_wndFileView.InsertItem(_T(""), 0, 0, tmpChild);//为了显示+号
+				m_wndFileView.InsertItem(_T(""), 8, 8, tmpChild);//为了显示+号
 			}
 		}
 		else if (curOrg->iLine.size() > 0)
@@ -332,7 +332,7 @@ void CFileView::OnTvnItemexpandedFileView(NMHDR *pNMHDR, LRESULT *pResult)
 			for(size_t i=0; i<curOrg->iLine.size(); i++)
 			{
 				line = curOrg->iLine[i];
-				tmpChild = m_wndFileView.InsertItem(line->iLineName, 1, 1, curItem);
+				tmpChild = m_wndFileView.InsertItem(line->iLineName, 8, 8, curItem);
 				m_wndFileView.SetItemData(tmpChild, (DWORD_PTR)line);
 			}
 		}

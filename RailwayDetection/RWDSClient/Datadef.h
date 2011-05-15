@@ -14,6 +14,7 @@ extern const int DirectNameCount;
 extern const CString StrKm;
 extern const CString StrStartNo[];
 extern const int StrStartNoCount;
+extern const CString StrClientCaption;
 
 #define ENCODERAILWAYFULLNAME(aStr, aRailLine, aKm, aLineDirect)\
 	aStr.Format(RailLineName[aRailLine]+_T("%.2f")+StrKm+DirectName[aLineDirect], aKm);
@@ -53,6 +54,7 @@ enum LineDirect
 
 enum LineStartNo
 {
+	KUndefine=-1,
 	KFirstDay=0,
 	KSecondDay,
 	KThirdDay,
@@ -60,6 +62,12 @@ enum LineStartNo
 	KFifthDay,
 	KSixthDay,
 	KSeventhDay
+};
+
+enum EmergencyStatus
+{
+    KNormal=0,
+    KFinished
 };
 
 typedef struct _MapPoint
@@ -71,7 +79,9 @@ typedef struct _MapPoint
 	LineDirect iDirect;
 	//vector<int> iArriveTime;
 }MapPoint;
-struct _Schedule;
+
+struct _Staff;
+
 typedef struct _Line	//线路
 {
 	int iLineID;
@@ -81,10 +91,19 @@ typedef struct _Line	//线路
 	LineStartNo iStartNo;//开始天数
 	vector<MapPoint*> iLineKmLonLat;	//每公里处经纬度
 	vector<time_t> iLineKmTime;			//每公里处时间
-	//struct _Schedule* iSchedule;
-	//vector<time_t> iLineKmTime;
-	//vector<MapPoint> iDownlineKmLonLat;	//下行每公里处经纬度
+    vector<struct _Staff*> iArrangeStaff;   //该线上所有要巡查的员工
+    CString iLineRemark;
 }LineInfo;
+
+typedef struct _Staff
+{
+    int iID;
+    int iOrgID;
+    CString iName;
+    CString iPassword;
+    vector<LineInfo*> iArrangeLine;
+    BOOL iLoginPermission;
+}StaffInfo;
 
 typedef struct _Device	//设备
 {
@@ -94,23 +113,6 @@ typedef struct _Device	//设备
 	double iCurrentLon;
 	double iCurrentLat;
 }DeviceInfo;
-
-typedef struct _Worker
-{
-	int iID;
-	CString iName;
-}Worker;
-
-//typedef struct _Schedule	//排班表
-//{
-//	int iScheduleID;
-//	//CString iScheduleName;
-//	//Worker* iWorker;
-//	//DeviceInfo* iDevice;
-//	LineInfo* iLine;
-//	vector<time_t> iULineKmTime;	//上下行每公里处时间, 与iLine->iUplineKmLonLat对应
-//	//vector<int> iDownlineKmTime;	//下行每公里处时间
-//}ScheduleLine;
 
 typedef struct _Calendar  //排班表
 {
@@ -132,3 +134,12 @@ typedef struct _OrgObj	//机构
 	vector<LineInfo*> iLine;
 }OrganizationInfo;
 
+typedef struct _Emergency
+{
+    int iTaskID;
+    MapPoint* i_BeginPoint;
+    MapPoint* i_EndPoint;
+    time_t iBeginTime;
+    time_t iEndTime;
+    EmergencyStatus iStatus;
+}EmergencyTaskInfo;

@@ -116,6 +116,7 @@ void CLineList::OnBnClickedBtnLineadd()
 	line->iLineKmLonLat.push_back(m_CRWDSClientView->m_MapPoint[0]);
 	line->iLineKmTime.push_back(0);
 	line->iStartNo = KFirstDay;
+    GetDlgItem(IDC_EDIT_LINEREMARK)->GetWindowText(line->iLineRemark);
 	m_CRWDSClientView->m_Line.push_back(line);
 
 	CString id;
@@ -147,6 +148,7 @@ void CLineList::OnClickedBtnLinemodify()
 	}
 	LineInfo* line = m_CRWDSClientView->m_Line[select];
 	line->iLineName = m_ListCtrl.GetItemText(select, 0);
+    GetDlgItem(IDC_EDIT_LINEREMARK)->GetWindowText(line->iLineRemark);
 	//line->iLineKmLonLat.clear();
 	//for (size_t i=0; i<m_Selected.size(); i++)
 	//{
@@ -163,11 +165,27 @@ void CLineList::OnClickedBtnLinedelete()
 		return;
 	LineInfo* line = m_CRWDSClientView->m_Line[select];
 	m_CRWDSClientView->m_Line.erase(m_CRWDSClientView->m_Line.begin()+select);
-	delete line;
 
 	m_ListCtrl.DeleteItem(select);
 	m_ListAllPoint.ResetContent();
 	m_ListSelectedPoint.ResetContent();
+
+    //清除员工设置的线
+    StaffInfo* staff;
+    for (size_t i=0; i<m_CRWDSClientView->m_Staff.size(); i++)
+    {
+        staff = m_CRWDSClientView->m_Staff[i];
+        for (size_t j=0; j<staff->iArrangeLine.size(); j++)
+        {
+            if(line == staff->iArrangeLine[j])
+            {
+                staff->iArrangeLine.erase(staff->iArrangeLine.begin()+j);
+                break;
+            }
+        }
+    }
+
+    delete line;
 }
 
 void CLineList::OnClickedBtnLineok()
@@ -189,22 +207,27 @@ void CLineList::OnLvnItemchangedLinelist(NMHDR *pNMHDR, LRESULT *pResult)
 		return;
 	}
 	CString str;
-	m_ListAllPoint.ResetContent();
+    //GetDlgItem(IDC_EDIT_LINEREMARK)->SetWindowText(_T(""));
+    m_ListAllPoint.ResetContent();
 	m_ListSelectedPoint.ResetContent();
 	m_Selected.clear();
 	m_Unselected.clear();
+    LineInfo* line = m_CRWDSClientView->m_Line[select];
+    GetDlgItem(IDC_EDIT_LINEREMARK)->SetWindowText(line->iLineRemark);
 	for (size_t i=0; i<m_CRWDSClientView->m_MapPoint.size(); i++)
-	{
+	{//根据已选点与未选点加载界面
 		bool addSelect = FALSE;
-		for (size_t j=0; j<m_CRWDSClientView->m_Line[select]->iLineKmLonLat.size(); j++)
-		{//找到相同的点
-			if (m_CRWDSClientView->m_MapPoint[i] == m_CRWDSClientView->m_Line[select]->iLineKmLonLat[j])
+		for (size_t j=0; j<line->iLineKmLonLat.size(); j++)
+		{
+			if (m_CRWDSClientView->m_MapPoint[i] == line->iLineKmLonLat[j])
 			{
 				addSelect = TRUE;
 				break;
 			}
 		}
-		ENCODERAILWAYFULLNAME(str, m_CRWDSClientView->m_MapPoint[i]->iRailLine, m_CRWDSClientView->m_MapPoint[i]->iKM, m_CRWDSClientView->m_MapPoint[i]->iDirect);
+		ENCODERAILWAYFULLNAME(str, m_CRWDSClientView->m_MapPoint[i]->iRailLine, 
+                              m_CRWDSClientView->m_MapPoint[i]->iKM, 
+                              m_CRWDSClientView->m_MapPoint[i]->iDirect);
 		if (addSelect)
 		{
 			m_ListSelectedPoint.AddString(str);
@@ -222,7 +245,7 @@ void CLineList::OnLvnItemchangedLinelist(NMHDR *pNMHDR, LRESULT *pResult)
 
 
 void CLineList::OnNMDblclkLinelist(NMHDR *pNMHDR, LRESULT *pResult)
-{
+{//双击listctrl编辑线路名
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 	// TODO: 在此添加控件通知处理程序代码
 
@@ -240,7 +263,7 @@ void CLineList::OnNMDblclkLinelist(NMHDR *pNMHDR, LRESULT *pResult)
 
 
 void CLineList::OnLvnEndlabeleditLinelist(NMHDR *pNMHDR, LRESULT *pResult)
-{
+{//完成线路名编辑
 	NMLVDISPINFO *pDispInfo = reinterpret_cast<NMLVDISPINFO*>(pNMHDR);
 	// TODO: 在此添加控件通知处理程序代码
 	CString pName = pDispInfo->item.pszText;
