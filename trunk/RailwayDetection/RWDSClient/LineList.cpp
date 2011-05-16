@@ -91,20 +91,20 @@ BOOL CLineList::OnInitDialog()
 	// 异常: OCX 属性页应返回 FALSE
 }
 
-void CLineList::StrLineKmToLineKm( CString aStrLine, RailLine& aRailLine, double& aKm )
-{//宝成线100公里转换成RailLine与Km格式
-	aStrLine.Delete(aStrLine.GetLength()-StrKm.GetLength(), StrKm.GetLength());
-	for (int i=0; i<RailLineNameCount; i++)
-	{
-		if(aStrLine.Find(RailLineName[i]) == 0)
-		{
-			aRailLine = static_cast<RailLine>(i);
-			aStrLine.Delete(0, RailLineName[i].GetLength());
-			aKm = _ttoi(aStrLine);
-			break;
-		}
-	}
-}
+//void CLineList::StrLineKmToLineKm( CString aStrLine, RailLine& aRailLine, double& aKm )
+//{//宝成线100公里转换成RailLine与Km格式
+//	aStrLine.Delete(aStrLine.GetLength()-StrKm.GetLength(), StrKm.GetLength());
+//	for (int i=0; i<RailLineNameCount; i++)
+//	{
+//		if(aStrLine.Find(RailLineName[i]) == 0)
+//		{
+//			aRailLine = static_cast<RailLine>(i);
+//			aStrLine.Delete(0, RailLineName[i].GetLength());
+//			aKm = _ttoi(aStrLine);
+//			break;
+//		}
+//	}
+//}
 
 void CLineList::OnBnClickedBtnLineadd()
 {
@@ -147,14 +147,10 @@ void CLineList::OnClickedBtnLinemodify()
 		return;
 	}
 	LineInfo* line = m_CRWDSClientView->m_Line[select];
-	line->iLineName = m_ListCtrl.GetItemText(select, 0);
+    GetDlgItem(IDC_EDIT_LINENAME)->GetWindowText(line->iLineName);
     GetDlgItem(IDC_EDIT_LINEREMARK)->GetWindowText(line->iLineRemark);
-	//line->iLineKmLonLat.clear();
-	//for (size_t i=0; i<m_Selected.size(); i++)
-	//{
-	//	line->iLineKmLonLat.push_back(m_Selected[i]);
-	//}
-	//AfxMessageBox(_T("保存成功"), MB_OK);
+	AfxMessageBox(_T("保存成功"), MB_OK);
+    m_ListCtrl.SetItemText(select, 0, line->iLineName);
 }
 
 void CLineList::OnClickedBtnLinedelete()
@@ -214,6 +210,9 @@ void CLineList::OnLvnItemchangedLinelist(NMHDR *pNMHDR, LRESULT *pResult)
 	m_Unselected.clear();
     LineInfo* line = m_CRWDSClientView->m_Line[select];
     GetDlgItem(IDC_EDIT_LINEREMARK)->SetWindowText(line->iLineRemark);
+    GetDlgItem(IDC_EDIT_LINENAME)->SetWindowText(line->iLineName);
+    str.Format(_T("%d"), line->iLineID);
+    GetDlgItem(IDC_EDIT_LINEID)->SetWindowText(str);
 	for (size_t i=0; i<m_CRWDSClientView->m_MapPoint.size(); i++)
 	{//根据已选点与未选点加载界面
 		bool addSelect = FALSE;
@@ -249,14 +248,14 @@ void CLineList::OnNMDblclkLinelist(NMHDR *pNMHDR, LRESULT *pResult)
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 	// TODO: 在此添加控件通知处理程序代码
 
-	POSITION pos = m_ListCtrl.GetFirstSelectedItemPosition();
-	int tIndex = m_ListCtrl.GetNextSelectedItem(pos);
+	//POSITION pos = m_ListCtrl.GetFirstSelectedItemPosition();
+	//int tIndex = m_ListCtrl.GetNextSelectedItem(pos);
 
-	if ( tIndex >= 0 )
-	{
-		m_ListCtrl.SetFocus();
-		CEdit* pEdit = m_ListCtrl.EditLabel( tIndex );
-	}
+	//if ( tIndex >= 0 )
+	//{
+	//	m_ListCtrl.SetFocus();
+	//	CEdit* pEdit = m_ListCtrl.EditLabel( tIndex );
+	//}
 
 	*pResult = 0;
 }
@@ -266,14 +265,14 @@ void CLineList::OnLvnEndlabeleditLinelist(NMHDR *pNMHDR, LRESULT *pResult)
 {//完成线路名编辑
 	NMLVDISPINFO *pDispInfo = reinterpret_cast<NMLVDISPINFO*>(pNMHDR);
 	// TODO: 在此添加控件通知处理程序代码
-	CString pName = pDispInfo->item.pszText;
-	int tIndex = pDispInfo->item.iItem;
-	m_ListCtrl.SetFocus();
+	//CString pName = pDispInfo->item.pszText;
+	//int tIndex = pDispInfo->item.iItem;
+	//m_ListCtrl.SetFocus();
 
-	if( ( ! pName.IsEmpty() ) && tIndex >= 0 )
-	{
-		m_ListCtrl.SetItemText( tIndex, 0, pName);
-	}
+	//if( ( ! pName.IsEmpty() ) && tIndex >= 0 )
+	//{
+	//	m_ListCtrl.SetItemText( tIndex, 0, pName);
+	//}
 	*pResult = 0;
 }
 

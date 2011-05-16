@@ -20,7 +20,7 @@ public:
 	enum { IDD = IDD_SETLINE };
 
 public:
-	void StrLineKmToLineKm(CString aStrLine, RailLine& aRailLine, double& aKm);
+	//void StrLineKmToLineKm(CString aStrLine, RailLine& aRailLine, double& aKm);
 protected:
 	CRWDSClientView* m_CRWDSClientView;
 	CListCtrl m_ListCtrl;

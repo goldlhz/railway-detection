@@ -17,6 +17,7 @@
 #include "MainFrm.h"
 #include "StaticData.h"
 #include "StaffList.h"
+#include "EmergencyTask.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -56,6 +57,7 @@ BEGIN_MESSAGE_MAP(CRWDSClientView, CView)
 	ON_COMMAND(ID_SET_SCHEDULE, &CRWDSClientView::OnSetSchedule)
 	ON_WM_TIMER()
     ON_COMMAND(ID_SET_STAFF, &CRWDSClientView::OnSetStaff)
+    ON_COMMAND(ID_SET_EMERGENCYTASK, &CRWDSClientView::OnSetEmergencytask)
 END_MESSAGE_MAP()
 
 BEGIN_EVENTSINK_MAP(CRWDSClientView, CView)
@@ -839,4 +841,12 @@ void CRWDSClientView::OnSetStaff()
     // TODO: 在此添加命令处理程序代码
     CStaffList setStaff(this);
     setStaff.DoModal();
+}
+
+
+void CRWDSClientView::OnSetEmergencytask()
+{
+    // TODO: 在此添加命令处理程序代码
+    CEmergencyTask task(this);
+    task.DoModal();
 }
