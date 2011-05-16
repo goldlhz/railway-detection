@@ -137,9 +137,9 @@ typedef struct _OrgObj	//机构
 typedef struct _Emergency
 {
     int iTaskID;
-    MapPoint* i_BeginPoint;
-    MapPoint* i_EndPoint;
+    CString iTaskName;
+    vector<MapPoint*> iLineKmLonLat;
     time_t iBeginTime;
     time_t iEndTime;
-    EmergencyStatus iStatus;
+    EmergencyStatus iStatus;//0正常，1结束
 }EmergencyTaskInfo;

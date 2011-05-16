@@ -98,6 +98,7 @@ public:
 	afx_msg void OnMapViewChangedMap();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
     afx_msg void OnSetStaff();
+    afx_msg void OnSetEmergencytask();
 };
 extern CRWDSClientView* gClientView;
 

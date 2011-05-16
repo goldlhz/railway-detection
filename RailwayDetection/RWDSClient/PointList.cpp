@@ -186,16 +186,29 @@ void CPointList::OnBnClickedBtnPointdelete()
 	MapPoint* point = m_CRWDSClientView->m_MapPoint[select];
 	m_CRWDSClientView->m_MapPoint.erase(m_CRWDSClientView->m_MapPoint.begin()+select);
 	for(size_t i=0; i<m_CRWDSClientView->m_Line.size(); i++)
-	{
+	{//删除线中设置的点
 		for (size_t j=0; j<m_CRWDSClientView->m_Line[i]->iLineKmLonLat.size(); j++)
 		{
 			if(point == m_CRWDSClientView->m_Line[i]->iLineKmLonLat[j])
-			{//删除线中设置的点
+			{
 				m_CRWDSClientView->m_Line[i]->iLineKmLonLat.erase(m_CRWDSClientView->m_Line[i]->iLineKmLonLat.begin()+j);
 				break;
 			}
 		}
 	}
+
+    for(size_t i=0; i<m_CRWDSClientView->m_Emergency.size(); i++)
+    {//删除线紧急任务中设置的点
+        for (size_t j=0; j<m_CRWDSClientView->m_Emergency[i]->iLineKmLonLat.size(); j++)
+        {
+            if(point == m_CRWDSClientView->m_Emergency[i]->iLineKmLonLat[j])
+            {
+                m_CRWDSClientView->m_Emergency[i]->iLineKmLonLat.erase(m_CRWDSClientView->m_Emergency[i]->iLineKmLonLat.begin()+j);
+                break;
+            }
+        }
+    }
+
 	delete point;
 
 	m_ListCtrl.DeleteItem(select);
