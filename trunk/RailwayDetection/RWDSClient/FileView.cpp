@@ -272,6 +272,7 @@ void CFileView::OnNMDblclkFileView(NMHDR *pNMHDR, LRESULT *pResult)
 		*pResult = 0;
 		return;
 	}
+    m_RWDSClientView->m_DisplayFlag = KRealTime;
 	m_RWDSClientView->MapxCleanAllFeature(m_RWDSClientView->m_SymbolLayer);
 	LineInfo* line = (LineInfo*)m_wndFileView.GetItemData(curItem);
 	for (size_t i=0; i<line->iLineKmLonLat.size(); i++)

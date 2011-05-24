@@ -26,17 +26,13 @@ public:
     int CreateEmergencyTaskID();
 private:
     CRWDSClientView* m_CRWDSClientView;
-    CListBox m_ListAllPoint;
-    CListBox m_ListSelectedPoint;
-    vector<MapPoint*> m_Selected;
-    vector<MapPoint*> m_Unselected;
+    CComboBox m_Combo_StartKM;
+    CComboBox m_Combo_EndKM;
     CListCtrl m_ListCtrl;
     CComboBox m_ComboEmergencyStatus;
 public:
     virtual BOOL OnInitDialog();
     afx_msg void OnLvnItemchangedEmergencylist(NMHDR *pNMHDR, LRESULT *pResult);
-    afx_msg void OnBnClickedBtnEmergencyadd1();
-    afx_msg void OnBnClickedBtnEmergencyremove1();
     afx_msg void OnBnClickedBtnEmergencyadd();
     afx_msg void OnBnClickedBtnEmergencymodify();
     afx_msg void OnBnClickedBtnEmergencydelete();

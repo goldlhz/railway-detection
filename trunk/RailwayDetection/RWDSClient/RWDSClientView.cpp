@@ -18,6 +18,7 @@
 #include "StaticData.h"
 #include "StaffList.h"
 #include "EmergencyTask.h"
+#include "RecordStaff.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -58,6 +59,9 @@ BEGIN_MESSAGE_MAP(CRWDSClientView, CView)
 	ON_WM_TIMER()
     ON_COMMAND(ID_SET_STAFF, &CRWDSClientView::OnSetStaff)
     ON_COMMAND(ID_SET_EMERGENCYTASK, &CRWDSClientView::OnSetEmergencytask)
+//    ON_COMMAND(ID_REVIEW_RECORD, &CRWDSClientView::OnReviewRecord)
+    ON_COMMAND(ID_REVIEW_RECORDDEVICE, &CRWDSClientView::OnReviewRecorddevice)
+    ON_COMMAND(ID_REVIEW_RECORDSTAFF, &CRWDSClientView::OnReviewRecordstaff)
 END_MESSAGE_MAP()
 
 BEGIN_EVENTSINK_MAP(CRWDSClientView, CView)
@@ -77,6 +81,8 @@ CRWDSClientView::CRWDSClientView()
 	m_SymbolLayer = "SymbolLayer";
 	m_TrackLayer = "TrackLayer";
 	m_MapName = "RailwayMap.GST";
+    m_RecordStaff = NULL;
+    m_DisplayFlag = KNone;
 	m_Calendar = new CalendarSchedule;
 	m_Calendar->iDateSchedule = &m_Line;
 	m_Calendar->iStartDay = 1288915200;
@@ -849,4 +855,79 @@ void CRWDSClientView::OnSetEmergencytask()
     // TODO: 在此添加命令处理程序代码
     CEmergencyTask task(this);
     task.DoModal();
+}
+
+
+void CRWDSClientView::OnReviewRecorddevice()
+{
+    // TODO: 在此添加命令处理程序代码
+}
+
+
+void CRWDSClientView::OnReviewRecordstaff()
+{
+    // TODO: 在此添加命令处理程序代码
+    m_DisplayFlag = KStaffLog;
+    CRecordStaff rstaff(this);
+    if(rstaff.DoModal() == IDOK)
+    {
+        /////////////////////////////
+        if (!m_RecordStaff)
+        {
+            m_RecordStaff = new RecordStaff;
+            if(m_Staff.size()>0)
+                m_RecordStaff->iStaff = m_Staff[0];
+            MapPoint* point;
+            for(int i=0; i<3; i++)
+            {
+                point = new MapPoint;
+                point->iDirect = m_MapPoint[i]->iDirect;
+                point->iKM = m_MapPoint[i]->iKM;
+                point->iLon = m_MapPoint[i]->iLon - 0.0001;
+                point->iLat = m_MapPoint[i]->iLat + 0.0001;
+                point->iRailLine = m_MapPoint[i]->iRailLine;
+                m_RecordStaff->iRecordPoint.push_back(point);
+            }
+        }
+        /////////////////////////////
+        int recordSelect = rstaff.GetSelect();
+        m_RecordStaff->iStaff = m_Staff[recordSelect];
+        MapxCleanAllFeature(m_SymbolLayer);
+        MapxCleanAllFeature(m_TrackLayer);
+        MapPoint* point = NULL;
+        LineInfo* line = NULL;
+        double centerX = 0.0;
+        double centerY = 0.0;
+        for (size_t i=0; i<m_RecordStaff->iStaff->iArrangeLine.size(); i++)
+        {//显示该员工所设计的路线
+            line = m_RecordStaff->iStaff->iArrangeLine[i];
+            for (size_t j=0; j<line->iLineKmLonLat.size(); j++)
+            {
+                point = line->iLineKmLonLat[j];
+                MapxDrawCircle(point->iLon, point->iLat, m_SymbolLayer);
+                if (centerX == 0 || centerY == 0)
+                {
+                    centerX = point->iLon;
+                    centerY = point->iLat;
+                }
+            }
+        }
+        for (size_t i=0; i<m_RecordStaff->iRecordPoint.size(); i++)
+        {
+            point = m_RecordStaff->iRecordPoint[i];
+            MapxDrawCircle(point->iLon, point->iLat, m_TrackLayer, miColorBlue);
+            if (centerX == 0 || centerY == 0)
+            {
+                centerX = point->iLon;
+                centerY = point->iLat;
+            }
+        }
+        m_MapX.SetCenterX(centerX);
+        m_MapX.SetCenterY(centerY);
+        m_MapX.SetZoom(m_InitZoom/256);
+        CMainFrame* mainFrame = (CMainFrame *)GetParentFrame();
+        CString str;
+        str = m_RecordStaff->iStaff->iName + _T("巡查记录");
+        mainFrame->m_wndStatusBar.SetPaneText(mainFrame->m_wndStatusBar.CommandToIndex(ID_RECORD), str);
+    }
 }

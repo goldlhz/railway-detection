@@ -7,7 +7,13 @@
 #include "Datadef.h"
 
 #define TIMERNTRACK 1
-
+enum DisplayFlag
+{
+    KNone = 0,
+    KRealTime,
+    KStaffLog,
+    KDeviceLog
+};
 class CFileView;
 class CRWDSClientView : public CView
 {
@@ -17,6 +23,7 @@ class CRWDSClientView : public CView
 	friend class CFileView;
     friend class CStaffList;
     friend class CEmergencyTask;
+    friend class CRecordStaff;
 protected: // 仅从序列化创建
 	CRWDSClientView();
 	DECLARE_DYNCREATE(CRWDSClientView)
@@ -63,14 +70,16 @@ protected:
 	double  m_MouseLon;
 	double  m_MouseLat;
 	CPoint  m_RightClkPoint;
-	vector<MapPoint*> m_MapPoint;
-	vector<LineInfo*> m_Line;
+	vector<MapPoint*> m_MapPoint;//点集
+	vector<LineInfo*> m_Line;//线集
 	vector<OrganizationInfo*> m_Org;
-	CalendarSchedule* m_Calendar;
+	CalendarSchedule* m_Calendar;//日程安排
 	vector<LineInfo*> m_CurrentLinePosition;
-	vector<StaffInfo*> m_Staff;
-    vector<EmergencyTaskInfo*> m_Emergency;
+	vector<StaffInfo*> m_Staff;//员工
+    vector<EmergencyTaskInfo*> m_Emergency;//紧急任务
+    RecordStaff* m_RecordStaff;//人员巡查记录查看
 	CFileView* m_FileView;
+    DisplayFlag m_DisplayFlag;
 // 生成的消息映射函数
 protected:
 	afx_msg void OnFilePrintPreview();
@@ -99,6 +108,9 @@ public:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
     afx_msg void OnSetStaff();
     afx_msg void OnSetEmergencytask();
+//    afx_msg void OnReviewRecord();
+    afx_msg void OnReviewRecorddevice();
+    afx_msg void OnReviewRecordstaff();
 };
 extern CRWDSClientView* gClientView;
 

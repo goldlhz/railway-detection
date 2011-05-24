@@ -72,27 +72,43 @@ enum EmergencyStatus
 
 typedef struct _MapPoint
 {
-	RailLine iRailLine;
-	double iKM;
+    _MapPoint()
+    {
+        iRailLine = Baoji_Chengdu;
+        iKM = 0.0;
+        iLon = 0.0;
+        iLat = 0.0;
+        iDirect = KDownLine;
+    }
+	RailLine iRailLine;//铁路线
+	double iKM;//公里处
 	double iLon;
 	double iLat;
-	LineDirect iDirect;
-	//vector<int> iArriveTime;
+	LineDirect iDirect;//上下行
 }MapPoint;
 
 struct _Staff;
 
 typedef struct _Line	//线路
 {
+    _Line()
+    {
+        iLineID = 0;
+        iLineName = _T("");
+        iOrgID = 0;
+        iStartKm = 0.0;
+        iStartNo = KFirstDay;
+        iLineRemark = _T("");
+    }
 	int iLineID;
 	CString iLineName;
-	int iOrgID;
+	int iOrgID;//所属机构
 	double iStartKm;
 	LineStartNo iStartNo;//开始天数
 	vector<MapPoint*> iLineKmLonLat;	//每公里处经纬度
 	vector<time_t> iLineKmTime;			//每公里处时间
     vector<struct _Staff*> iArrangeStaff;   //该线上所有要巡查的员工
-    CString iLineRemark;
+    CString iLineRemark;//备注
 }LineInfo;
 
 typedef struct _Staff
@@ -101,45 +117,61 @@ typedef struct _Staff
     int iOrgID;
     CString iName;
     CString iPassword;
-    vector<LineInfo*> iArrangeLine;
+    vector<LineInfo*> iArrangeLine;//巡查路线
     BOOL iLoginPermission;
 }StaffInfo;
 
 typedef struct _Device	//设备
 {
 	int iDevID;
-	int iOrgID;
+	int iOrgID;//所属机构
 	DevState iDevState;
-	double iCurrentLon;
-	double iCurrentLat;
+	double iCurrentLon;//当前经度
+	double iCurrentLat;//当前纬度
 }DeviceInfo;
 
 typedef struct _Calendar  //排班表
 {
 	int iCaledarID;
 	int iOrgID;
-	time_t iStartDay;
-	int iPeriods;
-	vector<LineInfo*>* iDateSchedule;
+	time_t iStartDay;//开始日期
+	int iPeriods;//周期
+	vector<LineInfo*>* iDateSchedule;//该排班下的路线集
 }CalendarSchedule;
 
 typedef struct _OrgObj	//机构
 {
 	int iOrgID;
 	CString iOrgName;
-	struct _OrgObj* iParentOrg;
+	struct _OrgObj* iParentOrg;//上级机构
 	vector<int> iChildID;
-	vector<struct _OrgObj*> iChildOrg;
-	vector<DeviceInfo*> iDevice;
-	vector<LineInfo*> iLine;
+	vector<struct _OrgObj*> iChildOrg;//直接下级机构
+	vector<DeviceInfo*> iDevice;//该机构拥有的设备
+	vector<LineInfo*> iLine;//该机构配置的路线，若不为最后一级，则为NULL
 }OrganizationInfo;
 
 typedef struct _Emergency
 {
     int iTaskID;
     CString iTaskName;
-    vector<MapPoint*> iLineKmLonLat;
-    time_t iBeginTime;
-    time_t iEndTime;
+    MapPoint* iBeginKm;//开始处
+    MapPoint* iEndKm;//终点
+    time_t iBeginTime;//开始处时间
+    time_t iEndTime;//终点处时间
     EmergencyStatus iStatus;//0正常，1结束
+    CString iEmergencyRemark;
 }EmergencyTaskInfo;
+
+typedef struct _RecordStaff//员工所巡查记录
+{
+    _RecordStaff()
+    {
+    iStaff = NULL;
+    }
+    StaffInfo* iStaff;
+    vector<MapPoint*> iRecordPoint;//所经过的点
+
+    //iRecordPoint可改为
+    vector<double> iRecordLon;
+    vector<double> iRecordLat;
+}RecordStaff;
