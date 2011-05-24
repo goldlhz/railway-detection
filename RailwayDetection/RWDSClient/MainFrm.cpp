@@ -34,6 +34,7 @@ static UINT indicators[] =
 	//ID_INDICATOR_CAPS,
 	//ID_INDICATOR_NUM,
 	//ID_INDICATOR_SCRL,
+    ID_RECORD,                  //巡查记录
 	ID_INDICATOR_SCALE,			//地图比例尺
 	ID_INDICATOR_COORDINATE,	//鼠标位置坐标
 	//ID_INDICATOR_CLOCK,			//时钟

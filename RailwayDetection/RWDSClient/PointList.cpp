@@ -166,6 +166,7 @@ void CPointList::OnBnClickedBtnPointmodify()
 		point->iDirect = KDownLine;
 	}
 	m_Modifying = FALSE;
+    AfxMessageBox(_T("修改成功"), MB_OK);
 }
 
 void CPointList::OnBnClickedBtnPointdelete()
@@ -199,13 +200,13 @@ void CPointList::OnBnClickedBtnPointdelete()
 
     for(size_t i=0; i<m_CRWDSClientView->m_Emergency.size(); i++)
     {//删除线紧急任务中设置的点
-        for (size_t j=0; j<m_CRWDSClientView->m_Emergency[i]->iLineKmLonLat.size(); j++)
+        if (point == m_CRWDSClientView->m_Emergency[i]->iBeginKm)
         {
-            if(point == m_CRWDSClientView->m_Emergency[i]->iLineKmLonLat[j])
-            {
-                m_CRWDSClientView->m_Emergency[i]->iLineKmLonLat.erase(m_CRWDSClientView->m_Emergency[i]->iLineKmLonLat.begin()+j);
-                break;
-            }
+            m_CRWDSClientView->m_Emergency[i]->iBeginKm = NULL;
+        }
+        if (point == m_CRWDSClientView->m_Emergency[i]->iEndKm)
+        {
+            m_CRWDSClientView->m_Emergency[i]->iEndKm = NULL;
         }
     }
 

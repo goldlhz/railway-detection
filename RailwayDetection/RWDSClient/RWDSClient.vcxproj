@@ -139,6 +139,7 @@
     <ClInclude Include="OutputWnd.h" />
     <ClInclude Include="PointList.h" />
     <ClInclude Include="PropertiesWnd.h" />
+    <ClInclude Include="RecordStaff.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="RWDSClient.h" />
     <ClInclude Include="RWDSClientDoc.h" />
@@ -163,6 +164,7 @@
     <ClCompile Include="OutputWnd.cpp" />
     <ClCompile Include="PointList.cpp" />
     <ClCompile Include="PropertiesWnd.cpp" />
+    <ClCompile Include="RecordStaff.cpp" />
     <ClCompile Include="RWDSClient.cpp" />
     <ClCompile Include="RWDSClientDoc.cpp" />
     <ClCompile Include="RWDSClientView.cpp" />

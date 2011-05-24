@@ -188,6 +188,7 @@ void CStaffList::OnBnClickedBtnmodifystaff()
         m_SeletedStaff->iLoginPermission = FALSE;
         m_SeletedStaff->iPassword = _T("");
     }
+    AfxMessageBox(_T("ÐÞ¸Ä³É¹¦"), MB_OK);
 }
 
 

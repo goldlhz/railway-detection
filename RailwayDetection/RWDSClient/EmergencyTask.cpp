@@ -5,6 +5,7 @@
 #include "RWDSClient.h"
 #include "EmergencyTask.h"
 #include "afxdialogex.h"
+#include "Datadef.h"
 
 
 // CEmergencyTask 对话框
@@ -26,15 +27,17 @@ void CEmergencyTask::DoDataExchange(CDataExchange* pDX)
     CDialogEx::DoDataExchange(pDX);
     DDX_Control(pDX, IDC_EMERGENCYLIST, m_ListCtrl);
     DDX_Control(pDX, IDC_COMBO_EMERGENCYSTATUS, m_ComboEmergencyStatus);
-    DDX_Control(pDX, IDC_EMERGENCY_ALLPOINT, m_ListAllPoint);
-    DDX_Control(pDX, IDC_EMERGENCY_SELETED, m_ListSelectedPoint);
+    //    DDX_Control(pDX, IDC_EMERGENCY_ALLPOINT, m_ListAllPoint);
+    //    DDX_Control(pDX, IDC_EMERGENCY_SELETED, m_ListSelectedPoint);
+    DDX_Control(pDX, IDC_COMBO_STARTKM, m_Combo_StartKM);
+    DDX_Control(pDX, IDC_COMBO_ENDKM, m_Combo_EndKM);
 }
 
 
 BEGIN_MESSAGE_MAP(CEmergencyTask, CDialogEx)
     ON_NOTIFY(LVN_ITEMCHANGED, IDC_EMERGENCYLIST, &CEmergencyTask::OnLvnItemchangedEmergencylist)
-    ON_BN_CLICKED(IDC_BTN_EMERGENCYADD1, &CEmergencyTask::OnBnClickedBtnEmergencyadd1)
-    ON_BN_CLICKED(IDC_BTN_EMERGENCYREMOVE1, &CEmergencyTask::OnBnClickedBtnEmergencyremove1)
+//    ON_BN_CLICKED(IDC_BTN_EMERGENCYADD1, &CEmergencyTask::OnBnClickedBtnEmergencyadd1)
+//    ON_BN_CLICKED(IDC_BTN_EMERGENCYREMOVE1, &CEmergencyTask::OnBnClickedBtnEmergencyremove1)
     ON_BN_CLICKED(IDC_BTN_EMERGENCYADD, &CEmergencyTask::OnBnClickedBtnEmergencyadd)
     ON_BN_CLICKED(IDC_BTN_EMERGENCYMODIFY, &CEmergencyTask::OnBnClickedBtnEmergencymodify)
     ON_BN_CLICKED(IDC_BTN_EMERGENCYDELETE, &CEmergencyTask::OnBnClickedBtnEmergencydelete)
@@ -62,6 +65,19 @@ BOOL CEmergencyTask::OnInitDialog()
     m_ComboEmergencyStatus.AddString(_T("正常"));
     m_ComboEmergencyStatus.AddString(_T("结束"));
 
+    CString str;
+    for(size_t i=0; i<m_CRWDSClientView->m_MapPoint.size(); i++)
+    {
+        
+        ENCODERAILWAYFULLNAME(str, m_CRWDSClientView->m_MapPoint[i]->iRailLine, 
+                              m_CRWDSClientView->m_MapPoint[i]->iKM, 
+                              m_CRWDSClientView->m_MapPoint[i]->iDirect);
+        m_Combo_StartKM.AddString(str);
+        //m_Combo_StartKM.SetItemData(i, reinterpret_cast<DWORD_PTR>(m_CRWDSClientView->m_MapPoint[i]));
+        m_Combo_EndKM.AddString(str);
+        //m_Combo_EndKM.SetItemData(i, reinterpret_cast<DWORD_PTR>(m_CRWDSClientView->m_MapPoint[i]));
+    }
+
     int count = m_CRWDSClientView->m_Emergency.size();
     CString id;
     CString name;
@@ -72,14 +88,20 @@ BOOL CEmergencyTask::OnInitDialog()
     {
         id.Format(_T("%d"), m_CRWDSClientView->m_Emergency[i]->iTaskID);
         name = m_CRWDSClientView->m_Emergency[i]->iTaskName;
-        if (m_CRWDSClientView->m_Emergency[i]->iLineKmLonLat.size() > 0)
+        if (m_CRWDSClientView->m_Emergency[i]->iBeginKm)
         {
-            startKm.Format(_T("%.0f"), m_CRWDSClientView->m_Emergency[i]->iLineKmLonLat[0]->iKM);
-            endKm.Format(_T("%.0f"), m_CRWDSClientView->m_Emergency[i]->iLineKmLonLat[m_CRWDSClientView->m_Line[i]->iLineKmLonLat.size()-1]->iKM);
+            startKm.Format(_T("%.0f"), m_CRWDSClientView->m_Emergency[i]->iBeginKm->iKM);
         }
         else
         {
             startKm = _T("");
+        }
+        if (m_CRWDSClientView->m_Emergency[i]->iEndKm)
+        {
+            endKm.Format(_T("%.0f"), m_CRWDSClientView->m_Emergency[i]->iEndKm->iKM);
+        }
+        else
+        {
             endKm = _T("");
         }
 
@@ -114,55 +136,58 @@ void CEmergencyTask::OnLvnItemchangedEmergencylist(NMHDR *pNMHDR, LRESULT *pResu
         return;
     }
     CString str;
-    //GetDlgItem(IDC_EDIT_LINEREMARK)->SetWindowText(_T(""));
-    m_ListAllPoint.ResetContent();
-    m_ListSelectedPoint.ResetContent();
-    m_Selected.clear();
-    m_Unselected.clear();
     EmergencyTaskInfo* task = m_CRWDSClientView->m_Emergency[select];
-    //GetDlgItem(IDC_EDIT_LINEREMARK)->SetWindowText(task->iLineRemark);
+    GetDlgItem(IDC_EDIT_EMERGENCYREMARK)->SetWindowText(task->iEmergencyRemark);
     GetDlgItem(IDC_EDIT_EMERGENCYNAME)->SetWindowText(task->iTaskName);
     str.Format(_T("%d"), task->iTaskID);
     GetDlgItem(IDC_EDIT_EMERGENCYID)->SetWindowText(str);
     m_ComboEmergencyStatus.SetCurSel(task->iStatus);
+
+    CString strBeginHour;
+    CString strBeginMin;
+    CString strEndHour;
+    CString strEndMin;
+    struct tm* beginTime = localtime(&task->iBeginTime);
+    strBeginHour.Format(_T("%02d"), beginTime->tm_hour);
+    strBeginMin.Format(_T("%02d"), beginTime->tm_min);
+
+    struct tm* endTime = localtime(&task->iEndTime);
+    strEndHour.Format(_T("%02d"), endTime->tm_hour);
+    strEndMin.Format(_T("%02d"), endTime->tm_min);
+
+    GetDlgItem(IDC_EDIT_STARTHOUR)->SetWindowText(strBeginHour);
+    GetDlgItem(IDC_EDIT_STARTMINUTE)->SetWindowText(strBeginMin);
+    GetDlgItem(IDC_EDIT_ENDHOUR)->SetWindowText(strEndHour);
+    GetDlgItem(IDC_EDIT_ENDMINUTE)->SetWindowText(strEndMin);
+
+    m_Combo_StartKM.SetCurSel(-1);
+    m_Combo_EndKM.SetCurSel(-1);
+
     for (size_t i=0; i<m_CRWDSClientView->m_MapPoint.size(); i++)
-    {//根据已选点与未选点加载界面
-        bool addSelect = FALSE;
-        for (size_t j=0; j<task->iLineKmLonLat.size(); j++)
+    {
+        if (m_CRWDSClientView->m_MapPoint[i] == task->iBeginKm)
         {
-            if (m_CRWDSClientView->m_MapPoint[i] == task->iLineKmLonLat[j])
-            {
-                addSelect = TRUE;
-                break;
-            }
+            m_Combo_StartKM.SetCurSel(i);
         }
-        ENCODERAILWAYFULLNAME(str, m_CRWDSClientView->m_MapPoint[i]->iRailLine, 
-            m_CRWDSClientView->m_MapPoint[i]->iKM, 
-            m_CRWDSClientView->m_MapPoint[i]->iDirect);
-        if (addSelect)
+        if (m_CRWDSClientView->m_MapPoint[i] == task->iEndKm)
         {
-            m_ListSelectedPoint.AddString(str);
-            m_Selected.push_back(m_CRWDSClientView->m_MapPoint[i]);
-        }
-        else
-        {
-            m_ListAllPoint.AddString(str);
-            m_Unselected.push_back(m_CRWDSClientView->m_MapPoint[i]);
+            m_Combo_EndKM.SetCurSel(i);
         }
     }
+
     *pResult = 0;
 }
 
-void CEmergencyTask::OnBnClickedBtnEmergencyadd1()
-{
-    // TODO: 在此添加控件通知处理程序代码
-}
-
-
-void CEmergencyTask::OnBnClickedBtnEmergencyremove1()
-{
-    // TODO: 在此添加控件通知处理程序代码
-}
+//void CEmergencyTask::OnBnClickedBtnEmergencyadd1()
+//{
+//    // TODO: 在此添加控件通知处理程序代码
+//}
+//
+//
+//void CEmergencyTask::OnBnClickedBtnEmergencyremove1()
+//{
+//    // TODO: 在此添加控件通知处理程序代码
+//}
 
 int CEmergencyTask::CreateEmergencyTaskID()
 {
@@ -186,6 +211,11 @@ void CEmergencyTask::OnBnClickedBtnEmergencyadd()
     task->iTaskID = CreateEmergencyTaskID();
     task->iTaskName = _T("紧急任务");
     task->iStatus = KNormal;
+    task->iBeginKm = NULL;
+    task->iEndKm = NULL;
+    task->iBeginTime = 10;
+    task->iEndTime = 10;
+    task->iEmergencyRemark = _T("");
     m_CRWDSClientView->m_Emergency.push_back(task);
 
     CString id;
@@ -221,13 +251,61 @@ void CEmergencyTask::OnBnClickedBtnEmergencymodify()
     }
     EmergencyTaskInfo* task = m_CRWDSClientView->m_Emergency[select];
     GetDlgItem(IDC_EDIT_EMERGENCYNAME)->GetWindowText(task->iTaskName);
+    
     task->iStatus = static_cast<EmergencyStatus>(m_ComboEmergencyStatus.GetCurSel());
+    CString str;
+    if (m_Combo_StartKM.GetCurSel() > -1)
+    {
+        task->iBeginKm = m_CRWDSClientView->m_MapPoint[m_Combo_StartKM.GetCurSel()];
+        
+    }
+    if (m_Combo_EndKM.GetCurSel() > -1)
+    {
+        task->iEndKm = m_CRWDSClientView->m_MapPoint[m_Combo_EndKM.GetCurSel()];
 
-    //LineInfo* line = m_CRWDSClientView->m_Line[select];
-    //GetDlgItem(IDC_EDIT_LINENAME)->GetWindowText(line->iLineName);
-    //GetDlgItem(IDC_EDIT_LINEREMARK)->GetWindowText(line->iLineRemark);
-    AfxMessageBox(_T("保存成功"), MB_OK);
+    }
+    GetDlgItem(IDC_EDIT_EMERGENCYREMARK)->GetWindowText(task->iEmergencyRemark);
+
+    CString strBeginHour;
+    CString strBeginMin;
+    CString strEndHour;
+    CString strEndMin;
+
+    GetDlgItem(IDC_EDIT_STARTHOUR)->GetWindowText(strBeginHour);
+    GetDlgItem(IDC_EDIT_STARTMINUTE)->GetWindowText(strBeginMin);
+    GetDlgItem(IDC_EDIT_ENDHOUR)->GetWindowText(strEndHour);
+    GetDlgItem(IDC_EDIT_ENDMINUTE)->GetWindowText(strEndMin);
+
+    struct tm* beginTime = localtime(&task->iBeginTime);
+    beginTime->tm_hour = _ttoi(strBeginHour);
+    beginTime->tm_min = _ttoi(strBeginMin);
+    task->iBeginTime = mktime(beginTime);
+
+    struct tm* endTime = localtime(&task->iEndTime);
+    endTime->tm_hour = _ttoi(strEndHour);
+    endTime->tm_min = _ttoi(strEndMin);
+    task->iEndTime = mktime(endTime);
+
+    AfxMessageBox(_T("修改成功"), MB_OK);
+
     m_ListCtrl.SetItemText(select, 0, task->iTaskName);
+
+    str = _T("");
+    if(task->iBeginKm)
+        str.Format(_T("%s%.0f"), RailLineName[task->iBeginKm->iRailLine], task->iBeginKm->iKM);
+    m_ListCtrl.SetItemText(select, 2, str);
+
+    str = _T("");
+    if(task->iEndKm)
+        str.Format(_T("%s%.0f"), RailLineName[task->iEndKm->iRailLine], task->iEndKm->iKM);
+    m_ListCtrl.SetItemText(select, 3, str);
+
+    if (task->iStatus == KNormal)
+        str = _T("正常");
+    else
+        str =  _T("结束");
+    m_ListCtrl.SetItemText(select, 4, str);
+
 }
 
 void CEmergencyTask::OnBnClickedBtnEmergencydelete()
@@ -242,11 +320,17 @@ void CEmergencyTask::OnBnClickedBtnEmergencydelete()
     m_CRWDSClientView->m_Emergency.erase(m_CRWDSClientView->m_Emergency.begin()+select);
 
     m_ListCtrl.DeleteItem(select);
-    m_ListAllPoint.ResetContent();
-    m_ListSelectedPoint.ResetContent();
 
     GetDlgItem(IDC_EDIT_EMERGENCYID)->SetWindowText(_T(""));
     GetDlgItem(IDC_EDIT_EMERGENCYNAME)->SetWindowText(_T(""));
+    GetDlgItem(IDC_EDIT_EMERGENCYREMARK)->SetWindowText(_T(""));
+    GetDlgItem(IDC_EDIT_STARTHOUR)->SetWindowText(_T(""));
+    GetDlgItem(IDC_EDIT_STARTMINUTE)->SetWindowText(_T(""));
+    GetDlgItem(IDC_EDIT_ENDHOUR)->SetWindowText(_T(""));
+    GetDlgItem(IDC_EDIT_ENDMINUTE)->SetWindowText(_T(""));
+
+    m_Combo_StartKM.SetCurSel(-1);
+    m_Combo_EndKM.SetCurSel(-1);
     m_ComboEmergencyStatus.SetCurSel(-1);
 
     delete task;
@@ -255,4 +339,5 @@ void CEmergencyTask::OnBnClickedBtnEmergencydelete()
 void CEmergencyTask::OnBnClickedBtnEmergencyok()
 {
     // TODO: 在此添加控件通知处理程序代码
+    OnOK();
 }
