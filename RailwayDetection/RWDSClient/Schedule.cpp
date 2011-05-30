@@ -292,9 +292,11 @@ void CSchedule::OnBnClickedBtnModifycalender()
 		AfxMessageBox(_T("请选择开始日期"));
 		return;
 	}
+    //排班开始时间
 	m_CRWDSClientView->m_Calendar->iPeriods = _ttoi(str);
 	((CDateTimeCtrl*)GetDlgItem(IDC_DATETIMEPICKER_STARTDAY))->GetTime(startTime);
 	m_CRWDSClientView->m_Calendar->iStartDay = startTime.GetTime();
+
 	m_SelectedLine->iStartNo = static_cast<LineStartNo>(m_ComboStartDay.GetCurSel());
 	m_ComboStartDay.ResetContent();
 	for (int i=0; i<m_CRWDSClientView->m_Calendar->iPeriods && i<StrStartNoCount; i++)

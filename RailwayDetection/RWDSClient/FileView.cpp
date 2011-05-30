@@ -4,6 +4,7 @@
 #include "FileView.h"
 #include "Resource.h"
 #include "RWDSClient.h"
+#include "DataService.h"
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -35,6 +36,7 @@ BEGIN_MESSAGE_MAP(CFileView, CDockablePane)
 	ON_COMMAND(ID_EDIT_CLEAR, OnEditClear)
 	ON_WM_PAINT()
 	ON_WM_SETFOCUS()
+    ON_NOTIFY(NM_CLICK, 4, &CFileView::OnNMClickFileView)
 	ON_NOTIFY(NM_DBLCLK, 4, &CFileView::OnNMDblclkFileView)
 	ON_NOTIFY(TVN_ITEMEXPANDED, 4, &CFileView::OnTvnItemexpandedFileView)
 	ON_NOTIFY(TVN_ITEMEXPANDING, 4, &CFileView::OnTvnItemexpandingFileView)
@@ -94,43 +96,33 @@ void CFileView::OnSize(UINT nType, int cx, int cy)
 
 void CFileView::FillFileView()
 {
-	//HTREEITEM hRoot = m_wndFileView.InsertItem(_T("FakeApp 文件"), 0, 0);
-	//m_wndFileView.SetItemState(hRoot, TVIS_BOLD, TVIS_BOLD);
-
-	//HTREEITEM hSrc = m_wndFileView.InsertItem(_T("FakeApp 源文件"), 0, 0, hRoot);
-
-	//m_wndFileView.InsertItem(_T("FakeApp.cpp"), 1, 1, hSrc);
-	//m_wndFileView.InsertItem(_T("FakeApp.rc"), 1, 1, hSrc);
-	//m_wndFileView.InsertItem(_T("FakeAppDoc.cpp"), 1, 1, hSrc);
-	//m_wndFileView.InsertItem(_T("FakeAppView.cpp"), 1, 1, hSrc);
-	//m_wndFileView.InsertItem(_T("MainFrm.cpp"), 1, 1, hSrc);
-	//m_wndFileView.InsertItem(_T("StdAfx.cpp"), 1, 1, hSrc);
-
-	//HTREEITEM hInc = m_wndFileView.InsertItem(_T("FakeApp 头文件"), 0, 0, hRoot);
-
-	//m_wndFileView.InsertItem(_T("FakeApp.h"), 2, 2, hInc);
-	//m_wndFileView.InsertItem(_T("FakeAppDoc.h"), 2, 2, hInc);
-	//m_wndFileView.InsertItem(_T("FakeAppView.h"), 2, 2, hInc);
-	//m_wndFileView.InsertItem(_T("Resource.h"), 2, 2, hInc);
-	//m_wndFileView.InsertItem(_T("MainFrm.h"), 2, 2, hInc);
-	//m_wndFileView.InsertItem(_T("StdAfx.h"), 2, 2, hInc);
-
-	//HTREEITEM hRes = m_wndFileView.InsertItem(_T("FakeApp 资源文件"), 0, 0, hRoot);
-
-	//m_wndFileView.InsertItem(_T("FakeApp.ico"), 2, 2, hRes);
-	//m_wndFileView.InsertItem(_T("FakeApp.rc2"), 2, 2, hRes);
-	//m_wndFileView.InsertItem(_T("FakeAppDoc.ico"), 2, 2, hRes);
-	//m_wndFileView.InsertItem(_T("FakeToolbar.bmp"), 2, 2, hRes);
-
-	//m_wndFileView.Expand(hRoot, TVE_EXPAND);
-	//m_wndFileView.Expand(hSrc, TVE_EXPAND);
-	//m_wndFileView.Expand(hInc, TVE_EXPAND);
-
-
 	OrganizationInfo* org = m_RWDSClientView->m_Org[0];
 	HTREEITEM hRoot = m_wndFileView.InsertItem(org->iOrgName, 8, 8);
 	m_wndFileView.SetItemData(hRoot, (DWORD_PTR)org);
 	m_wndFileView.InsertItem(_T(""), 8, 8, hRoot);//为了显示+号
+}
+
+void CFileView::CleanFileView()
+{
+    m_wndFileView.DeleteAllItems();
+    //m_wndFileView.GetItemData()
+}
+
+void CFileView::TreeVisitForDeleteItemData(HTREEITEM aItem)
+{
+    if(m_wndFileView.ItemHasChildren(aItem))
+    {
+        HTREEITEM item = m_wndFileView.GetChildItem(aItem);
+
+        OrganizationInfo* curOrg = (OrganizationInfo*) m_wndFileView.GetItemData(aItem);
+        curOrg->iLine.clear();
+
+        while (item != NULL)
+        {
+            TreeVisitForDeleteItemData(item);
+            item = m_wndFileView.GetNextItem(item, TVGN_NEXT);
+        }
+    }
 }
 
 void CFileView::OnContextMenu(CWnd* pWnd, CPoint point)
@@ -262,13 +254,46 @@ void CFileView::OnChangeVisualStyle()
 	m_wndFileView.SetImageList(&m_FileViewImages, TVSIL_NORMAL);
 }
 
+void CFileView::OnNMClickFileView(NMHDR *pNMHDR, LRESULT *pResult)
+{
+    // TODO: 在此添加控件通知处理程序代码
+    HTREEITEM curItem = reinterpret_cast<LPNMTREEVIEW>(pNMHDR)->itemNew.hItem;
+    if (!m_wndFileView.ItemHasChildren(curItem))
+    {
+        return;
+    }
+    HTREEITEM childItem = m_wndFileView.GetChildItem(curItem);
+    OrganizationInfo* curOrg = (OrganizationInfo*) m_wndFileView.GetItemData(curItem);
+    //删除view保存的点线
+    m_RWDSClientView->DeleteAllLine();
+    m_RWDSClientView->DeleteAllMapPoint();
+    m_RWDSClientView->DeleteAllStaff();
+    //获取该机构拥有的点与员工
+    GetOrgPoint(curOrg->iOrgID, &m_RWDSClientView->m_MapPoint);
+    GetOrgStaff(curOrg->iOrgID, &m_RWDSClientView->m_Staff);
+    m_RWDSClientView->m_CurrentOrg = curOrg;
+    if (m_wndFileView.GetItemText(childItem).Compare(_T("")) == 0)
+    {//从未展开过最后一层机构
+        //获取该机构拥有的路线
+        GetOrgLine(curOrg->iOrgID, &m_RWDSClientView->m_MapPoint, &m_RWDSClientView->m_Line);
+    }
+    else
+    {
+        for(size_t i=0; i<curOrg->iLine.size(); i++)
+        {
+            m_RWDSClientView->m_Line.push_back(curOrg->iLine[i]);
+        }
+    }
+    *pResult = 0;
+}
+
 void CFileView::OnNMDblclkFileView(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	// TODO: 在此添加控件通知处理程序代码
 	//只处理线路的double事件
 	HTREEITEM curItem = m_wndFileView.GetSelectedItem();
 	if (m_wndFileView.ItemHasChildren(curItem))
-	{
+	{//最后节点为路线，如果还有子节点表明当前节点不是路线
 		*pResult = 0;
 		return;
 	}
@@ -295,6 +320,40 @@ void CFileView::OnNMDblclkFileView(NMHDR *pNMHDR, LRESULT *pResult)
 	*pResult = 0;
 }
 
+void CFileView::OnTvnItemexpandingFileView(NMHDR *pNMHDR, LRESULT *pResult)
+{
+    LPNMTREEVIEW pNMTreeView = reinterpret_cast<LPNMTREEVIEW>(pNMHDR);
+    // TODO: 在此添加控件通知处理程序代码
+    if (pNMTreeView->action ==  TVE_EXPAND)
+    {//展开
+        HTREEITEM curItem = reinterpret_cast<LPNMTREEVIEW>(pNMHDR)->itemNew.hItem;
+        if (!m_wndFileView.ItemHasChildren(curItem))
+        {
+            return;
+        }
+        HTREEITEM childItem = m_wndFileView.GetChildItem(curItem);
+        OrganizationInfo* curOrg = (OrganizationInfo*) m_wndFileView.GetItemData(curItem);
+        m_RWDSClientView->m_CurrentOrg = curOrg;
+        if (m_wndFileView.GetItemText(childItem).Compare(_T("")) == 0)
+        {//从未展开过最后一层机构
+
+            //删除view保存的点线
+            m_RWDSClientView->DeleteAllLine();
+            m_RWDSClientView->DeleteAllMapPoint();
+            m_RWDSClientView->DeleteAllStaff();
+            //获取该机构拥有的点/线/员工
+            GetOrgPoint(curOrg->iOrgID, &m_RWDSClientView->m_MapPoint);
+            GetOrgLine(curOrg->iOrgID, &m_RWDSClientView->m_MapPoint, &curOrg->iLine);
+            GetOrgStaff(curOrg->iOrgID, &m_RWDSClientView->m_Staff);
+            for(size_t i=0; i<curOrg->iLine.size(); i++)
+            {
+                m_RWDSClientView->m_Line.push_back(curOrg->iLine[i]);
+            }
+        }
+    }
+    *pResult = 0;
+}
+
 void CFileView::OnTvnItemexpandedFileView(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMTREEVIEW pNMTreeView = reinterpret_cast<LPNMTREEVIEW>(pNMHDR);
@@ -313,7 +372,7 @@ void CFileView::OnTvnItemexpandedFileView(NMHDR *pNMHDR, LRESULT *pResult)
 			m_wndFileView.DeleteItem(childItem);//清楚临时无效item
 		}
 		OrganizationInfo* curOrg = (OrganizationInfo*) m_wndFileView.GetItemData(curItem);
-		
+		m_RWDSClientView->m_CurrentOrg = curOrg;
 		HTREEITEM tmpChild;
 		if(curOrg->iChildOrg.size() > 0)
 		{//加载子项
@@ -341,58 +400,6 @@ void CFileView::OnTvnItemexpandedFileView(NMHDR *pNMHDR, LRESULT *pResult)
 	*pResult = 0;
 }
 
-void CFileView::OnTvnItemexpandingFileView(NMHDR *pNMHDR, LRESULT *pResult)
-{
-	LPNMTREEVIEW pNMTreeView = reinterpret_cast<LPNMTREEVIEW>(pNMHDR);
-	// TODO: 在此添加控件通知处理程序代码
-	if (pNMTreeView->action ==  TVE_EXPAND)
-	{//展开
-		HTREEITEM curItem = reinterpret_cast<LPNMTREEVIEW>(pNMHDR)->itemNew.hItem;
-		if (!m_wndFileView.ItemHasChildren(curItem))
-		{
-			return;
-		}
-		HTREEITEM childItem = m_wndFileView.GetChildItem(curItem);
-		if (m_wndFileView.GetItemText(childItem).Compare(_T("")) != 0)
-		{//该item已经展开过
-			
-			return;
-		}
-		OrganizationInfo* curOrg = (OrganizationInfo*) m_wndFileView.GetItemData(curItem);
-		///////////////////////////从网络获取数据////////////////////////////////////////
-		/*
-		OrganizationInfo* org= new OrganizationInfo;
-		org->iOrgID = 2;
-		org->iOrgName = curOrg->iOrgName + _T("Child1");
-		org->iParentOrg = curOrg;
-		org->iChildID.push_back(3);
-
-		curOrg->iChildOrg.push_back(org);
-
-		org= new OrganizationInfo;
-		org->iOrgID = 4;
-		org->iOrgName = curOrg->iOrgName + _T("Child2");
-		org->iParentOrg = curOrg;
-		org->iChildID.push_back(5);
-
-		curOrg->iChildOrg.push_back(org);*/
-
-		///////////////////////////从网络获取数据////////////////////////////////////////
-
-		//DeviceInfo* dev = new DeviceInfo;
-		//dev->iDevID = 123456;
-		//curOrg->iDevice.push_back(dev);
-		//dev = new DeviceInfo;
-		//dev->iDevID = 44444;
-		//curOrg->iDevice.push_back(dev);
-		//dev = new DeviceInfo;
-		//dev->iDevID = 55555;
-		//curOrg->iDevice.push_back(dev);
-		for(size_t i=0; i<m_RWDSClientView->m_Line.size(); i++)
-			curOrg->iLine.push_back(m_RWDSClientView->m_Line[i]);
-	}
-	*pResult = 0;
-}
 
 void CFileView::SetRWDSClientView( CRWDSClientView* aRWDSClientView )
 {

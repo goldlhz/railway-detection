@@ -19,6 +19,7 @@
 #include "StaffList.h"
 #include "EmergencyTask.h"
 #include "RecordStaff.h"
+#include "DataService.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -62,6 +63,7 @@ BEGIN_MESSAGE_MAP(CRWDSClientView, CView)
 //    ON_COMMAND(ID_REVIEW_RECORD, &CRWDSClientView::OnReviewRecord)
     ON_COMMAND(ID_REVIEW_RECORDDEVICE, &CRWDSClientView::OnReviewRecorddevice)
     ON_COMMAND(ID_REVIEW_RECORDSTAFF, &CRWDSClientView::OnReviewRecordstaff)
+    ON_COMMAND(ID_RESET_ORG, &CRWDSClientView::OnResetOrg)
 END_MESSAGE_MAP()
 
 BEGIN_EVENTSINK_MAP(CRWDSClientView, CView)
@@ -81,7 +83,8 @@ CRWDSClientView::CRWDSClientView()
 	m_SymbolLayer = "SymbolLayer";
 	m_TrackLayer = "TrackLayer";
 	m_MapName = "RailwayMap.GST";
-    m_RecordStaff = NULL;
+    m_StaffRecord = NULL;
+    //m_StaffCurrentTrack = NULL;
     m_DisplayFlag = KNone;
 	m_Calendar = new CalendarSchedule;
 	m_Calendar->iDateSchedule = &m_Line;
@@ -283,96 +286,8 @@ int CRWDSClientView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	//SetTimer(TIMERNTRACK, 500, NULL);
 
 
-	////////////////////////////////////////////////////user data
-	MapPoint *pt = new MapPoint;
-	pt->iRailLine = Chengdu_Chongqing; 
-	pt->iKM = 251;
-	pt->iLon = 104.064531;
-	pt->iLat = 30.699965;
-	pt->iDirect = KUpLine;
-	m_MapPoint.push_back(pt);
-
-	pt = new MapPoint;
-	pt->iRailLine = Chengdu_Chongqing; 
-	pt->iKM = 252;
-	pt->iLon = 104.075530;
-	pt->iLat = 30.699484;
-	pt->iDirect = KUpLine;
-	m_MapPoint.push_back(pt);
-
-	pt = new MapPoint;
-	pt->iRailLine = Chengdu_Chongqing; 
-	pt->iKM = 253;
-	pt->iLon = 104.086526;
-	pt->iLat = 30.699484;
-	pt->iDirect = KUpLine;
-	m_MapPoint.push_back(pt);
-
-	pt = new MapPoint;
-	pt->iRailLine = Chengdu_Chongqing; 
-	pt->iKM = 254;
-	pt->iLon = 104.097521;
-	pt->iLat = 30.699484;
-	pt->iDirect = KUpLine;
-	m_MapPoint.push_back(pt);
-
-	LineInfo *line = new LineInfo;
-	line->iLineID = 1;
-	line->iLineName = _T("成局1段");
-	line->iStartKm = m_MapPoint[0]->iKM;
-	line->iStartNo = KFirstDay;
-	line->iLineKmLonLat.push_back(m_MapPoint[0]);
-	line->iLineKmTime.push_back(100);
-	line->iLineKmLonLat.push_back(m_MapPoint[1]);
-	line->iLineKmTime.push_back(100);
-	line->iLineKmLonLat.push_back(m_MapPoint[2]);
-	line->iLineKmTime.push_back(100);
-	line->iLineKmLonLat.push_back(m_MapPoint[3]);
-	line->iLineKmTime.push_back(100);
-	m_Line.push_back(line);
-
-	line = new LineInfo;
-	line->iLineID = 2;
-	line->iLineName = _T("成局2段");
-	line->iStartKm = m_MapPoint[1]->iKM;
-	line->iStartNo = KThirdDay;
-	line->iLineKmLonLat.push_back(m_MapPoint[1]);
-	line->iLineKmTime.push_back(0);
-	line->iLineKmLonLat.push_back(m_MapPoint[3]);
-	line->iLineKmTime.push_back(0);
-	m_Line.push_back(line);
-
-	OrganizationInfo* org = new OrganizationInfo;
-	org->iOrgName = _T("Admin");
-	org->iParentOrg = NULL;
-	org->iOrgID = 1;
-	org->iChildID.push_back(2);
-	m_Org.push_back(org);
-
-    StaffInfo* staff = new StaffInfo;
-    staff->iID = 1;
-    staff->iOrgID = 1;
-    staff->iPassword = _T("111");
-    staff->iLoginPermission = TRUE;
-    staff->iName = _T("张三");
-    m_Staff.push_back(staff);
-
-    staff = new StaffInfo;
-    staff->iID = 2;
-    staff->iOrgID = 1;
-    staff->iPassword = _T("");
-    staff->iLoginPermission = FALSE;
-    staff->iName = _T("李四");
-    m_Staff.push_back(staff);
-
-    staff = new StaffInfo;
-    staff->iID = 3;
-    staff->iOrgID = 1;
-    staff->iName = _T("王五");
-    staff->iPassword = _T("");
-    staff->iLoginPermission = FALSE;
-    m_Staff.push_back(staff);
-	//////////////////////////////////////////////////
+    //获取初始化数据
+    GetOrgTree(m_LoginCount, &m_Org);
 
 	MapxCleanAllFeature(m_SymbolLayer);
 	return 0;
@@ -552,7 +467,7 @@ void CRWDSClientView::MapxDrawCircle(double aMapLon, double aMapLat, CString aLa
 	m_MapX.GetLayers().Item(aLayerName).AddFeature(ft);
 }
 
-void CRWDSClientView::MapxDrawLine(double aMapLon1, double aMapLat1, double aMapLon2, double aMapLat2)
+void CRWDSClientView::MapxDrawLine(double aMapLon1, double aMapLat1, double aMapLon2, double aMapLat2, ColorConstants aColor)
 {
 	CMapXPoints points;
 	points.CreateDispatch(points.GetClsid());
@@ -569,7 +484,7 @@ void CRWDSClientView::MapxDrawLine(double aMapLon1, double aMapLat1, double aMap
 	CMapXStyle style;
 	style = ft.GetStyle();
 	style.SetLineWidth(2);
-	style.SetLineColor(miColorBlue);
+	style.SetLineColor(aColor);
 	m_MapX.GetLayers().Item(m_SymbolLayer).AddFeature(ft);
 	//m_MapX.GetLayers().Item(m_SymbolLayer).Refresh();
 }
@@ -871,36 +786,26 @@ void CRWDSClientView::OnReviewRecordstaff()
     CRecordStaff rstaff(this);
     if(rstaff.DoModal() == IDOK)
     {
-        /////////////////////////////
-        if (!m_RecordStaff)
+        if (!m_StaffRecord)
         {
-            m_RecordStaff = new RecordStaff;
-            if(m_Staff.size()>0)
-                m_RecordStaff->iStaff = m_Staff[0];
-            MapPoint* point;
-            for(int i=0; i<3; i++)
-            {
-                point = new MapPoint;
-                point->iDirect = m_MapPoint[i]->iDirect;
-                point->iKM = m_MapPoint[i]->iKM;
-                point->iLon = m_MapPoint[i]->iLon - 0.0001;
-                point->iLat = m_MapPoint[i]->iLat + 0.0001;
-                point->iRailLine = m_MapPoint[i]->iRailLine;
-                m_RecordStaff->iRecordPoint.push_back(point);
-            }
+            m_StaffRecord = new RecordStaff;
         }
-        /////////////////////////////
         int recordSelect = rstaff.GetSelect();
-        m_RecordStaff->iStaff = m_Staff[recordSelect];
+        m_StaffRecord->iStaff = m_Staff[recordSelect];
+
+        //获取员工巡查记录
+        GetStaffCurrentTrack(m_StaffRecord, rstaff.GetPickDateTime());
+
         MapxCleanAllFeature(m_SymbolLayer);
         MapxCleanAllFeature(m_TrackLayer);
+
         MapPoint* point = NULL;
         LineInfo* line = NULL;
         double centerX = 0.0;
         double centerY = 0.0;
-        for (size_t i=0; i<m_RecordStaff->iStaff->iArrangeLine.size(); i++)
+        for (size_t i=0; i<m_StaffRecord->iStaff->iArrangeLine.size(); i++)
         {//显示该员工所设计的路线
-            line = m_RecordStaff->iStaff->iArrangeLine[i];
+            line = m_StaffRecord->iStaff->iArrangeLine[i];
             for (size_t j=0; j<line->iLineKmLonLat.size(); j++)
             {
                 point = line->iLineKmLonLat[j];
@@ -912,14 +817,14 @@ void CRWDSClientView::OnReviewRecordstaff()
                 }
             }
         }
-        for (size_t i=0; i<m_RecordStaff->iRecordPoint.size(); i++)
-        {
-            point = m_RecordStaff->iRecordPoint[i];
-            MapxDrawCircle(point->iLon, point->iLat, m_TrackLayer, miColorBlue);
+
+        for (size_t i=0; i<m_StaffRecord->iRecordLon.size() && i<m_StaffRecord->iRecordLat.size() ; i++)
+        {//描绘员工巡查路线
+            MapxDrawCircle(m_StaffRecord->iRecordLon[i], m_StaffRecord->iRecordLat[i], m_TrackLayer, miColorBlue);
             if (centerX == 0 || centerY == 0)
             {
-                centerX = point->iLon;
-                centerY = point->iLat;
+                centerX = m_StaffRecord->iRecordLon[0];
+                centerY = m_StaffRecord->iRecordLat[0];
             }
         }
         m_MapX.SetCenterX(centerX);
@@ -927,7 +832,49 @@ void CRWDSClientView::OnReviewRecordstaff()
         m_MapX.SetZoom(m_InitZoom/256);
         CMainFrame* mainFrame = (CMainFrame *)GetParentFrame();
         CString str;
-        str = m_RecordStaff->iStaff->iName + _T("巡查记录");
+        str = m_StaffRecord->iStaff->iName + _T("巡查记录");
         mainFrame->m_wndStatusBar.SetPaneText(mainFrame->m_wndStatusBar.CommandToIndex(ID_RECORD), str);
     }
+}
+
+void CRWDSClientView::DeleteAllMapPoint()
+{
+    MapPoint* point = NULL;
+    while(m_MapPoint.size() > 0)
+    {
+        point = m_MapPoint[0];
+        m_MapPoint.erase(m_MapPoint.begin());
+        delete point;
+    }
+}
+
+void CRWDSClientView::DeleteAllLine()
+{
+    LineInfo* line = NULL;
+    while(m_Line.size() > 0)
+    {
+        line = m_Line[0];
+        m_Line.erase(m_Line.begin());
+        delete line;
+    }
+}
+
+void CRWDSClientView::DeleteAllStaff()
+{
+    StaffInfo* staff = NULL;
+    while (m_Staff.size() > 0)
+    {
+        staff = m_Staff[0];
+        m_Staff.erase(m_Staff.begin());
+        delete staff;
+    }
+}
+
+void CRWDSClientView::OnResetOrg()
+{
+    // TODO: 在此添加命令处理程序代码
+    CMainFrame* pMain=static_cast<CMainFrame*>(AfxGetApp()->m_pMainWnd);
+    pMain->m_wndFileView.TreeVisitForDeleteItemData(pMain->m_wndFileView.m_wndFileView.GetRootItem());
+    pMain->m_wndFileView.CleanFileView();
+    pMain->m_wndFileView.FillFileView();
 }

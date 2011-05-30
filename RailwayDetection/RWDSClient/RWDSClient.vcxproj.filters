@@ -171,6 +171,15 @@
     <ClInclude Include="RecordStaff.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="DataService.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ErrorDefine.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CmdDefine.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RWDSClient.cpp">
@@ -234,6 +243,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="RecordStaff.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="DataService.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

@@ -169,7 +169,7 @@ typedef struct _RecordStaff//员工所巡查记录
     iStaff = NULL;
     }
     StaffInfo* iStaff;
-    vector<MapPoint*> iRecordPoint;//所经过的点
+    //vector<MapPoint*> iRecordPoint;//所经过的点
 
     //iRecordPoint可改为
     vector<double> iRecordLon;

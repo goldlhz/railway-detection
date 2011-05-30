@@ -19,6 +19,8 @@ public:
 	enum { IDD = IDD_RECORDSTAFF };
 public:
     int GetSelect();
+    time_t GetPickDateTime();
+    void SetDateVisible(BOOL aVisible);
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV Ö§³Ö
 
@@ -27,10 +29,15 @@ private:
     CRWDSClientView* m_CRWDSClientView;
     CComboBox m_ComboRecord;
     CDateTimeCtrl m_DateTimeRecord;
+    CButton m_RadioCurrentTrack;
     int m_Select;
+    CTime m_PickDateTime;
 public:
     afx_msg void OnBnClickedOk();
     afx_msg void OnBnClickedCancel();
     
     virtual BOOL OnInitDialog();
+    afx_msg void OnBnClickedRadioCurrenttrack();
+    
+    afx_msg void OnBnClickedRadioRecord();
 };
