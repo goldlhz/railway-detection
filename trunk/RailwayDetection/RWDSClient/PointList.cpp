@@ -5,6 +5,8 @@
 #include "RWDSClient.h"
 #include "PointList.h"
 #include "afxdialogex.h"
+#include "DataService.h"
+#include "CmdDefine.h"
 
 
 // CPointList 对话框
@@ -100,6 +102,7 @@ void CPointList::OnBnClickedBtnPointadd()
 	point->iLat = 30;
 	point->iDirect = KDownLine;
 	m_CRWDSClientView->m_MapPoint.push_back(point);
+    SetOrgPoint(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_POINT_ADD, point);
 
 	CString km;
 	CString lon;
@@ -166,6 +169,7 @@ void CPointList::OnBnClickedBtnPointmodify()
 		point->iDirect = KDownLine;
 	}
 	m_Modifying = FALSE;
+    SetOrgPoint(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_POINT_MODIFY, point);
     AfxMessageBox(_T("修改成功"), MB_OK);
 }
 
@@ -209,7 +213,7 @@ void CPointList::OnBnClickedBtnPointdelete()
             m_CRWDSClientView->m_Emergency[i]->iEndKm = NULL;
         }
     }
-
+    SetOrgPoint(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_POINT_DELETE, point);
 	delete point;
 
 	m_ListCtrl.DeleteItem(select);

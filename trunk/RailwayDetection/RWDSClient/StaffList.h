@@ -28,14 +28,17 @@ public:
 private:
     CRWDSClientView* m_CRWDSClientView;
     StaffInfo* m_SeletedStaff;
-public:
-    CListCtrl m_ListCtrl;
-    virtual BOOL OnInitDialog();
-    afx_msg void OnLvnItemchangedStafflist(NMHDR *pNMHDR, LRESULT *pResult);
-    CListBox m_ArrangeLine;
-    afx_msg void OnBnClickedCheckLoginpermission();
     CButton m_CheckLoginPermission;
     CButton m_BtnSetPassword;
+    CListCtrl m_ListCtrl;
+    CListBox m_ArrangeLine;
+public:
+
+    virtual BOOL OnInitDialog();
+    afx_msg void OnLvnItemchangedStafflist(NMHDR *pNMHDR, LRESULT *pResult);
+
+    afx_msg void OnBnClickedCheckLoginpermission();
+
     afx_msg void OnBnClickedBtnSetpassword();
     afx_msg void OnBnClickedBtnAddstaff();
     afx_msg void OnBnClickedBtnmodifystaff();

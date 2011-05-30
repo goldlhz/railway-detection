@@ -128,8 +128,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ClassView.h" />
+    <ClInclude Include="CmdDefine.h" />
     <ClInclude Include="Datadef.h" />
+    <ClInclude Include="DataService.h" />
     <ClInclude Include="EmergencyTask.h" />
+    <ClInclude Include="ErrorDefine.h" />
     <ClInclude Include="FileView.h" />
     <ClInclude Include="LineList.h" />
     <ClInclude Include="Login.h" />
@@ -154,6 +157,7 @@
   <ItemGroup>
     <ClCompile Include="ClassView.cpp" />
     <ClCompile Include="Datadef.cpp" />
+    <ClCompile Include="DataService.cpp" />
     <ClCompile Include="EmergencyTask.cpp" />
     <ClCompile Include="FileView.cpp" />
     <ClCompile Include="LineList.cpp" />

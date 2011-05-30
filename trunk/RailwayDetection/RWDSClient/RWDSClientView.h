@@ -52,10 +52,13 @@ public:
 	virtual void Dump(CDumpContext& dc) const;
 #endif
 public:
+    void DeleteAllMapPoint();
+    void DeleteAllLine();
+    void DeleteAllStaff();
 	CString GetModulePath();
 	void DecimalGeoToStandardGeo(double dX, double dY, int *iXd, int *iXm, int *iXs, int *iYd, int *iYm, int *iYs);
 	void MapxDrawCircle(double aMapLon, double aMapLat, CString aLayerName, ColorConstants aColor = miColorRed);
-	void MapxDrawLine(double aMapLon1, double aMapLat1, double aMapLon2, double aMapLat2);
+	void MapxDrawLine(double aMapLon1, double aMapLat1, double aMapLon2, double aMapLat2, ColorConstants aColor = miColorRed);
 	void MapxSetText(double aMapLon, double aMapLat, CString aText);
 	void MapxCleanAllFeature(CString aLayerName);
 protected:
@@ -77,9 +80,14 @@ protected:
 	vector<LineInfo*> m_CurrentLinePosition;
 	vector<StaffInfo*> m_Staff;//员工
     vector<EmergencyTaskInfo*> m_Emergency;//紧急任务
-    RecordStaff* m_RecordStaff;//人员巡查记录查看
+    RecordStaff* m_StaffRecord;//查看人员巡查记录
+    //RecordStaff* m_StaffCurrentTrack;//查看员工实时巡查
 	CFileView* m_FileView;
     DisplayFlag m_DisplayFlag;
+    OrganizationInfo* m_CurrentOrg;//当前选中的机构
+
+    CString m_LoginCount;
+    CString m_LoginPassword;
 // 生成的消息映射函数
 protected:
 	afx_msg void OnFilePrintPreview();
@@ -111,6 +119,8 @@ public:
 //    afx_msg void OnReviewRecord();
     afx_msg void OnReviewRecorddevice();
     afx_msg void OnReviewRecordstaff();
+    afx_msg void OnResetOrg();
+
 };
 extern CRWDSClientView* gClientView;
 

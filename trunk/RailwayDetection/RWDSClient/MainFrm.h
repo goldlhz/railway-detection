@@ -60,6 +60,7 @@ protected:
 
 	BOOL CreateDockingWindows();
 	void SetDockingWindowIcons(BOOL bHiColorIcons);
+    friend class CRWDSClientView;
 };
 
 

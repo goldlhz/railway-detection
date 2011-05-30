@@ -17,12 +17,15 @@ class CFileViewToolBar : public CMFCToolBar
 
 class CFileView : public CDockablePane
 {
+    friend class CRWDSClientView;
 // ππ‘Ï
 public:
 	CFileView();
 
 	void AdjustLayout();
 	void FillFileView();
+    void CleanFileView();
+    void TreeVisitForDeleteItemData(HTREEITEM aItem);
 	void OnChangeVisualStyle();
 	void SetRWDSClientView(CRWDSClientView* aRWDSClientView);
 
@@ -51,10 +54,12 @@ protected:
 	afx_msg void OnEditClear();
 	afx_msg void OnPaint();
 	afx_msg void OnSetFocus(CWnd* pOldWnd);
+    afx_msg void OnNMClickFileView(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnNMDblclkFileView(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnTvnItemexpandedFileView(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnTvnItemexpandingFileView(NMHDR *pNMHDR, LRESULT *pResult);
 
 	DECLARE_MESSAGE_MAP()
+    
 };
 
