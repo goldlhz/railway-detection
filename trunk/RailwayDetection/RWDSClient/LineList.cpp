@@ -5,6 +5,8 @@
 #include "RWDSClient.h"
 #include "LineList.h"
 #include "afxdialogex.h"
+#include "DataService.h"
+#include "CmdDefine.h"
 
 
 // CLineList 对话框
@@ -118,6 +120,7 @@ void CLineList::OnBnClickedBtnLineadd()
 	line->iStartNo = KFirstDay;
     GetDlgItem(IDC_EDIT_LINEREMARK)->GetWindowText(line->iLineRemark);
 	m_CRWDSClientView->m_Line.push_back(line);
+    SetOrgLine(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_LINE_ADD, line);
 
 	CString id;
 	CString name;
@@ -149,8 +152,9 @@ void CLineList::OnClickedBtnLinemodify()
 	LineInfo* line = m_CRWDSClientView->m_Line[select];
     GetDlgItem(IDC_EDIT_LINENAME)->GetWindowText(line->iLineName);
     GetDlgItem(IDC_EDIT_LINEREMARK)->GetWindowText(line->iLineRemark);
-	AfxMessageBox(_T("保存成功"), MB_OK);
+	AfxMessageBox(_T("修改成功"), MB_OK);
     m_ListCtrl.SetItemText(select, 0, line->iLineName);
+    SetOrgLine(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_LINE_MODIFY, line);
 }
 
 void CLineList::OnClickedBtnLinedelete()
@@ -176,11 +180,12 @@ void CLineList::OnClickedBtnLinedelete()
             if(line == staff->iArrangeLine[j])
             {
                 staff->iArrangeLine.erase(staff->iArrangeLine.begin()+j);
+                SetOrgStaff(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_STAFF_MODIFY, staff);
                 break;
             }
         }
     }
-
+    SetOrgLine(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_LINE_DELETE, line);
     delete line;
 }
 
@@ -297,6 +302,7 @@ void CLineList::OnBnClickedBtnAdd1()
 	LineInfo* line = m_CRWDSClientView->m_Line[select];
 	line->iLineKmLonLat.push_back(point);
 	line->iLineKmTime.push_back(0);//为新加点设置时间
+    SetOrgLine(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_LINE_MODIFY, line);
 
 	CString str;
 	ENCODERAILWAYFULLNAME(str, point->iRailLine, point->iKM, point->iDirect);
@@ -330,6 +336,8 @@ void CLineList::OnBnClickedBtnRemove1()
 	LineInfo* line = m_CRWDSClientView->m_Line[select];
 	line->iLineKmLonLat.erase(line->iLineKmLonLat.begin()+index);
 	line->iLineKmTime.erase(line->iLineKmTime.begin()+index);
+
+    SetOrgLine(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_LINE_MODIFY, line);
 
 	CString str;
 	if (line->iLineKmLonLat.size() != 0)

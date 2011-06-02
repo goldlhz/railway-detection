@@ -13,9 +13,19 @@ public:
 
 // 对话框数据
 	enum { IDD = IDD_LOGIN };
-
+public:
+    CString GetLoginAccount();
+    void SetLoginAccount(const CString& aAccount);
+    CString GetLoginPassword();
+    void SetLoginPassword(const CString& aPassword);
+private:
+    CString m_LoginAccount;
+    CString m_LoginPassword;
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 
 	DECLARE_MESSAGE_MAP()
+public:
+    afx_msg void OnBnClickedOk();
+    afx_msg void OnBnClickedCancel();
 };

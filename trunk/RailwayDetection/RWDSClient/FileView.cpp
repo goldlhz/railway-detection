@@ -275,7 +275,7 @@ void CFileView::OnNMClickFileView(NMHDR *pNMHDR, LRESULT *pResult)
     if (m_wndFileView.GetItemText(childItem).Compare(_T("")) == 0)
     {//从未展开过最后一层机构
         //获取该机构拥有的路线
-        GetOrgLine(curOrg->iOrgID, &m_RWDSClientView->m_MapPoint, &m_RWDSClientView->m_Line);
+        GetOrgLine(curOrg->iOrgID, m_RWDSClientView->m_MapPoint, &m_RWDSClientView->m_Line);
     }
     else
     {
@@ -302,11 +302,11 @@ void CFileView::OnNMDblclkFileView(NMHDR *pNMHDR, LRESULT *pResult)
 	LineInfo* line = (LineInfo*)m_wndFileView.GetItemData(curItem);
 	for (size_t i=0; i<line->iLineKmLonLat.size(); i++)
 	{//在地图上绘制点线
-		m_RWDSClientView->MapxDrawCircle(line->iLineKmLonLat[i]->iLon, line->iLineKmLonLat[i]->iLat, m_RWDSClientView->m_SymbolLayer);
+		m_RWDSClientView->MapxDrawCircle(line->iLineKmLonLat[i]->iLon, line->iLineKmLonLat[i]->iLat, m_RWDSClientView->m_SymbolLayer, miColorBlue);
 		if (i>0)
 		{
 			m_RWDSClientView->MapxDrawLine(line->iLineKmLonLat[i-1]->iLon, line->iLineKmLonLat[i-1]->iLat,
-										   line->iLineKmLonLat[i]->iLon, line->iLineKmLonLat[i]->iLat);
+										   line->iLineKmLonLat[i]->iLon, line->iLineKmLonLat[i]->iLat, miColorBlue);
 		}
 		CString str;
 		CTime arrTime(line->iLineKmTime[i]);
@@ -343,12 +343,14 @@ void CFileView::OnTvnItemexpandingFileView(NMHDR *pNMHDR, LRESULT *pResult)
             m_RWDSClientView->DeleteAllStaff();
             //获取该机构拥有的点/线/员工
             GetOrgPoint(curOrg->iOrgID, &m_RWDSClientView->m_MapPoint);
-            GetOrgLine(curOrg->iOrgID, &m_RWDSClientView->m_MapPoint, &curOrg->iLine);
+            GetOrgLine(curOrg->iOrgID, m_RWDSClientView->m_MapPoint, &curOrg->iLine);
             GetOrgStaff(curOrg->iOrgID, &m_RWDSClientView->m_Staff);
+            
             for(size_t i=0; i<curOrg->iLine.size(); i++)
             {
                 m_RWDSClientView->m_Line.push_back(curOrg->iLine[i]);
             }
+            GetCalendarSchedule(curOrg->iOrgID, m_RWDSClientView->m_Calendar);
         }
     }
     *pResult = 0;

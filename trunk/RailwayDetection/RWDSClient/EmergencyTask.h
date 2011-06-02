@@ -30,6 +30,12 @@ private:
     CComboBox m_Combo_EndKM;
     CListCtrl m_ListCtrl;
     CComboBox m_ComboEmergencyStatus;
+    CListBox m_ListEmSeletedStaff;
+    CListBox m_ListEmUnseletedStaff;
+
+    EmergencyTaskInfo* m_SeletedTask;
+    vector<StaffInfo*> m_StaffSeleted;
+    vector<StaffInfo*> m_StaffUnseleted;//选择的线有哪些员工可以走
 public:
     virtual BOOL OnInitDialog();
     afx_msg void OnLvnItemchangedEmergencylist(NMHDR *pNMHDR, LRESULT *pResult);
@@ -37,6 +43,6 @@ public:
     afx_msg void OnBnClickedBtnEmergencymodify();
     afx_msg void OnBnClickedBtnEmergencydelete();
     afx_msg void OnBnClickedBtnEmergencyok();
-
-
+    afx_msg void OnBnClickedBtnEmaddstaff();
+    afx_msg void OnBnClickedBtnEmremovestaff();
 };
