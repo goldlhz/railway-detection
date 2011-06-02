@@ -19,6 +19,9 @@ class CRWDSClientApp : public CWinAppEx
 public:
 	CRWDSClientApp();
 
+public:
+    CString m_LoginAccount;
+    CString m_LoginPassword;
 
 // ÖØÐ´
 public:

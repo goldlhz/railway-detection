@@ -87,9 +87,7 @@ CRWDSClientView::CRWDSClientView()
     //m_StaffCurrentTrack = NULL;
     m_DisplayFlag = KNone;
 	m_Calendar = new CalendarSchedule;
-	m_Calendar->iDateSchedule = &m_Line;
-	m_Calendar->iStartDay = 1288915200;
-	m_Calendar->iPeriods = 3;
+    m_Calendar->iDateSchedule = &m_Line;
 }
 
 CRWDSClientView::~CRWDSClientView()
@@ -285,9 +283,8 @@ int CRWDSClientView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	//SetTimer(TIMERNTRACK, 500, NULL);
 
-
     //获取初始化数据
-    GetOrgTree(m_LoginCount, &m_Org);
+    GetOrgTree(theApp.m_LoginAccount, &m_Org);
 
 	MapxCleanAllFeature(m_SymbolLayer);
 	return 0;
@@ -794,7 +791,11 @@ void CRWDSClientView::OnReviewRecordstaff()
         m_StaffRecord->iStaff = m_Staff[recordSelect];
 
         //获取员工巡查记录
-        GetStaffCurrentTrack(m_StaffRecord, rstaff.GetPickDateTime());
+        GetStaffCurrentTrack(rstaff.GetPickDateTime(), m_StaffRecord);
+        vector<double> recordLon;
+        vector<double> recordLat;
+        GetStaffScheduleTrack(m_StaffRecord->iStaff->iID, rstaff.GetPickDateTime(), 
+                              &recordLon, &recordLat);
 
         MapxCleanAllFeature(m_SymbolLayer);
         MapxCleanAllFeature(m_TrackLayer);
@@ -820,7 +821,7 @@ void CRWDSClientView::OnReviewRecordstaff()
 
         for (size_t i=0; i<m_StaffRecord->iRecordLon.size() && i<m_StaffRecord->iRecordLat.size() ; i++)
         {//描绘员工巡查路线
-            MapxDrawCircle(m_StaffRecord->iRecordLon[i], m_StaffRecord->iRecordLat[i], m_TrackLayer, miColorBlue);
+            MapxDrawCircle(m_StaffRecord->iRecordLon[i], m_StaffRecord->iRecordLat[i], m_TrackLayer, miColorRed);
             if (centerX == 0 || centerY == 0)
             {
                 centerX = m_StaffRecord->iRecordLon[0];

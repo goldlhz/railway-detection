@@ -190,14 +190,17 @@ void CPointList::OnBnClickedBtnPointdelete()
 	}
 	MapPoint* point = m_CRWDSClientView->m_MapPoint[select];
 	m_CRWDSClientView->m_MapPoint.erase(m_CRWDSClientView->m_MapPoint.begin()+select);
+    LineInfo* line = NULL;
 	for(size_t i=0; i<m_CRWDSClientView->m_Line.size(); i++)
 	{//删除线中设置的点
 		for (size_t j=0; j<m_CRWDSClientView->m_Line[i]->iLineKmLonLat.size(); j++)
 		{
-			if(point == m_CRWDSClientView->m_Line[i]->iLineKmLonLat[j])
+            line = m_CRWDSClientView->m_Line[i];
+			if(point == line->iLineKmLonLat[j])
 			{
-				m_CRWDSClientView->m_Line[i]->iLineKmLonLat.erase(m_CRWDSClientView->m_Line[i]->iLineKmLonLat.begin()+j);
-				break;
+				line->iLineKmLonLat.erase(line->iLineKmLonLat.begin()+j);
+				SetOrgLine(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_LINE_MODIFY, line);
+                break;
 			}
 		}
 	}
@@ -212,6 +215,7 @@ void CPointList::OnBnClickedBtnPointdelete()
         {
             m_CRWDSClientView->m_Emergency[i]->iEndKm = NULL;
         }
+        SetEmergencyTask(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_EMERGENCY_MODIFY, m_CRWDSClientView->m_Emergency[i]);
     }
     SetOrgPoint(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_POINT_DELETE, point);
 	delete point;

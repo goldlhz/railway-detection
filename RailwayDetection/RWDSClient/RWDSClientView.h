@@ -57,8 +57,8 @@ public:
     void DeleteAllStaff();
 	CString GetModulePath();
 	void DecimalGeoToStandardGeo(double dX, double dY, int *iXd, int *iXm, int *iXs, int *iYd, int *iYm, int *iYs);
-	void MapxDrawCircle(double aMapLon, double aMapLat, CString aLayerName, ColorConstants aColor = miColorRed);
-	void MapxDrawLine(double aMapLon1, double aMapLat1, double aMapLon2, double aMapLat2, ColorConstants aColor = miColorRed);
+	void MapxDrawCircle(double aMapLon, double aMapLat, CString aLayerName, ColorConstants aColor = miColorBlue);
+	void MapxDrawLine(double aMapLon1, double aMapLat1, double aMapLon2, double aMapLat2, ColorConstants aColor = miColorBlue);
 	void MapxSetText(double aMapLon, double aMapLat, CString aText);
 	void MapxCleanAllFeature(CString aLayerName);
 protected:
@@ -86,8 +86,8 @@ protected:
     DisplayFlag m_DisplayFlag;
     OrganizationInfo* m_CurrentOrg;//当前选中的机构
 
-    CString m_LoginCount;
-    CString m_LoginPassword;
+    //CString m_LoginAccount;
+    //CString m_LoginPassword;
 // 生成的消息映射函数
 protected:
 	afx_msg void OnFilePrintPreview();

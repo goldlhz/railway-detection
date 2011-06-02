@@ -5,6 +5,7 @@
 #include "RWDSClient.h"
 #include "Schedule.h"
 #include "afxdialogex.h"
+#include "DataService.h"
 
 
 // CSchedule 对话框
@@ -203,7 +204,6 @@ void CSchedule::OnLvnItemchangedSchedulelist(NMHDR *pNMHDR, LRESULT *pResult)
         }
         if (addStaff)
         {
-            int ii= m_ListStaffUnselected.GetCount();
             m_StaffUnseleted.push_back(staffUnseleted);
             m_ListStaffUnselected.AddString(staffUnseleted->iName);
         }
@@ -308,8 +308,10 @@ void CSchedule::OnBnClickedBtnModifycalender()
 		m_SelectedLine->iStartNo = KUndefine;
 	}
 	m_ComboStartDay.SetCurSel(m_SelectedLine->iStartNo);
-	AfxMessageBox(_T("修改成功"));
+
+    SetCalendarSchedule(m_CRWDSClientView->m_CurrentOrg->iOrgID, m_CRWDSClientView->m_Calendar);
 	
+    AfxMessageBox(_T("修改成功"));
 }
 
 

@@ -132,6 +132,14 @@ typedef struct _Device	//设备
 
 typedef struct _Calendar  //排班表
 {
+    _Calendar()
+    {
+        iCaledarID = 0;
+        iOrgID = 0;
+        iStartDay = 0;
+        iPeriods = 0;
+        iDateSchedule = NULL;
+    }
 	int iCaledarID;
 	int iOrgID;
 	time_t iStartDay;//开始日期
@@ -160,6 +168,7 @@ typedef struct _Emergency
     time_t iEndTime;//终点处时间
     EmergencyStatus iStatus;//0正常，1结束
     CString iEmergencyRemark;
+    vector<StaffInfo*> iAppointStaff;
 }EmergencyTaskInfo;
 
 typedef struct _RecordStaff//员工所巡查记录
@@ -169,9 +178,6 @@ typedef struct _RecordStaff//员工所巡查记录
     iStaff = NULL;
     }
     StaffInfo* iStaff;
-    //vector<MapPoint*> iRecordPoint;//所经过的点
-
-    //iRecordPoint可改为
     vector<double> iRecordLon;
     vector<double> iRecordLat;
 }RecordStaff;

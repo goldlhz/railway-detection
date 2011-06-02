@@ -7,6 +7,8 @@
 #include "afxdialogex.h"
 #include "Datadef.h"
 #include "ModifyPassword.h"
+#include "DataService.h"
+#include "CmdDefine.h"
 
 
 // CStaffList 对话框
@@ -135,6 +137,8 @@ void CStaffList::OnBnClickedBtnSetpassword()
     {
         m_SeletedStaff->iPassword = modifyPassword.GetPassword();
         m_SeletedStaff->iLoginPermission = TRUE;
+
+        SetOrgStaff(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_STAFF_MODIFY, m_SeletedStaff);
         AfxMessageBox(_T("密码修改成功"));
     }
 }
@@ -170,6 +174,8 @@ void CStaffList::OnBnClickedBtnAddstaff()
     m_ListCtrl.SetItemText(mask, 2, str);
     //保存到view类中
     m_CRWDSClientView->m_Staff.push_back(staff);
+
+    SetOrgStaff(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_STAFF_ADD, m_SeletedStaff);
 }
 
 
@@ -188,6 +194,8 @@ void CStaffList::OnBnClickedBtnmodifystaff()
         m_SeletedStaff->iLoginPermission = FALSE;
         m_SeletedStaff->iPassword = _T("");
     }
+
+    SetOrgStaff(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_STAFF_MODIFY, m_SeletedStaff);
     AfxMessageBox(_T("修改成功"), MB_OK);
 }
 
@@ -221,6 +229,24 @@ void CStaffList::OnBnClickedBtnDelstaff()
             }
         }
     }
+    //通知服务器线路安排的员工已经被修改
+    SetOrgLine(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_LINE_MODIFY, line);
+
+    EmergencyTaskInfo* task = NULL;
+    for (size_t i=0; i<m_CRWDSClientView->m_Emergency.size(); i++)
+    {//删除紧急任务关联的员工
+        task = m_CRWDSClientView->m_Emergency[i];
+        for (size_t j=0; j<task->iAppointStaff.size(); j++)
+        {
+            if (m_SeletedStaff == task->iAppointStaff[j])
+            {
+                task->iAppointStaff.erase(task->iAppointStaff.begin()+j);
+                break;
+            }
+        }
+    }
+    SetEmergencyTask(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_EMERGENCY_MODIFY, task);
+
     for (size_t i=0; i<m_CRWDSClientView->m_Staff.size(); i++)
     {//删除基类链表
         if (m_SeletedStaff == m_CRWDSClientView->m_Staff[i])
@@ -229,6 +255,7 @@ void CStaffList::OnBnClickedBtnDelstaff()
             break;
         }
     }
+    SetOrgStaff(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_STAFF_DELETE, m_SeletedStaff);
     m_SeletedStaff->iArrangeLine.clear();
     delete m_SeletedStaff;
     m_SeletedStaff = NULL;
