@@ -8,6 +8,7 @@
 #include "Datadef.h"
 #include "DataService.h"
 #include "CmdDefine.h"
+#include "OrgTree.h"
 
 
 // CEmergencyTask 对话框
@@ -18,6 +19,7 @@ CEmergencyTask::CEmergencyTask(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CEmergencyTask::IDD, pParent)
 {
     m_CRWDSClientView = static_cast<CRWDSClientView*>(pParent);
+    m_SeletedTask = NULL;
 }
 
 CEmergencyTask::~CEmergencyTask()
@@ -33,8 +35,8 @@ void CEmergencyTask::DoDataExchange(CDataExchange* pDX)
     //    DDX_Control(pDX, IDC_EMERGENCY_SELETED, m_ListSelectedPoint);
     DDX_Control(pDX, IDC_COMBO_STARTKM, m_Combo_StartKM);
     DDX_Control(pDX, IDC_COMBO_ENDKM, m_Combo_EndKM);
-    DDX_Control(pDX, IDC_LIST_EMSELETED, m_ListEmSeletedStaff);
-    DDX_Control(pDX, IDC_LIST_EMUNSELETED, m_ListEmUnseletedStaff);
+    //DDX_Control(pDX, IDC_LIST_EMSELETED, m_ListEmSeletedStaff);
+    //DDX_Control(pDX, IDC_LIST_EMUNSELETED, m_ListEmUnseletedStaff);
 }
 
 
@@ -46,8 +48,9 @@ BEGIN_MESSAGE_MAP(CEmergencyTask, CDialogEx)
     ON_BN_CLICKED(IDC_BTN_EMERGENCYMODIFY, &CEmergencyTask::OnBnClickedBtnEmergencymodify)
     ON_BN_CLICKED(IDC_BTN_EMERGENCYDELETE, &CEmergencyTask::OnBnClickedBtnEmergencydelete)
     ON_BN_CLICKED(IDC_BTN_EMERGENCYOK, &CEmergencyTask::OnBnClickedBtnEmergencyok)
-    ON_BN_CLICKED(IDC_BTN_EMADDSTAFF, &CEmergencyTask::OnBnClickedBtnEmaddstaff)
-    ON_BN_CLICKED(IDC_BTN_EMREMOVESTAFF, &CEmergencyTask::OnBnClickedBtnEmremovestaff)
+//    ON_BN_CLICKED(IDC_BTN_EMADDSTAFF, &CEmergencyTask::OnBnClickedBtnEmaddstaff)
+//    ON_BN_CLICKED(IDC_BTN_EMREMOVESTAFF, &CEmergencyTask::OnBnClickedBtnEmremovestaff)
+ON_BN_CLICKED(IDC_BTN_SETEMSTAFF, &CEmergencyTask::OnBnClickedBtnSetemstaff)
 END_MESSAGE_MAP()
 
 
@@ -139,6 +142,7 @@ void CEmergencyTask::OnLvnItemchangedEmergencylist(NMHDR *pNMHDR, LRESULT *pResu
     int select = m_ListCtrl.GetNextSelectedItem(pos);  
     if (select<0)
     {
+        m_SeletedTask = NULL;
         return;
     }
     CString str;
@@ -182,55 +186,8 @@ void CEmergencyTask::OnLvnItemchangedEmergencylist(NMHDR *pNMHDR, LRESULT *pResu
         }
     }
 
-    //选择员工
-    m_ListEmSeletedStaff.ResetContent();
-    m_ListEmUnseletedStaff.ResetContent();
-    m_StaffSeleted.clear();
-    m_StaffUnseleted.clear();
-    StaffInfo* staffSeleted;
-    StaffInfo* staffUnseleted;
-
-    for (size_t i=0; i<task->iAppointStaff.size(); i++)
-    {
-        staffSeleted = task->iAppointStaff[i];
-        m_StaffSeleted.push_back(staffSeleted);
-        m_ListEmSeletedStaff.AddString(staffSeleted->iName);
-    }
-
-    BOOL addStaff = TRUE;
-    for (size_t i=0; i<m_CRWDSClientView->m_Staff.size(); i++)
-    {
-        addStaff = TRUE;
-        staffUnseleted = m_CRWDSClientView->m_Staff[i];
-        for (size_t j=0; j<task->iAppointStaff.size(); j++)
-        {//添加已选员工
-            staffSeleted = task->iAppointStaff[j];
-            if (staffSeleted == staffUnseleted)
-            {//该员工已选择该线路
-                addStaff = FALSE;
-                break;
-            }
-        }
-        if (addStaff)
-        {
-            m_StaffUnseleted.push_back(staffUnseleted);
-            m_ListEmUnseletedStaff.AddString(staffUnseleted->iName);
-        }
-    }
-
     *pResult = 0;
 }
-
-//void CEmergencyTask::OnBnClickedBtnEmergencyadd1()
-//{
-//    // TODO: 在此添加控件通知处理程序代码
-//}
-//
-//
-//void CEmergencyTask::OnBnClickedBtnEmergencyremove1()
-//{
-//    // TODO: 在此添加控件通知处理程序代码
-//}
 
 int CEmergencyTask::CreateEmergencyTaskID()
 {
@@ -282,6 +239,8 @@ void CEmergencyTask::OnBnClickedBtnEmergencyadd()
 	m_ListCtrl.SetItemText(count, 2, startKm);
 	m_ListCtrl.SetItemText(count, 3, endKm);
     m_ListCtrl.SetItemText(count, 4, flag);
+
+    m_SeletedTask = NULL;
 }
 
 void CEmergencyTask::OnBnClickedBtnEmergencymodify()
@@ -295,6 +254,7 @@ void CEmergencyTask::OnBnClickedBtnEmergencymodify()
         return;
     }
     EmergencyTaskInfo* task = m_CRWDSClientView->m_Emergency[select];
+    m_SeletedTask = task;
     GetDlgItem(IDC_EDIT_EMERGENCYNAME)->GetWindowText(task->iTaskName);
     
     task->iStatus = static_cast<EmergencyStatus>(m_ComboEmergencyStatus.GetCurSel());
@@ -381,8 +341,7 @@ void CEmergencyTask::OnBnClickedBtnEmergencydelete()
     m_Combo_EndKM.SetCurSel(-1);
     m_ComboEmergencyStatus.SetCurSel(-1);
 
-
-
+    m_SeletedTask = NULL;
     delete task;
 }
 
@@ -392,44 +351,14 @@ void CEmergencyTask::OnBnClickedBtnEmergencyok()
     OnOK();
 }
 
-
-void CEmergencyTask::OnBnClickedBtnEmaddstaff()
+void CEmergencyTask::OnBnClickedBtnSetemstaff()
 {
     // TODO: 在此添加控件通知处理程序代码
-
-    int curStaffIndex = m_ListEmUnseletedStaff.GetCurSel();
-    if (curStaffIndex<0)
+    if (!m_SeletedTask)
     {
         return;
     }
-    StaffInfo* curStaff = m_StaffUnseleted[curStaffIndex];
-    //把员工添加到当前选择的路线
-    m_SeletedTask->iAppointStaff.push_back(curStaff);
-    SetEmergencyTask(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_EMERGENCY_MODIFY, m_SeletedTask);
-    //更改状态
-    m_ListEmUnseletedStaff.DeleteString(curStaffIndex);
-    m_ListEmSeletedStaff.AddString(curStaff->iName);
-    m_StaffUnseleted.erase(m_StaffUnseleted.begin()+curStaffIndex);
-    m_StaffSeleted.push_back(curStaff);
-    
-}
-
-void CEmergencyTask::OnBnClickedBtnEmremovestaff()
-{
-    // TODO: 在此添加控件通知处理程序代码
-    int curStaffIndex = m_ListEmSeletedStaff.GetCurSel();
-    if (curStaffIndex<0)
-    {
-        return;
-    }
-    StaffInfo* curStaff = m_StaffSeleted[curStaffIndex];
-    //把员工移除当前选择的路线
-    m_SeletedTask->iAppointStaff.erase(m_SeletedTask->iAppointStaff.begin()+curStaffIndex);
-    SetEmergencyTask(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_EMERGENCY_MODIFY, m_SeletedTask);
-
-    //更改状态
-    m_ListEmSeletedStaff.DeleteString(curStaffIndex);
-    m_ListEmUnseletedStaff.AddString(curStaff->iName);
-    m_StaffSeleted.erase(m_StaffSeleted.begin()+curStaffIndex);
-    m_StaffUnseleted.push_back(curStaff);
+    COrgTree staffTree(m_CRWDSClientView);
+    staffTree.SetEmergencyTaskInfo(m_SeletedTask);
+    staffTree.DoModal();
 }

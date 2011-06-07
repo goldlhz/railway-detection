@@ -139,6 +139,7 @@
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="MAPX.H" />
     <ClInclude Include="ModifyPassword.h" />
+    <ClInclude Include="OrgTree.h" />
     <ClInclude Include="OutputWnd.h" />
     <ClInclude Include="PointList.h" />
     <ClInclude Include="PropertiesWnd.h" />
@@ -165,6 +166,7 @@
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="MAPX.CPP" />
     <ClCompile Include="ModifyPassword.cpp" />
+    <ClCompile Include="OrgTree.cpp" />
     <ClCompile Include="OutputWnd.cpp" />
     <ClCompile Include="PointList.cpp" />
     <ClCompile Include="PropertiesWnd.cpp" />

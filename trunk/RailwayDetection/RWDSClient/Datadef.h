@@ -154,6 +154,7 @@ typedef struct _OrgObj	//机构
 	struct _OrgObj* iParentOrg;//上级机构
 	vector<int> iChildID;
 	vector<struct _OrgObj*> iChildOrg;//直接下级机构
+    vector<StaffInfo*> iStaff;//该机构的人员
 	vector<DeviceInfo*> iDevice;//该机构拥有的设备
 	vector<LineInfo*> iLine;//该机构配置的路线，若不为最后一级，则为NULL
 }OrganizationInfo;
