@@ -40,10 +40,10 @@ int GetOrgTree(const CString& aLoginCount, vector<OrganizationInfo*>* a_OrgTree)
 
 int GetOrgPoint(int iOrgID, vector<MapPoint*>* aPointList)
 {
-    if(iOrgID == 1)
-    {//不是最后一级机构
-        return kErrNotLastOrg;
-    }
+    //if(iOrgID == 1)
+    //{//不是最后一级机构
+    //    return kErrNotLastOrg;
+    //}
     MapPoint *pt = new MapPoint;
     pt->iRailLine = Chengdu_Chongqing; 
     pt->iKM = 251;
@@ -97,10 +97,6 @@ int SetOrgPoint( int aOrgID, int aCmd, const MapPoint* aPoint )
 
 int GetOrgLine(int iOrgID, const vector<MapPoint*>& aPointList, vector<LineInfo*>* aLineList)
 {
-    if(iOrgID == 1)
-    {//不是最后一级机构
-        return kErrNotLastOrg;
-    }
     LineInfo *line = new LineInfo;
     line->iLineID = 1;
     line->iLineName = _T("成局1段");
@@ -134,15 +130,11 @@ int SetOrgLine( int aOrgID, int aCmd, const LineInfo* aLine )
     return KErrNone;
 }
 
-int GetOrgStaff(int iOrgID, vector<StaffInfo*>* aStaffList)
+int GetOrgStaff(int aOrgID, vector<StaffInfo*>* aStaffList)
 {
-    if(iOrgID == 1)
-    {//不是最后一级机构
-        return kErrNotLastOrg;
-    }
     StaffInfo* staff = new StaffInfo;
     staff->iID = 1;
-    staff->iOrgID = 1;
+    staff->iOrgID = aOrgID;
     staff->iPassword = _T("111");
     staff->iLoginPermission = TRUE;
     staff->iName = _T("张三");
@@ -150,7 +142,7 @@ int GetOrgStaff(int iOrgID, vector<StaffInfo*>* aStaffList)
 
     staff = new StaffInfo;
     staff->iID = 2;
-    staff->iOrgID = 1;
+    staff->iOrgID = aOrgID;
     staff->iPassword = _T("");
     staff->iLoginPermission = FALSE;
     staff->iName = _T("李四");
@@ -158,7 +150,7 @@ int GetOrgStaff(int iOrgID, vector<StaffInfo*>* aStaffList)
 
     staff = new StaffInfo;
     staff->iID = 3;
-    staff->iOrgID = 1;
+    staff->iOrgID = aOrgID;
     staff->iName = _T("王五");
     staff->iPassword = _T("");
     staff->iLoginPermission = FALSE;
