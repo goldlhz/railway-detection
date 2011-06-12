@@ -20,6 +20,7 @@
 #include "EmergencyTask.h"
 #include "RecordStaff.h"
 #include "DataService.h"
+#include "OrgList.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -64,6 +65,7 @@ BEGIN_MESSAGE_MAP(CRWDSClientView, CView)
     ON_COMMAND(ID_REVIEW_RECORDDEVICE, &CRWDSClientView::OnReviewRecorddevice)
     ON_COMMAND(ID_REVIEW_RECORDSTAFF, &CRWDSClientView::OnReviewRecordstaff)
     ON_COMMAND(ID_RESET_ORG, &CRWDSClientView::OnResetOrg)
+    ON_COMMAND(ID_SET_ORGANIZATION, &CRWDSClientView::OnSetOrganization)
 END_MESSAGE_MAP()
 
 BEGIN_EVENTSINK_MAP(CRWDSClientView, CView)
@@ -878,4 +880,12 @@ void CRWDSClientView::OnResetOrg()
     pMain->m_wndFileView.TreeVisitForDeleteItemData(pMain->m_wndFileView.m_wndFileView.GetRootItem());
     pMain->m_wndFileView.CleanFileView();
     pMain->m_wndFileView.FillFileView();
+}
+
+
+void CRWDSClientView::OnSetOrganization()
+{
+    // TODO: 在此添加命令处理程序代码
+    COrgList org(this);
+    org.DoModal();
 }
