@@ -70,6 +70,19 @@ enum EmergencyStatus
     KFinished
 };
 
+typedef struct _Single
+{
+    char iBasical;
+    char iOperate;
+    char iReportForm;
+}SinglePermission;
+
+typedef union _Permission
+{//操作权限
+    int iPermissionGroup;
+    SinglePermission iSinglePermission;
+}Permission;
+
 typedef struct _MapPoint
 {
     _MapPoint()
@@ -113,12 +126,20 @@ typedef struct _Line	//线路
 
 typedef struct _Staff
 {
+    _Staff()
+    {
+        iID = 0;
+        iOrgID = 0;
+        iLoginPermission = FALSE;
+        iPermission.iPermissionGroup = 0;
+    }
     int iID;
     int iOrgID;
     CString iName;
     CString iPassword;
     vector<LineInfo*> iArrangeLine;//巡查路线
     BOOL iLoginPermission;
+    Permission iPermission;
 }StaffInfo;
 
 typedef struct _Device	//设备
@@ -149,6 +170,12 @@ typedef struct _Calendar  //排班表
 
 typedef struct _OrgObj	//机构
 {
+    _OrgObj()
+    {
+        iOrgID = 0;
+        iOrgName = _T("");
+        iParentOrg = NULL;
+    }
 	int iOrgID;
 	CString iOrgName;
 	struct _OrgObj* iParentOrg;//上级机构
@@ -182,3 +209,5 @@ typedef struct _RecordStaff//员工所巡查记录
     vector<double> iRecordLon;
     vector<double> iRecordLat;
 }RecordStaff;
+
+

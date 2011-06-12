@@ -32,6 +32,9 @@ void CStaffList::DoDataExchange(CDataExchange* pDX)
     DDX_Control(pDX, IDC_LIST_ARRANGELINE, m_ArrangeLine);
     DDX_Control(pDX, IDC_CHECK_LOGINPERMISSION, m_CheckLoginPermission);
     DDX_Control(pDX, IDC_BTN_SETPASSWORD, m_BtnSetPassword);
+    DDX_Control(pDX, IDC_CHECK_PERMISSIONBASICAL, m_PermissionBasical);
+    DDX_Control(pDX, IDC_CHECK_PERMISSIONOPERATE, m_PermissionOperate);
+    DDX_Control(pDX, IDC_CHECK_PERMISSIONREPORTFORM, m_PermissionReportform);
 }
 
 
@@ -110,6 +113,11 @@ void CStaffList::OnLvnItemchangedStafflist(NMHDR *pNMHDR, LRESULT *pResult)
     {
         m_ArrangeLine.AddString(m_SeletedStaff->iArrangeLine[i]->iLineName);
     }
+
+    //设置权限
+    m_PermissionBasical.SetCheck(m_SeletedStaff->iPermission.iSinglePermission.iBasical);
+    m_PermissionOperate.SetCheck(m_SeletedStaff->iPermission.iSinglePermission.iOperate);
+    m_PermissionReportform.SetCheck(m_SeletedStaff->iPermission.iSinglePermission.iReportForm);
     *pResult = 0;
 }
 
@@ -194,7 +202,10 @@ void CStaffList::OnBnClickedBtnmodifystaff()
         m_SeletedStaff->iLoginPermission = FALSE;
         m_SeletedStaff->iPassword = _T("");
     }
-
+    m_SeletedStaff->iPermission.iSinglePermission.iBasical = m_PermissionBasical.GetCheck();
+    m_SeletedStaff->iPermission.iSinglePermission.iOperate = m_PermissionOperate.GetCheck();
+    m_SeletedStaff->iPermission.iSinglePermission.iReportForm = m_PermissionReportform.GetCheck();
+    int iii = m_SeletedStaff->iPermission.iPermissionGroup;
     SetOrgStaff(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_STAFF_MODIFY, m_SeletedStaff);
     AfxMessageBox(_T("修改成功"), MB_OK);
 }

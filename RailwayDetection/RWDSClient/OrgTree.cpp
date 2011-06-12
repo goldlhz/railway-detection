@@ -173,7 +173,6 @@ void COrgTree::OnTvnSelchangedTreeOrg(NMHDR *pNMHDR, LRESULT *pResult)
 {
     LPNMTREEVIEW pNMTreeView = reinterpret_cast<LPNMTREEVIEW>(pNMHDR);
     // TODO: 在此添加控件通知处理程序代码
-
     HTREEITEM curItem = m_TreeOrg.GetSelectedItem();
     if (curItem == NULL)
     {

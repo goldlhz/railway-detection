@@ -183,6 +183,9 @@
     <ClInclude Include="OrgTree.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="OrgList.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RWDSClient.cpp">
@@ -252,6 +255,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="OrgTree.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="OrgList.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

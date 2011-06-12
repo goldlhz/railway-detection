@@ -25,6 +25,7 @@ class CRWDSClientView : public CView
     friend class CEmergencyTask;
     friend class CRecordStaff;
     friend class COrgTree;
+    friend class COrgList;
 
 protected: // 仅从序列化创建
 	CRWDSClientView();
@@ -123,6 +124,7 @@ public:
     afx_msg void OnReviewRecordstaff();
     afx_msg void OnResetOrg();
 
+    afx_msg void OnSetOrganization();
 };
 extern CRWDSClientView* gClientView;
 
