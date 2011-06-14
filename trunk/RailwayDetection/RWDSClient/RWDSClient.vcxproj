@@ -131,6 +131,7 @@
     <ClInclude Include="CmdDefine.h" />
     <ClInclude Include="Datadef.h" />
     <ClInclude Include="DataService.h" />
+    <ClInclude Include="DeviceList.h" />
     <ClInclude Include="EmergencyTask.h" />
     <ClInclude Include="ErrorDefine.h" />
     <ClInclude Include="FileView.h" />
@@ -160,6 +161,7 @@
     <ClCompile Include="ClassView.cpp" />
     <ClCompile Include="Datadef.cpp" />
     <ClCompile Include="DataService.cpp" />
+    <ClCompile Include="DeviceList.cpp" />
     <ClCompile Include="EmergencyTask.cpp" />
     <ClCompile Include="FileView.cpp" />
     <ClCompile Include="LineList.cpp" />

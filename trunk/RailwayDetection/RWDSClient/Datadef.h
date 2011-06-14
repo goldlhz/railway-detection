@@ -174,10 +174,14 @@ typedef struct _OrgObj	//机构
     {
         iOrgID = 0;
         iOrgName = _T("");
+        iOrgAddress = _T("");
+        iOrgLevel = 0;
         iParentOrg = NULL;
     }
 	int iOrgID;
 	CString iOrgName;
+    CString iOrgAddress;
+    int iOrgLevel;
 	struct _OrgObj* iParentOrg;//上级机构
 	vector<int> iChildID;
 	vector<struct _OrgObj*> iChildOrg;//直接下级机构

@@ -26,7 +26,7 @@ class CRWDSClientView : public CView
     friend class CRecordStaff;
     friend class COrgTree;
     friend class COrgList;
-
+    friend class CDeviceList;
 protected: // 仅从序列化创建
 	CRWDSClientView();
 	DECLARE_DYNCREATE(CRWDSClientView)
@@ -65,6 +65,7 @@ public:
 	void MapxSetText(double aMapLon, double aMapLat, CString aText);
 	void MapxCleanAllFeature(CString aLayerName);
 protected:
+    Permission m_CurrentPermission;
 	bool m_SymbolMove;
 	CMapX m_MapX;
 	CString m_SymbolLayer;
@@ -125,6 +126,16 @@ public:
     afx_msg void OnResetOrg();
 
     afx_msg void OnSetOrganization();
+    //virtual void OnInitialUpdate();
+    afx_msg void OnSetDevice();
+    afx_msg void OnUpdateSetEmergencytask(CCmdUI *pCmdUI);
+    afx_msg void OnUpdateSetLine(CCmdUI *pCmdUI);
+    afx_msg void OnUpdateSetOrganization(CCmdUI *pCmdUI);
+    afx_msg void OnUpdateSetPoint(CCmdUI *pCmdUI);
+    afx_msg void OnUpdateSetSchedule(CCmdUI *pCmdUI);
+    afx_msg void OnUpdateSetStaff(CCmdUI *pCmdUI);
+   
+    afx_msg void OnUpdateSetDevice(CCmdUI *pCmdUI);
 };
 extern CRWDSClientView* gClientView;
 
