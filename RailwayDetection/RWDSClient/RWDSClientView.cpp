@@ -21,6 +21,7 @@
 #include "RecordStaff.h"
 #include "DataService.h"
 #include "OrgList.h"
+#include "DeviceList.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -66,6 +67,14 @@ BEGIN_MESSAGE_MAP(CRWDSClientView, CView)
     ON_COMMAND(ID_REVIEW_RECORDSTAFF, &CRWDSClientView::OnReviewRecordstaff)
     ON_COMMAND(ID_RESET_ORG, &CRWDSClientView::OnResetOrg)
     ON_COMMAND(ID_SET_ORGANIZATION, &CRWDSClientView::OnSetOrganization)
+    ON_COMMAND(ID_SET_DEVICE, &CRWDSClientView::OnSetDevice)
+    ON_UPDATE_COMMAND_UI(ID_SET_EMERGENCYTASK, &CRWDSClientView::OnUpdateSetEmergencytask)
+    ON_UPDATE_COMMAND_UI(ID_SET_LINE, &CRWDSClientView::OnUpdateSetLine)
+    ON_UPDATE_COMMAND_UI(ID_SET_ORGANIZATION, &CRWDSClientView::OnUpdateSetOrganization)
+    ON_UPDATE_COMMAND_UI(ID_SET_POINT, &CRWDSClientView::OnUpdateSetPoint)
+    ON_UPDATE_COMMAND_UI(ID_SET_SCHEDULE, &CRWDSClientView::OnUpdateSetSchedule)
+    ON_UPDATE_COMMAND_UI(ID_SET_STAFF, &CRWDSClientView::OnUpdateSetStaff)
+    ON_UPDATE_COMMAND_UI(ID_SET_DEVICE, &CRWDSClientView::OnUpdateSetDevice)
 END_MESSAGE_MAP()
 
 BEGIN_EVENTSINK_MAP(CRWDSClientView, CView)
@@ -183,7 +192,6 @@ CRWDSClientDoc* CRWDSClientView::GetDocument() const // 非调试版本是内联的
 
 // CRWDSClientView 消息处理程序
 
-
 int CRWDSClientView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
 	if (CView::OnCreate(lpCreateStruct) == -1)
@@ -289,6 +297,10 @@ int CRWDSClientView::OnCreate(LPCREATESTRUCT lpCreateStruct)
     GetOrgTree(theApp.m_LoginAccount, &m_Org);
 
 	MapxCleanAllFeature(m_SymbolLayer);
+
+    //获取权限
+    m_CurrentPermission.iPermissionGroup = GetLoginerPermission(theApp.m_LoginAccount);
+    
 	return 0;
 }
 
@@ -299,6 +311,7 @@ void CRWDSClientView::OnSize(UINT nType, int cx, int cy)
 
 	// TODO: 在此处添加消息处理程序代码
 	m_MapX.MoveWindow(0, 0, cx, cy, TRUE);
+    
 }
 
 void CRWDSClientView::OnSetFocus(CWnd* pOldWnd)
@@ -694,7 +707,9 @@ void CRWDSClientView::OnSymbolDelete()
 void CRWDSClientView::OnSetPoint()
 {
 	// TODO: 在此添加命令处理程序代码
-		
+	//if (m_CurrentPermission.iSinglePermission.iBasical)
+	//{
+	//}
 	CPointList setPoint(this);
 	setPoint.DoModal();
 }
@@ -888,4 +903,80 @@ void CRWDSClientView::OnSetOrganization()
     // TODO: 在此添加命令处理程序代码
     COrgList org(this);
     org.DoModal();
+}
+
+void CRWDSClientView::OnSetDevice()
+{
+    // TODO: 在此添加命令处理程序代码
+    CDeviceList device(this);
+    device.DoModal();
+}
+
+
+void CRWDSClientView::OnUpdateSetEmergencytask(CCmdUI *pCmdUI)
+{
+    // TODO: 在此添加命令更新用户界面处理程序代码
+    if (!m_CurrentPermission.iSinglePermission.iOperate)
+    {//登录者不能设置任务
+        pCmdUI->Enable(FALSE);
+    }
+}
+
+
+void CRWDSClientView::OnUpdateSetLine(CCmdUI *pCmdUI)
+{
+    // TODO: 在此添加命令更新用户界面处理程序代码
+    if (!m_CurrentPermission.iSinglePermission.iOperate)
+    {//登录者不能设置任务
+        pCmdUI->Enable(FALSE);
+    }
+}
+
+
+void CRWDSClientView::OnUpdateSetOrganization(CCmdUI *pCmdUI)
+{
+    // TODO: 在此添加命令更新用户界面处理程序代码
+    if (!m_CurrentPermission.iSinglePermission.iOperate)
+    {//登录者不能设置任务
+        pCmdUI->Enable(FALSE);
+    }
+}
+
+
+void CRWDSClientView::OnUpdateSetPoint(CCmdUI *pCmdUI)
+{
+    // TODO: 在此添加命令更新用户界面处理程序代码
+    if (!m_CurrentPermission.iSinglePermission.iOperate)
+    {//登录者不能设置任务
+        pCmdUI->Enable(FALSE);
+    }
+}
+
+
+void CRWDSClientView::OnUpdateSetSchedule(CCmdUI *pCmdUI)
+{
+    // TODO: 在此添加命令更新用户界面处理程序代码
+    if (!m_CurrentPermission.iSinglePermission.iOperate)
+    {//登录者不能设置任务
+        pCmdUI->Enable(FALSE);
+    }
+}
+
+
+void CRWDSClientView::OnUpdateSetStaff(CCmdUI *pCmdUI)
+{
+    // TODO: 在此添加命令更新用户界面处理程序代码
+    if (!m_CurrentPermission.iSinglePermission.iOperate)
+    {//登录者不能设置任务
+        pCmdUI->Enable(FALSE);
+    }
+}
+
+void CRWDSClientView::OnUpdateSetDevice(CCmdUI *pCmdUI)
+{
+    // TODO: 在此添加命令更新用户界面处理程序代码
+    if (!m_CurrentPermission.iSinglePermission.iOperate)
+    {//登录者不能设置任务
+        pCmdUI->Enable(FALSE);
+    }
 }

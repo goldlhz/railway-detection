@@ -4,8 +4,12 @@
 //登录验证
 int VerifyLogin(const CString& aLoginAccount, const CString& aLoginPassword);
 
-//获取组织结构
+//获取登录者权限
+int GetLoginerPermission(const CString& aLoginAccount);
+
+//获取/设置组织结构
 int GetOrgTree(const CString& aLoginCount, vector<OrganizationInfo*>* aOrgTree);
+int SetOrganization(int aCmd, const OrganizationInfo* aOrganization);
 
 //获取/设置机构路线所有点
 int GetOrgPoint(int aOrgID, vector<MapPoint*>* aPointList);

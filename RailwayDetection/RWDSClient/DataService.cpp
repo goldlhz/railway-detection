@@ -10,6 +10,13 @@ int VerifyLogin( const CString& aLoginAccount, const CString& aLoginPassword )
 }
 
 
+int GetLoginerPermission(const CString& aLoginAccount)
+{//返回权限值
+    return 0x010101;
+    //return 0;
+}
+
+
 int GetOrgTree(const CString& aLoginCount, vector<OrganizationInfo*>* a_OrgTree)
 {
     OrganizationInfo* org = new OrganizationInfo;
@@ -37,6 +44,13 @@ int GetOrgTree(const CString& aLoginCount, vector<OrganizationInfo*>* a_OrgTree)
     a_OrgTree->push_back(org);
     return KErrNone;
 }
+
+
+int SetOrganization(int aCmd, const OrganizationInfo* aOrganization )
+{
+    return KErrNone;
+}
+
 
 int GetOrgPoint(int iOrgID, vector<MapPoint*>* aPointList)
 {
