@@ -82,6 +82,9 @@ BOOL CRWDSClientApp::InitInstance()
     m_LoginPassword = login.GetLoginPassword();
     if(VerifyLogin(m_LoginAccount, m_LoginPassword) != KErrNone)
         return FALSE;
+    //获取权限
+    m_LoginPermission = 0x01010101;
+
 	// 初始化 OLE 库
 	if (!AfxOleInit())
 	{

@@ -70,6 +70,12 @@ enum EmergencyStatus
     KFinished
 };
 
+enum DeviceType
+{
+    KPicture = 1,
+    KVideo
+};
+
 typedef struct _Single
 {
     char iBasical;
@@ -144,11 +150,16 @@ typedef struct _Staff
 
 typedef struct _Device	//设备
 {
+    _Device()
+    {
+        iDevID = 0;
+        iOrgID = 0;
+        iDeviceType = KPicture;
+    }
 	int iDevID;
 	int iOrgID;//所属机构
-	DevState iDevState;
-	double iCurrentLon;//当前经度
-	double iCurrentLat;//当前纬度
+	CString iPhoneNum;
+    DeviceType iDeviceType;
 }DeviceInfo;
 
 typedef struct _Calendar  //排班表
@@ -173,15 +184,15 @@ typedef struct _OrgObj	//机构
     _OrgObj()
     {
         iOrgID = 0;
+        iOrgLevel = 0;
         iOrgName = _T("");
         iOrgAddress = _T("");
-        iOrgLevel = 0;
         iParentOrg = NULL;
     }
 	int iOrgID;
+    int iOrgLevel;
 	CString iOrgName;
     CString iOrgAddress;
-    int iOrgLevel;
 	struct _OrgObj* iParentOrg;//上级机构
 	vector<int> iChildID;
 	vector<struct _OrgObj*> iChildOrg;//直接下级机构

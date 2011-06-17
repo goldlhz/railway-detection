@@ -12,7 +12,7 @@ int VerifyLogin( const CString& aLoginAccount, const CString& aLoginPassword )
 
 int GetLoginerPermission(const CString& aLoginAccount)
 {//返回权限值
-    return 0x010101;
+    return 0x01010101;
     //return 0;
 }
 
@@ -21,6 +21,7 @@ int GetOrgTree(const CString& aLoginCount, vector<OrganizationInfo*>* a_OrgTree)
 {
     OrganizationInfo* org = new OrganizationInfo;
     org->iOrgName = _T("Admin");
+    org->iOrgAddress = _T("chengdu");
     org->iParentOrg = NULL;
     org->iOrgID = 1;
     org->iChildID.push_back(2);
@@ -29,6 +30,7 @@ int GetOrgTree(const CString& aLoginCount, vector<OrganizationInfo*>* a_OrgTree)
 
     org = new OrganizationInfo;
     org->iOrgName = _T("Child1");
+    org->iOrgAddress = _T("chengdu");
     org->iParentOrg = (*a_OrgTree)[0];
     (*a_OrgTree)[0]->iChildOrg.push_back(org);
     org->iOrgID = 2;
@@ -37,6 +39,7 @@ int GetOrgTree(const CString& aLoginCount, vector<OrganizationInfo*>* a_OrgTree)
 
     org = new OrganizationInfo;
     org->iOrgName = _T("Child2");
+    org->iOrgAddress = _T("chengdu");
     org->iParentOrg = (*a_OrgTree)[0];
     (*a_OrgTree)[0]->iChildOrg.push_back(org);
     org->iOrgID = 3;
@@ -48,6 +51,9 @@ int GetOrgTree(const CString& aLoginCount, vector<OrganizationInfo*>* a_OrgTree)
 
 int SetOrganization(int aCmd, const OrganizationInfo* aOrganization )
 {
+//#define CMD_ORG_ADD 0x3C
+//#define CMD_ORG_MODIFY 0x3D
+//#define CMD_ORG_DELETE 0x3E
     return KErrNone;
 }
 
@@ -206,6 +212,16 @@ int SetEmergencyTask( int aOrgID, int aCmd, const EmergencyTaskInfo* aEmergencyT
     return KErrNone;
 }
 
+int GetOrgDevice( int aOrgID, vector<DeviceInfo*>* aDeviceList )
+{
+    return KErrNone;
+}
+
+int SetOrgDevice( int aOrgID, int aCmd, const DeviceInfo* aDeviceList )
+{
+    return KErrNone;
+}
+
 int GetStaffCurrentTrack(time_t aDate, RecordStaff* aStaff)
 {
     //Get the data by aStaff->iStaff->iID
@@ -226,6 +242,7 @@ int GetStaffScheduleTrack(int aStaffID, time_t aDate, vector<double>* aRecordLon
 {
     return KErrNone;
 }
+
 
 
 

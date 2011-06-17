@@ -9,6 +9,8 @@
 #include "RWDSClient.h"
 #endif
 
+//#pragma  pack()
+
 #include "RWDSClientDoc.h"
 #include "RWDSClientView.h"
 #include "PointList.h"
@@ -91,14 +93,15 @@ END_EVENTSINK_MAP()
 CRWDSClientView::CRWDSClientView()
 {
 	// TODO: 在此处添加构造代码
-	m_SymbolLayer = "SymbolLayer";
-	m_TrackLayer = "TrackLayer";
-	m_MapName = "RailwayMap.GST";
+	m_SymbolLayer = _T("SymbolLayer");
+	m_TrackLayer = _T("TrackLayer");
+	m_MapName = _T("RailwayMap.GST");
     m_StaffRecord = NULL;
     //m_StaffCurrentTrack = NULL;
     m_DisplayFlag = KNone;
 	m_Calendar = new CalendarSchedule;
     m_Calendar->iDateSchedule = &m_Line;
+    m_MapLoaded = FALSE;
 }
 
 CRWDSClientView::~CRWDSClientView()
@@ -202,91 +205,95 @@ int CRWDSClientView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	BSTR bstrLic = strLic.AllocSysString();
 	if(!m_MapX.Create(NULL, WS_VISIBLE, CRect(0,0,100,100), this, IDC_MAP, NULL, FALSE, bstrLic))
 	{
-		return -1;
+        m_MapLoaded = FALSE;
+		//return -1;
 	}
 	::SysFreeString(bstrLic); 
 	//if(!m_MapX.Create(NULL, WS_VISIBLE, CRect(0,0,100,100), this, IDC_MAP))
 	//{
 	//	return -1;
 	//}
-	try 
-	{	
-		CString curDir;
-		curDir = GetModulePath();
+    if (m_MapLoaded)
+    {
+	    try 
+        {	
+            //CString curDir;
+		    //curDir = GetModulePath();
 
-		CString mapPath = curDir + _T("\\map\\") + m_MapName;
-		//m_MapX.geoset(_T(".\\map"));
-		m_MapX.SetGeoSet(mapPath);		//指定地图集
-		m_MapX.SetTitleText(_T(""));
-		m_MapX.SetPanAnimationLayer(TRUE); 
+		    CString mapPath = LoadMapInfoFromFile();
+		    //m_MapX.geoset(_T(".\\map"));
+		    m_MapX.SetGeoSet(mapPath);		//指定地图集
+		    m_MapX.SetTitleText(_T(""));
+		    m_MapX.SetPanAnimationLayer(TRUE); 
 
-		CMapXLayers layers=m_MapX.GetLayers();
-		CMapXLayer layer;
-		BOOL flagSymbol=FALSE;
-		BOOL flagTrack = FALSE;
-		int layerSymbolIndex = 0;
-		int layerTrackIndex = 0;
-		for(int i=0; i<layers.GetCount(); i++)
-		{
-			layer=layers.Item(i+1);
-			if(layer.GetName() == m_SymbolLayer) 
-			{
-				flagSymbol=TRUE; 
-				layerSymbolIndex = i;
-				//break;
-			}
-			else if (layer.GetName() == m_TrackLayer)
-			{
-				flagTrack = TRUE;
-				layerTrackIndex = i;
-			}
-		}
-		//没有tempLayer图层，就新建
-		if (!flagSymbol)
-		{
-			layer=m_MapX.GetLayers().CreateLayer(m_SymbolLayer);
-			m_MapX.GetLayers().SetAnimationLayer(layer); //设为动态图层  
-			layerSymbolIndex = 0;
-		}
+		    CMapXLayers layers=m_MapX.GetLayers();
+		    CMapXLayer layer;
+		    BOOL flagSymbol=FALSE;
+		    BOOL flagTrack = FALSE;
+		    int layerSymbolIndex = 0;
+		    int layerTrackIndex = 0;
+		    for(int i=0; i<layers.GetCount(); i++)
+		    {
+			    layer=layers.Item(i+1);
+			    if(layer.GetName() == m_SymbolLayer) 
+			    {
+				    flagSymbol=TRUE; 
+				    layerSymbolIndex = i;
+				    //break;
+			    }
+			    else if (layer.GetName() == m_TrackLayer)
+			    {
+				    flagTrack = TRUE;
+				    layerTrackIndex = i;
+			    }
+		    }
+		    //没有tempLayer图层，就新建
+		    if (!flagSymbol)
+		    {
+			    layer=m_MapX.GetLayers().CreateLayer(m_SymbolLayer);
+			    m_MapX.GetLayers().SetAnimationLayer(layer); //设为动态图层  
+			    layerSymbolIndex = 0;
+		    }
 
-		m_MapX.GetLayers().Move(layerSymbolIndex+1, 1);
+		    m_MapX.GetLayers().Move(layerSymbolIndex+1, 1);
 
-		if (!flagTrack)
-		{
-			layer=m_MapX.GetLayers().CreateLayer(m_TrackLayer);
-			m_MapX.GetLayers().SetAnimationLayer(layer); //设为动态图层  
-			layerTrackIndex = 0;
-		}
-		m_MapX.GetLayers().Move(layerTrackIndex+1, 1);
+		    if (!flagTrack)
+		    {
+			    layer=m_MapX.GetLayers().CreateLayer(m_TrackLayer);
+			    m_MapX.GetLayers().SetAnimationLayer(layer); //设为动态图层  
+			    layerTrackIndex = 0;
+		    }
+		    m_MapX.GetLayers().Move(layerTrackIndex+1, 1);
 
-		m_InitCenterX=m_MapX.GetCenterX();
-		m_InitCenterY=m_MapX.GetCenterY();
-		//m_InitZoom=m_MapX.GetZoom();
-		m_InitZoom = 4096;
-		m_MapX.SetZoom(4096);
-		if (m_InitZoom <= 0)
-		{
-			MessageBox(_T("未指定地图集，请确认地图数据是否正确安装。"));
-		}
+		    m_InitCenterX=m_MapX.GetCenterX();
+		    m_InitCenterY=m_MapX.GetCenterY();
+		    //m_InitZoom=m_MapX.GetZoom();
+		    m_InitZoom = 4096;
+		    m_MapX.SetZoom(4096);
+		    if (m_InitZoom <= 0)
+		    {
+			    MessageBox(_T("未指定地图集，请确认地图数据是否正确安装。"));
+		    }
 
-		m_MapX.CreateCustomTool(miAddSymbol, 0, miArrowCursor);	
-		m_MapX.CreateCustomTool(miDeleteSymbol, 0, miArrowCursor);
-		m_MapX.CreateCustomTool(miMoveSymbol, 0, miArrowCursor);
-		m_MapX.SetMousewheelSupport(miFullMousewheelSupport);
-		m_MapX.GetLayers().Item(m_SymbolLayer).SetAutoLabel(true);
-	}
-	catch (COleDispatchException *e) 
-	{
-		e->ReportError();
-		e->Delete();
-	} 
-	catch (COleException *e)
-	{
-		e->ReportError();
-		e->Delete();
-	}
-
-	m_MapX.SetRedrawInterval(2000);
+		    m_MapX.CreateCustomTool(miAddSymbol, 0, miArrowCursor);	
+		    m_MapX.CreateCustomTool(miDeleteSymbol, 0, miArrowCursor);
+		    m_MapX.CreateCustomTool(miMoveSymbol, 0, miArrowCursor);
+		    m_MapX.SetMousewheelSupport(miFullMousewheelSupport);
+		    m_MapX.GetLayers().Item(m_SymbolLayer).SetAutoLabel(true);
+	    }
+	    catch (COleDispatchException *e) 
+	    {
+		    e->ReportError();
+		    e->Delete();
+	    } 
+	    catch (COleException *e)
+	    {
+		    e->ReportError();
+		    e->Delete();
+	    }
+        m_MapX.SetRedrawInterval(2000);
+    }
+	
 	m_FileView = &((CMainFrame *)AfxGetApp()->m_pMainWnd)->GetFileView();
 	//m_FileView->SetRWDSClientView(this);
 	//m_FileView->FillFileView();
@@ -294,12 +301,13 @@ int CRWDSClientView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	//SetTimer(TIMERNTRACK, 500, NULL);
 
     //获取初始化数据
+    m_Org.clear();
     GetOrgTree(theApp.m_LoginAccount, &m_Org);
-
+    OrganizationInfo* org = m_Org[0];
 	MapxCleanAllFeature(m_SymbolLayer);
 
     //获取权限
-    m_CurrentPermission.iPermissionGroup = GetLoginerPermission(theApp.m_LoginAccount);
+    m_CurrentPermission.iPermissionGroup = theApp.m_LoginPermission;//GetLoginerPermission(theApp.m_LoginAccount);
     
 	return 0;
 }
@@ -310,8 +318,10 @@ void CRWDSClientView::OnSize(UINT nType, int cx, int cy)
 	CView::OnSize(nType, cx, cy);
 
 	// TODO: 在此处添加消息处理程序代码
-	m_MapX.MoveWindow(0, 0, cx, cy, TRUE);
-    
+    if (m_MapLoaded)
+    {
+	    m_MapX.MoveWindow(0, 0, cx, cy, TRUE);
+    }
 }
 
 void CRWDSClientView::OnSetFocus(CWnd* pOldWnd)
@@ -319,125 +329,169 @@ void CRWDSClientView::OnSetFocus(CWnd* pOldWnd)
 	CView::OnSetFocus(pOldWnd);
 
 	// TODO: 在此处添加消息处理程序代码
-	m_MapX.SetFocus();
+    if (m_MapLoaded)
+    {
+	    m_MapX.SetFocus(); 
+    }
 }
 
 
 void CRWDSClientView::OnMapPan()
 {
 	// TODO: 在此添加命令处理程序代码
-	try 
-	{
-		if(miPanTool==m_MapX.GetCurrentTool())
-			m_MapX.SetCurrentTool(miArrowTool);
-		else
-			m_MapX.SetCurrentTool(miPanTool);
-	} 
-	catch (COleDispatchException *e) 
-	{
-		e->ReportError();
-		e->Delete();
-	} 
-	catch (COleException *e)
-	{
-		e->ReportError();
-		e->Delete();
-	}
+    if (m_MapLoaded)
+    {
+        try 
+        {
+            if(miPanTool==m_MapX.GetCurrentTool())
+                m_MapX.SetCurrentTool(miArrowTool);
+            else
+                m_MapX.SetCurrentTool(miPanTool);
+        } 
+        catch (COleDispatchException *e) 
+        {
+            e->ReportError();
+            e->Delete();
+        } 
+        catch (COleException *e)
+        {
+            e->ReportError();
+            e->Delete();
+        }
+    }
 }
 
 
 void CRWDSClientView::OnUpdateMapPan(CCmdUI *pCmdUI)
 {
 	// TODO: 在此添加命令更新用户界面处理程序代码
-	BOOL bCheck;
-	if(miPanTool==m_MapX.GetCurrentTool())
-		bCheck=TRUE;
-	else
-		bCheck=FALSE;
-	pCmdUI->SetCheck(bCheck);
+    if (m_MapLoaded)
+    {
+        BOOL bCheck;
+        if(miPanTool==m_MapX.GetCurrentTool())
+            bCheck=TRUE;
+        else
+            bCheck=FALSE;
+        pCmdUI->SetCheck(bCheck);
+    }
 }
 
 
 void CRWDSClientView::OnMapZoomin()
 {
 	// TODO: 在此添加命令处理程序代码
-	try 
-	{
-		if(miZoomInTool==m_MapX.GetCurrentTool())
-		{
-			m_MapX.SetCurrentTool(miArrowTool);
-			//m_MapX.SetMousewheelSupport(miNoMousewheelSupport);
-		}
-		else
-		{
-			//m_MapX.GetLayers().SetInsertionLayer(m_MapX.GetLayers().Item(m_SymbolLayer));
-			m_MapX.SetCurrentTool(miZoomInTool);
-			//m_MapX.SetMousewheelSupport(miFullMousewheelSupport);
-		}
-	} 
-	catch (COleDispatchException *e) 
-	{
-		e->ReportError();
-		e->Delete();
-	} 
-	catch (COleException *e)
-	{
-		e->ReportError();
-		e->Delete();
-	}
+    if (m_MapLoaded)
+    {
+	    try 
+	    {
+		    if(miZoomInTool==m_MapX.GetCurrentTool())
+		    {
+			    m_MapX.SetCurrentTool(miArrowTool);
+			    //m_MapX.SetMousewheelSupport(miNoMousewheelSupport);
+		    }
+		    else
+		    {
+			    //m_MapX.GetLayers().SetInsertionLayer(m_MapX.GetLayers().Item(m_SymbolLayer));
+			    m_MapX.SetCurrentTool(miZoomInTool);
+			    //m_MapX.SetMousewheelSupport(miFullMousewheelSupport);
+		    }
+	    } 
+	    catch (COleDispatchException *e) 
+	    {
+		    e->ReportError();
+		    e->Delete();
+	    } 
+	    catch (COleException *e)
+	    {
+		    e->ReportError();
+		    e->Delete();
+	    }
+    }
 }
 
 
 void CRWDSClientView::OnUpdateMapZoomin(CCmdUI *pCmdUI)
 {
 	// TODO: 在此添加命令更新用户界面处理程序代码
-	BOOL bCheck;
-	if(miZoomInTool==m_MapX.GetCurrentTool())
-		bCheck=TRUE;
-	else
-		bCheck=FALSE;
-	pCmdUI->SetCheck(bCheck);
+    if (m_MapLoaded)
+    {
+        BOOL bCheck;
+        if(miZoomInTool==m_MapX.GetCurrentTool())
+            bCheck=TRUE;
+        else
+            bCheck=FALSE;
+        pCmdUI->SetCheck(bCheck);
+    }
 }
 
 
 void CRWDSClientView::OnMapZoomout()
 {
 	// TODO: 在此添加命令处理程序代码
-	try 
-	{
-		if(miZoomOutTool==m_MapX.GetCurrentTool())
-		{
-			m_MapX.SetCurrentTool(miArrowTool);
-			//m_MapX.SetMousewheelSupport(miNoMousewheelSupport);
-		}
-		else
-		{
-			m_MapX.SetCurrentTool(miZoomOutTool);
-			//m_MapX.SetMousewheelSupport(miFullMousewheelSupport);
-		}
-	} 
-	catch (COleDispatchException *e) 
-	{
-		e->ReportError();
-		e->Delete();
-	} 
-	catch (COleException *e)
-	{
-		e->ReportError();
-		e->Delete();
-	}
+    if (m_MapLoaded)
+    {
+	    try 
+	    {
+		    if(miZoomOutTool==m_MapX.GetCurrentTool())
+		    {
+			    m_MapX.SetCurrentTool(miArrowTool);
+			    //m_MapX.SetMousewheelSupport(miNoMousewheelSupport);
+		    }
+		    else
+		    {
+			    m_MapX.SetCurrentTool(miZoomOutTool);
+			    //m_MapX.SetMousewheelSupport(miFullMousewheelSupport);
+		    }
+	    } 
+	    catch (COleDispatchException *e) 
+	    {
+		    e->ReportError();
+		    e->Delete();
+	    } 
+	    catch (COleException *e)
+	    {
+		    e->ReportError();
+		    e->Delete();
+	    }
+    }
 }
 
 void CRWDSClientView::OnUpdateMapZoomout(CCmdUI *pCmdUI)
 {
 	// TODO: 在此添加命令更新用户界面处理程序代码
-	BOOL bCheck;
-	if(miZoomOutTool==m_MapX.GetCurrentTool())
-		bCheck=TRUE;
-	else
-		bCheck=FALSE;
-	pCmdUI->SetCheck(bCheck);
+    if (m_MapLoaded)
+    {
+	    BOOL bCheck;
+	    if(miZoomOutTool==m_MapX.GetCurrentTool())
+		    bCheck=TRUE;
+	    else
+		    bCheck=FALSE;
+	    pCmdUI->SetCheck(bCheck);
+    }
 }
+
+
+CString CRWDSClientView::LoadMapInfoFromFile()
+{
+    CFile pFile;
+    CFileException e;
+    CString mapPath = _T("");
+    if(!pFile.Open(_T("map.cfg"), CFile::modeRead, &e))
+    {//return default
+        CString curDir;
+        curDir = GetModulePath();
+        mapPath = curDir + _T("\\map\\") + m_MapName;
+    }
+    else
+    {
+        pFile.Read(mapPath.GetBuffer(MAX_PATH), MAX_PATH);
+        mapPath.ReleaseBuffer();
+        int pos = mapPath.ReverseFind('\\');
+        m_MapName = mapPath.Right(mapPath.GetLength() - pos);
+    }
+    return mapPath;
+}
+
 
 CString CRWDSClientView::GetModulePath()
 {
@@ -445,8 +499,8 @@ CString CRWDSClientView::GetModulePath()
 	GetModuleFileName(NULL, modDir.GetBuffer(MAX_PATH), MAX_PATH); 
 	modDir.ReleaseBuffer();
 	int pos;   
-	pos=modDir.ReverseFind('\\');   
-	modDir=modDir.Left(pos);  
+	pos = modDir.ReverseFind('\\');   
+	modDir = modDir.Left(pos);  
 	return modDir;
 }
 
@@ -467,145 +521,158 @@ void CRWDSClientView::DecimalGeoToStandardGeo(double dX, double dY, int *iXd, in
 
 void CRWDSClientView::MapxDrawCircle(double aMapLon, double aMapLat, CString aLayerName, ColorConstants aColor)
 {
-	CMapXPoint point;
-	point.CreateDispatch(point.GetClsid());
-	point.Set(aMapLon, aMapLat);
-	CMapXFeature ft;
-	ft=m_MapX.GetFeatureFactory().CreateCircularRegion(miCircleTypeScreen, point, 0.0003, miUnitDegree,100);
-	CMapXStyle style;
-	style = ft.GetStyle();
-	style.SetRegionColor(aColor);
-	style.SetRegionBorderStyle(0);//无边框
-	m_MapX.GetLayers().Item(aLayerName).AddFeature(ft);
+    if (m_MapLoaded)
+    {
+	    CMapXPoint point;
+	    point.CreateDispatch(point.GetClsid());
+	    point.Set(aMapLon, aMapLat);
+	    CMapXFeature ft;
+	    ft=m_MapX.GetFeatureFactory().CreateCircularRegion(miCircleTypeScreen, point, 0.0003, miUnitDegree,100);
+	    CMapXStyle style;
+	    style = ft.GetStyle();
+	    style.SetRegionColor(aColor);
+	    style.SetRegionBorderStyle(0);//无边框
+	    m_MapX.GetLayers().Item(aLayerName).AddFeature(ft);
+    }
 }
 
 void CRWDSClientView::MapxDrawLine(double aMapLon1, double aMapLat1, double aMapLon2, double aMapLat2, ColorConstants aColor)
 {
-	CMapXPoints points;
-	points.CreateDispatch(points.GetClsid());
-	//point.Set(aMapLon1, aMapLat1);
-	points.AddXY(aMapLon1, aMapLat1);
-	points.AddXY(aMapLon2, aMapLat2);
+    if (m_MapLoaded)
+    {
+	    CMapXPoints points;
+	    points.CreateDispatch(points.GetClsid());
+	    //point.Set(aMapLon1, aMapLat1);
+	    points.AddXY(aMapLon1, aMapLat1);
+	    points.AddXY(aMapLon2, aMapLat2);
 
-	COleVariant vtPoints;
-	vtPoints.vt=VT_DISPATCH;
-	vtPoints.pdispVal=points.m_lpDispatch;
-	vtPoints.pdispVal->AddRef();
-	CMapXFeature ft;
-	ft=m_MapX.GetFeatureFactory().CreateLine(vtPoints);
-	CMapXStyle style;
-	style = ft.GetStyle();
-	style.SetLineWidth(2);
-	style.SetLineColor(aColor);
-	m_MapX.GetLayers().Item(m_SymbolLayer).AddFeature(ft);
-	//m_MapX.GetLayers().Item(m_SymbolLayer).Refresh();
+	    COleVariant vtPoints;
+	    vtPoints.vt=VT_DISPATCH;
+	    vtPoints.pdispVal=points.m_lpDispatch;
+	    vtPoints.pdispVal->AddRef();
+	    CMapXFeature ft;
+	    ft=m_MapX.GetFeatureFactory().CreateLine(vtPoints);
+	    CMapXStyle style;
+	    style = ft.GetStyle();
+	    style.SetLineWidth(2);
+	    style.SetLineColor(aColor);
+	    m_MapX.GetLayers().Item(m_SymbolLayer).AddFeature(ft);
+	    //m_MapX.GetLayers().Item(m_SymbolLayer).Refresh();
+    }
 }
 
 void CRWDSClientView::MapxSetText(double aMapLon, double aMapLat, CString aText)
 {
-	try 
-	{
-		CMapXLayer layer;
-		CMapXFeatureFactory ftFy;
-		CMapXFeature ftr;
-		COleVariant pntVt;
-		CY			fontSize;
-		fontSize.Hi = 0x00000;
-		fontSize.Lo = 0x28000;
+    if (m_MapLoaded)
+    {
+	    try 
+	    {
+		    CMapXLayer layer;
+		    CMapXFeatureFactory ftFy;
+		    CMapXFeature ftr;
+		    COleVariant pntVt;
+		    CY			fontSize;
+		    fontSize.Hi = 0x00000;
+		    fontSize.Lo = 0x28000;
 
-		layer=m_MapX.GetLayers().Item(m_SymbolLayer);
+		    layer=m_MapX.GetLayers().Item(m_SymbolLayer);
 
-		CMapXFeature    m_fMarkText;        //标记文字图元
-		CMapXFeature    m_fMarkSymbol;		//标记符号图元
-		CMapXPoint		m_ptMarkPoint;		//标记定位点
+		    CMapXFeature    m_fMarkText;        //标记文字图元
+		    CMapXFeature    m_fMarkSymbol;		//标记符号图元
+		    CMapXPoint		m_ptMarkPoint;		//标记定位点
 
-		m_ptMarkPoint.CreateDispatch(m_ptMarkPoint.GetClsid());
-		m_ptMarkPoint.Set(aMapLon, aMapLat);
+		    m_ptMarkPoint.CreateDispatch(m_ptMarkPoint.GetClsid());
+		    m_ptMarkPoint.Set(aMapLon, aMapLat);
 
-		pntVt.vt = VT_DISPATCH;
-		pntVt.pdispVal = m_ptMarkPoint.m_lpDispatch;
-		pntVt.pdispVal->AddRef();
+		    pntVt.vt = VT_DISPATCH;
+		    pntVt.pdispVal = m_ptMarkPoint.m_lpDispatch;
+		    pntVt.pdispVal->AddRef();
 
-		ftFy=m_MapX.GetFeatureFactory();
+		    ftFy=m_MapX.GetFeatureFactory();
 
-		//绘制bmp图标
-		ftr=ftFy.CreateSymbol(pntVt);
-		//Ftr.GetStyle().SetSymbolType(miSymbolTypeBitmap);
-		//Ftr.GetStyle().SetSymbolBitmapSize(16);
-		//Ftr.GetStyle().SetSymbolBitmapTransparent(TRUE);	
-		//Ftr.GetStyle().SetSymbolBitmapName(m_strBmpFileName);
-		ftr.GetStyle().SetSymbolCharacter(0);
-		layer.GetLabelProperties().GetStyle().SetTextFontColor(miColorBlack);
-		layer.GetLabelProperties().GetStyle().GetTextFont().SetSize(fontSize);
-		layer.GetLabelProperties().GetStyle().GetTextFont().SetBold(FALSE);
-		//layer.GetLabel().SetOffset(5);
-		//layer.GetLabel().SetPosition(5);
-		ftr.SetKeyValue(aText);
-		m_fMarkSymbol = layer.AddFeature(ftr);  
-	}
-	catch (COleDispatchException *e) 
-	{
-		e->ReportError();
-		e->Delete();
-	}
-	catch (COleException *e) {
-		e->ReportError();
-		e->Delete();
-	}
+		    //绘制bmp图标
+		    ftr=ftFy.CreateSymbol(pntVt);
+		    //Ftr.GetStyle().SetSymbolType(miSymbolTypeBitmap);
+		    //Ftr.GetStyle().SetSymbolBitmapSize(16);
+		    //Ftr.GetStyle().SetSymbolBitmapTransparent(TRUE);	
+		    //Ftr.GetStyle().SetSymbolBitmapName(m_strBmpFileName);
+		    ftr.GetStyle().SetSymbolCharacter(0);
+		    layer.GetLabelProperties().GetStyle().SetTextFontColor(miColorBlack);
+		    layer.GetLabelProperties().GetStyle().GetTextFont().SetSize(fontSize);
+		    layer.GetLabelProperties().GetStyle().GetTextFont().SetBold(FALSE);
+		    //layer.GetLabel().SetOffset(5);
+		    //layer.GetLabel().SetPosition(5);
+		    ftr.SetKeyValue(aText);
+		    m_fMarkSymbol = layer.AddFeature(ftr);  
+	    }
+	    catch (COleDispatchException *e) 
+	    {
+		    e->ReportError();
+		    e->Delete();
+	    }
+	    catch (COleException *e) {
+		    e->ReportError();
+		    e->Delete();
+	    }
+    }
 }
 
 void CRWDSClientView::MapxCleanAllFeature(CString aLayerName)
 {
-	CMapXLayer layer;
-	CMapXFeature Ftr;
-	CMapXFeatures Ftrs;
-	int featureCount;
+    if (m_MapLoaded)
+    {
+	    CMapXLayer layer;
+	    CMapXFeature Ftr;
+	    CMapXFeatures Ftrs;
+	    int featureCount;
 
-	layer = m_MapX.GetLayers().Item(aLayerName);
-	Ftrs = layer.AllFeatures();
-	featureCount = layer.AllFeatures().GetCount();
+	    layer = m_MapX.GetLayers().Item(aLayerName);
+	    Ftrs = layer.AllFeatures();
+	    featureCount = layer.AllFeatures().GetCount();
 
-	for (int i=1; i<=featureCount; i++)
-	{
-		Ftr=Ftrs.Item(i);
-		layer.DeleteFeature(Ftrs.Item(i).GetFeatureKey());
-	}	
-
+	    for (int i=1; i<=featureCount; i++)
+	    {
+		    Ftr=Ftrs.Item(i);
+		    layer.DeleteFeature(Ftrs.Item(i).GetFeatureKey());
+        }
+    }
 }
 
 void CRWDSClientView::OnMouseMove_Map(short Button, short Shift, long X, long Y)
 {
-	CString sCoordinate;
+    if (m_MapLoaded)
+    {
+	    CString sCoordinate;
 
-	float singleX = (float)X;
-	float singleY = (float)Y;
-	int iXd;
-	int iXm;
-	int iXs;
-	int iYd;
-	int iYm;
-	int iYs;
+	    float singleX = (float)X;
+	    float singleY = (float)Y;
+	    int iXd;
+	    int iXm;
+	    int iXs;
+	    int iYd;
+	    int iYm;
+	    int iYs;
 
-	try
-	{
-		CMainFrame* mainFrame = (CMainFrame *)GetParentFrame();		//获取父窗口句柄
+	    try
+	    {
+		    CMainFrame* mainFrame = (CMainFrame *)GetParentFrame();		//获取父窗口句柄
 
-		m_MapX.ConvertCoord(&singleX, &singleY, &m_MouseLon, &m_MouseLat, miScreenToMap);	//屏幕坐标转换为地图坐标
-		DecimalGeoToStandardGeo(m_MouseLon,m_MouseLat,&iXd,&iXm,&iXs,&iYd,&iYm,&iYs);			//小数坐标==>标准地理坐标
-		sCoordinate.Format(_T("经度:%d°%d′%d\" ,纬度:%d°%d′%d\" "),iXd,iXm,iXs,iYd,iYm,iYs);	//在状态栏中显示当前坐标         
-		mainFrame->m_wndStatusBar.SetPaneText(mainFrame->m_wndStatusBar.CommandToIndex(ID_INDICATOR_COORDINATE) ,sCoordinate);
-	} 
-	catch (COleDispatchException *e) 
-	{
-		e->ReportError();
-		e->Delete();
-	} 
-	catch (COleException *e)	
-	{
-		e->ReportError();
-		e->Delete();
-	}
-
+		    m_MapX.ConvertCoord(&singleX, &singleY, &m_MouseLon, &m_MouseLat, miScreenToMap);	//屏幕坐标转换为地图坐标
+		    DecimalGeoToStandardGeo(m_MouseLon,m_MouseLat,&iXd,&iXm,&iXs,&iYd,&iYm,&iYs);			//小数坐标==>标准地理坐标
+		    sCoordinate.Format(_T("经度:%d°%d′%d\" ,纬度:%d°%d′%d\" "),iXd,iXm,iXs,iYd,iYm,iYs);	//在状态栏中显示当前坐标         
+		    mainFrame->m_wndStatusBar.SetPaneText(mainFrame->m_wndStatusBar.CommandToIndex(ID_INDICATOR_COORDINATE) ,sCoordinate);
+	    } 
+	    catch (COleDispatchException *e) 
+	    {
+		    e->ReportError();
+		    e->Delete();
+	    } 
+	    catch (COleException *e)	
+	    {
+		    e->ReportError();
+		    e->Delete();
+	    }
+    }
 	//if (m_SymbolMove)
 	//{
 	//	try 
@@ -643,25 +710,28 @@ void CRWDSClientView::OnMouseMove_Map(short Button, short Shift, long X, long Y)
 
 void CRWDSClientView::OnMapViewChangedMap() 
 {
-	double dZoom;
-	double dPaperWidth;
-	double dScale;
-	long lScale;
+    if (m_MapLoaded)
+    {
+	    double dZoom;
+	    double dPaperWidth;
+	    double dScale;
+	    long lScale;
 
-	CMainFrame* mainFrame = (CMainFrame *)GetParentFrame();		//获取父窗口句柄
+	    CMainFrame* mainFrame = (CMainFrame *)GetParentFrame();		//获取父窗口句柄
 
-	dZoom=m_MapX.GetZoom();
-	dPaperWidth=m_MapX.GetMapPaperWidth();
-	dScale=dZoom/dPaperWidth*100000;
-	lScale=(long)dScale;
+	    dZoom=m_MapX.GetZoom();
+	    dPaperWidth=m_MapX.GetMapPaperWidth();
+	    dScale=dZoom/dPaperWidth*100000;
+	    lScale=(long)dScale;
 
-	if (mainFrame->m_wndStatusBar.m_hWnd == NULL)
-	{
-		return;
-	}
-	CString strScale;
-	strScale.Format(_T("比例尺：1:%ld"),lScale);
-	mainFrame->m_wndStatusBar.SetPaneText(mainFrame->m_wndStatusBar.CommandToIndex(ID_INDICATOR_SCALE),strScale);
+	    if (mainFrame->m_wndStatusBar.m_hWnd == NULL)
+	    {
+		    return;
+	    }
+	    CString strScale;
+	    strScale.Format(_T("比例尺：1:%ld"),lScale);
+	    mainFrame->m_wndStatusBar.SetPaneText(mainFrame->m_wndStatusBar.CommandToIndex(ID_INDICATOR_SCALE),strScale);
+    }
 }
 
 void CRWDSClientView::OnSymbolAdd()
@@ -675,32 +745,35 @@ void CRWDSClientView::OnSymbolAdd()
 void CRWDSClientView::OnSymbolDelete()
 {
 	// TODO: 在此添加命令处理程序代码
-	CMapXLayer layer;
-	CMapXFeature Ftr;
-	CMapXFeatures Ftrs;
-	int iFtrNum;
+    if (m_MapLoaded)
+    {
+	    CMapXLayer layer;
+	    CMapXFeature Ftr;
+	    CMapXFeatures Ftrs;
+	    int iFtrNum;
 
-	try 
-	{
-		layer=m_MapX.GetLayers().Item(m_SymbolLayer);
-		Ftrs=layer.AllFeatures();
-		iFtrNum=Ftrs.GetCount();
-		for(int i=1; i<=iFtrNum; i++)
-		{
-			Ftr=Ftrs.Item(i);
-			layer.DeleteFeature(Ftr.GetFeatureKey());
-		}
+	    try 
+	    {
+		    layer=m_MapX.GetLayers().Item(m_SymbolLayer);
+		    Ftrs=layer.AllFeatures();
+		    iFtrNum=Ftrs.GetCount();
+		    for(int i=1; i<=iFtrNum; i++)
+		    {
+			    Ftr=Ftrs.Item(i);
+			    layer.DeleteFeature(Ftr.GetFeatureKey());
+		    }
 
-		m_MapX.Refresh();		//屏幕显示刷新
-	}
-	catch (COleDispatchException *e) {
-		e->ReportError();
-		e->Delete();
-	}
-	catch (COleException *e) {
-		e->ReportError();
-		e->Delete();
-	}
+		    m_MapX.Refresh();		//屏幕显示刷新
+	    }
+	    catch (COleDispatchException *e) {
+		    e->ReportError();
+		    e->Delete();
+	    }
+	    catch (COleException *e) {
+		    e->ReportError();
+		    e->Delete();
+	    }
+    }
 }
 
 
