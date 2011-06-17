@@ -55,6 +55,7 @@ public:
 	virtual void Dump(CDumpContext& dc) const;
 #endif
 public:
+    CString LoadMapInfoFromFile();
     void DeleteAllMapPoint();
     void DeleteAllLine();
     void DeleteAllStaff();
@@ -84,12 +85,14 @@ protected:
 	vector<LineInfo*> m_CurrentLinePosition;
 	vector<StaffInfo*> m_Staff;//员工
     vector<EmergencyTaskInfo*> m_Emergency;//紧急任务
+    vector<DeviceInfo*> m_Device;
     RecordStaff* m_StaffRecord;//查看人员巡查记录
     //RecordStaff* m_StaffCurrentTrack;//查看员工实时巡查
 	CFileView* m_FileView;
     DisplayFlag m_DisplayFlag;
     OrganizationInfo* m_CurrentOrg;//当前选中的机构
-
+    int m_TestValue;
+    BOOL m_MapLoaded;
     //CString m_LoginAccount;
     //CString m_LoginPassword;
 // 生成的消息映射函数

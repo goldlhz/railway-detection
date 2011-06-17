@@ -28,8 +28,12 @@ int GetCalendarSchedule(int aOrgID, CalendarSchedule* aSchedule);
 int SetCalendarSchedule(int aOrgID, const CalendarSchedule* aSchedule);
 
 //获取/设置紧急任务
-int GetEmergencyTask(int aOrgID, vector<EmergencyTaskInfo*>* m_Emergency);
+int GetEmergencyTask(int aOrgID, vector<EmergencyTaskInfo*>* aEmergency);
 int SetEmergencyTask(int aOrgID, int aCmd, const EmergencyTaskInfo* aEmergencyTask);
+
+//获取/设置设备
+int GetOrgDevice(int aOrgID, vector<DeviceInfo*>* aDeviceList);
+int SetOrgDevice(int aOrgID, int aCmd, const DeviceInfo* aDeviceList);
 
 //获取员工巡查记录
 int GetStaffCurrentTrack(time_t aDate, RecordStaff* aStaff);

@@ -226,9 +226,9 @@ void CSchedule::OnLvnItemchangedListarrivettime(NMHDR *pNMHDR, LRESULT *pResult)
 	CTime t1(m_SelectedLine->iLineKmTime[select]);
 	CString str;
 	str.Format(_T("%02d"), t1.GetHour());
-	GetDlgItem(IDC_EDIT_HOUR)->SetWindowTextW(str);
+	GetDlgItem(IDC_EDIT_HOUR)->SetWindowText(str);
 	str.Format(_T("%02d"), t1.GetMinute());
-	GetDlgItem(IDC_EDIT_MINUTE)->SetWindowTextW(str);
+	GetDlgItem(IDC_EDIT_MINUTE)->SetWindowText(str);
 	*pResult = 0;
 }
 
@@ -247,9 +247,9 @@ void CSchedule::OnBnClickedBtnModifytime()
 	CString strHour;
 	CString strMin;
 	struct tm* schTime = localtime(&m_SelectedLine->iLineKmTime[select]);
-	GetDlgItem(IDC_EDIT_HOUR)->GetWindowTextW(strHour);
+	GetDlgItem(IDC_EDIT_HOUR)->GetWindowText(strHour);
 	schTime->tm_hour = _ttoi(strHour);
-	GetDlgItem(IDC_EDIT_MINUTE)->GetWindowTextW(strMin);
+	GetDlgItem(IDC_EDIT_MINUTE)->GetWindowText(strMin);
 	schTime->tm_min = _ttoi(strMin);
 	m_SelectedLine->iLineKmTime[select] = mktime(schTime);
 	AfxMessageBox(_T("ÐÞ¸Ä³É¹¦"));

@@ -96,10 +96,11 @@ void CFileView::OnSize(UINT nType, int cx, int cy)
 
 void CFileView::FillFileView()
 {
-	OrganizationInfo* org = m_RWDSClientView->m_Org[0];
-	HTREEITEM hRoot = m_wndFileView.InsertItem(org->iOrgName, 8, 8);
-	m_wndFileView.SetItemData(hRoot, (DWORD_PTR)org);
-	m_wndFileView.InsertItem(_T(""), 8, 8, hRoot);//为了显示+号
+    int i = m_RWDSClientView->m_TestValue;
+    OrganizationInfo* org = m_RWDSClientView->m_Org[0];
+    HTREEITEM hRoot = m_wndFileView.InsertItem(org->iOrgName, 8, 8);
+    m_wndFileView.SetItemData(hRoot, (DWORD_PTR)org);
+    m_wndFileView.InsertItem(_T(""), 8, 8, hRoot);//为了显示+号
 }
 
 void CFileView::CleanFileView()
@@ -271,6 +272,7 @@ void CFileView::OnNMClickFileView(NMHDR *pNMHDR, LRESULT *pResult)
     //获取该机构拥有的点与员工
     GetOrgPoint(curOrg->iOrgID, &m_RWDSClientView->m_MapPoint);
     GetOrgStaff(curOrg->iOrgID, &m_RWDSClientView->m_Staff);
+    GetOrgDevice(curOrg->iOrgID, &m_RWDSClientView->m_Device);
     m_RWDSClientView->m_CurrentOrg = curOrg;
     if (m_wndFileView.GetItemText(childItem).Compare(_T("")) == 0)
     {//从未展开过最后一层机构

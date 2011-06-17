@@ -22,7 +22,7 @@ public:
 public:
     CString m_LoginAccount;
     CString m_LoginPassword;
-
+    int m_LoginPermission;
 // ÖØÐ´
 public:
 	virtual BOOL InitInstance();
