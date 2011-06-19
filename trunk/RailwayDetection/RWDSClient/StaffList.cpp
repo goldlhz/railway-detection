@@ -227,21 +227,15 @@ void CStaffList::OnBnClickedBtnDelstaff()
     m_CheckLoginPermission.SetCheck(BST_UNCHECKED);
     m_ArrangeLine.ResetContent();
 
-    LineInfo* line;
-    for (size_t i=0; i<m_CRWDSClientView->m_Line.size(); i++)
+    for (size_t i=0; i<m_CRWDSClientView->m_Calendar->iScheduleStaff.size(); i++)
     {//删除线路安排的员工
-        line = m_CRWDSClientView->m_Line[i];
-        for (size_t j=0; j<line->iArrangeStaff.size(); j++)
+        if (m_SeletedStaff == m_CRWDSClientView->m_Calendar->iScheduleStaff[i])
         {
-            if (m_SeletedStaff == line->iArrangeStaff[j])
-            {
-                line->iArrangeStaff.erase(line->iArrangeStaff.begin()+j);
-                break;
-            }
+            m_CRWDSClientView->m_Calendar->iScheduleStaff.erase(
+                     m_CRWDSClientView->m_Calendar->iScheduleStaff.begin()+i);
+            break;
         }
     }
-    //通知服务器线路安排的员工已经被修改
-    SetOrgLine(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_LINE_MODIFY, line);
 
     EmergencyTaskInfo* task = NULL;
     for (size_t i=0; i<m_CRWDSClientView->m_Emergency.size(); i++)

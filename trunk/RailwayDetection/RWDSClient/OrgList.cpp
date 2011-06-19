@@ -28,6 +28,7 @@ void COrgList::DoDataExchange(CDataExchange* pDX)
     CDialogEx::DoDataExchange(pDX);
     DDX_Control(pDX, IDC_TREE_ORGLIST, m_TreeOrg);
     DDX_Control(pDX, IDC_COMBO_ORGPARENT, m_ComboOrgParent);
+    DDX_Control(pDX, IDC_COMBO_BOUNDARY, m_ComboBoundaryLine);
 }
 
 
@@ -124,7 +125,13 @@ BOOL COrgList::OnInitDialog()
     m_TreeOrg.InsertItem(_T(""), hRoot);//为了显示+号
 
     m_ComboOrgParent.ResetContent();
+    m_ComboOrgParent.AddString(_T("无"));
+    m_ComboOrgParent.SetItemData(0, NULL);
     OrgListVisitForAddComboOrgParent(m_CRWDSClientView->m_Org[0]);
+    for(size_t i=0; i<RailLineNameCount; i++)
+    {
+        m_ComboBoundaryLine.AddString(RailLineName[i]);
+    }
     return TRUE;  // return TRUE unless you set the focus to a control
     // 异常: OCX 属性页应返回 FALSE
 }
@@ -145,14 +152,20 @@ void COrgList::OnTvnSelchangedTreeOrglist(NMHDR *pNMHDR, LRESULT *pResult)
     str.Format(_T("%d"), curOrg->iOrgID);
     GetDlgItem(IDC_EDIT_ORGID)->SetWindowText(str);
     GetDlgItem(IDC_EDIT_ORGNAME)->SetWindowText(curOrg->iOrgName);
-    int comboIndex = -1;
-    if (curOrg->iParentOrg)
-    {
-        CString parentID;
-        parentID.Format(_T("%d"), curOrg->iParentOrg->iOrgID);
-        comboIndex = m_ComboOrgParent.FindString(0, parentID);
-    }
-    m_ComboOrgParent.SetCurSel(comboIndex);
+    //int comboIndex = -1;
+    //if (curOrg->iParentOrg)
+    //{
+    //    CString parentID;
+    //    parentID.Format(_T("%d"), curOrg->iParentOrg->iOrgID);
+    //    comboIndex = m_ComboOrgParent.FindString(0, parentID);
+    //}
+    m_ComboOrgParent.SetCurSel(curOrg->iParentID);
+    m_ComboBoundaryLine.SetCurSel(curOrg->iBoundaryRail);
+    //CString str;
+    str.Format(_T("%f"), curOrg->iBoundaryStartKM);
+    GetDlgItem(IDC_EDIT_BOUNDARYSTARTKM)->SetWindowText(str);
+    str.Format(_T("%f"), curOrg->iBoundaryEndKM);
+    GetDlgItem(IDC_EDIT_BOUNDARYENDKM)->SetWindowText(str);
     *pResult = 0;
 }
 
@@ -235,10 +248,17 @@ void COrgList::OnBnClickedBtnAddorg()
         newOrg->iOrgID = iOrgID;
         newOrg->iOrgName = orgName;
         newOrg->iParentOrg = parentOrg;
+        newOrg->iParentID = parentOrg->iOrgID;
         parentOrg->iChildID.push_back(newOrg->iOrgID);
         parentOrg->iChildOrg.push_back(newOrg);
-        AddOrgToTreeOrg(newOrg, parentOrg);
+        newOrg->iBoundaryRail = (RailLine)m_ComboBoundaryLine.GetCurSel();
         CString str;
+        GetDlgItem(IDC_EDIT_BOUNDARYSTARTKM)->GetWindowText(str);
+        newOrg->iBoundaryStartKM = _ttof(str);
+        GetDlgItem(IDC_EDIT_BOUNDARYENDKM)->GetWindowText(str);
+        newOrg->iBoundaryEndKM = _ttof(str);
+        AddOrgToTreeOrg(newOrg, parentOrg);
+        
         str.Format(_T("%d"), newOrg->iOrgID);
         m_ComboOrgParent.AddString(str);
         m_ComboOrgParent.SetItemData(m_ComboOrgParent.GetCount()-1, (DWORD_PTR)newOrg);
@@ -255,30 +275,37 @@ void COrgList::OnBnClickedBtnModifyorg()
     }
     CString orgID;
     CString orgName;
-    GetDlgItem(IDC_EDIT_ORGID)->GetWindowText(orgID);
+    //GetDlgItem(IDC_EDIT_ORGID)->GetWindowText(orgID);
     GetDlgItem(IDC_EDIT_ORGNAME)->GetWindowText(orgName);
-    int iOrgID = _ttoi(orgID);
+    //int iOrgID = _ttoi(orgID);
     int comboIndex = m_ComboOrgParent.GetCurSel();
     OrganizationInfo* parentOrg = (OrganizationInfo*)m_ComboOrgParent.GetItemData(comboIndex);
-    if (parentOrg != m_SeletedOrg->iParentOrg)
+    if (parentOrg && parentOrg != m_SeletedOrg->iParentOrg)
     {
         AfxMessageBox(_T("上级机构不能修改"));
         return;
     }
     if (AfxMessageBox(_T("确认修改？"), MB_OKCANCEL) == IDOK)
     {
-        if (m_SeletedOrg->iOrgID != iOrgID)
-        {//修改combo下拉机构号
-            CString str;
-            str.Format(_T("%d"), m_SeletedOrg->iOrgID);
-            int original = m_ComboOrgParent.FindString(0, str);
-            m_ComboOrgParent.DeleteString(original);
-            str.Format(_T("%d"), iOrgID);
-            m_ComboOrgParent.InsertString(original, str);
-            m_ComboOrgParent.SetItemData(original, (DWORD_PTR)m_SeletedOrg);
-        }
-        m_SeletedOrg->iOrgID = iOrgID;
+        //if (m_SeletedOrg->iOrgID != iOrgID)
+        //{//修改combo下拉机构号
+        //    CString str;
+        //    str.Format(_T("%d"), m_SeletedOrg->iOrgID);
+        //    int original = m_ComboOrgParent.FindString(0, str);
+        //    m_ComboOrgParent.DeleteString(original);
+        //    str.Format(_T("%d"), iOrgID);
+        //    m_ComboOrgParent.InsertString(original, str);
+        //    m_ComboOrgParent.SetItemData(original, (DWORD_PTR)m_SeletedOrg);
+        //}
+        //m_SeletedOrg->iOrgID = iOrgID;
         m_SeletedOrg->iOrgName = orgName;
+
+        m_SeletedOrg->iBoundaryRail = (RailLine)m_ComboBoundaryLine.GetCurSel();
+        CString str;
+        GetDlgItem(IDC_EDIT_BOUNDARYSTARTKM)->GetWindowText(str);
+        m_SeletedOrg->iBoundaryStartKM = _ttof(str);
+        GetDlgItem(IDC_EDIT_BOUNDARYENDKM)->GetWindowText(str);
+        m_SeletedOrg->iBoundaryEndKM = _ttof(str);
     }
 }
 

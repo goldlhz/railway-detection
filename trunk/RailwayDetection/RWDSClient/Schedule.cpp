@@ -38,7 +38,7 @@ BEGIN_MESSAGE_MAP(CSchedule, CDialogEx)
 	ON_NOTIFY(LVN_ITEMCHANGED, IDC_LISTARRIVETTIME, &CSchedule::OnLvnItemchangedListarrivettime)
 	ON_BN_CLICKED(IDC_BTN_MODIFYTIME, &CSchedule::OnBnClickedBtnModifytime)
 	ON_BN_CLICKED(IDC_BTN_MODIFYCALENDER, &CSchedule::OnBnClickedBtnModifycalender)
-    ON_BN_CLICKED(IDC_BTN_CLEANSTAFF, &CSchedule::OnBnClickedBtnCleanstaff)
+    //ON_BN_CLICKED(IDC_BTN_CLEANSTAFF, &CSchedule::OnBnClickedBtnCleanstaff)
     ON_BN_CLICKED(IDC_BTN_ADDLISTSTAFF, &CSchedule::OnBnClickedBtnAddliststaff)
     ON_BN_CLICKED(IDC_BTN_REMOVELISTSTAFF, &CSchedule::OnBnClickedBtnRemoveliststaff)
 END_MESSAGE_MAP()
@@ -115,10 +115,44 @@ BOOL CSchedule::OnInitDialog()
 	int ii = startTime.GetDay();
 	((CDateTimeCtrl*)GetDlgItem(IDC_DATETIMEPICKER_STARTDAY))->SetTime(&startTime);
 
+    AddStaffToListBox();
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// 异常: OCX 属性页应返回 FALSE
 }
 
+void CSchedule::AddStaffToListBox()
+{//加载排班员工至listbox
+    StaffInfo* staffSeleted;
+    StaffInfo* staffUnseleted;
+
+    for (size_t i=0; i<m_CRWDSClientView->m_Calendar->iScheduleStaff.size(); i++)
+    {
+        staffSeleted = m_CRWDSClientView->m_Calendar->iScheduleStaff[i];
+        m_StaffSeleted.push_back(staffSeleted);
+        m_ListStaffSelected.AddString(staffSeleted->iName);
+    }
+
+    BOOL addStaff = TRUE;
+    for (size_t i=0; i<m_CRWDSClientView->m_Staff.size(); i++)
+    {
+        addStaff = TRUE;
+        staffUnseleted = m_CRWDSClientView->m_Staff[i];
+        for (size_t j=0; j<m_CRWDSClientView->m_Calendar->iScheduleStaff.size(); j++)
+        {//添加已选员工
+            staffSeleted = m_CRWDSClientView->m_Calendar->iScheduleStaff[j];
+            if (staffSeleted == staffUnseleted)
+            {//该员工已选择该线路
+                addStaff = FALSE;
+                break;
+            }
+        }
+        if (addStaff)
+        {
+            m_StaffUnseleted.push_back(staffUnseleted);
+            m_ListStaffUnselected.AddString(staffUnseleted->iName);
+        }
+    }
+}
 
 void CSchedule::OnLvnItemchangedSchedulelist(NMHDR *pNMHDR, LRESULT *pResult)
 {
@@ -173,41 +207,6 @@ void CSchedule::OnLvnItemchangedSchedulelist(NMHDR *pNMHDR, LRESULT *pResult)
 	}
 	m_ComboStartDay.SetCurSel(curSel);
 	
-    //选择员工
-    m_ListStaffSelected.ResetContent();
-    m_ListStaffUnselected.ResetContent();
-    m_StaffSeleted.clear();
-    m_StaffUnseleted.clear();
-    StaffInfo* staffSeleted;
-    StaffInfo* staffUnseleted;
-
-    for (size_t i=0; i<m_SelectedLine->iArrangeStaff.size(); i++)
-    {
-        staffSeleted = m_SelectedLine->iArrangeStaff[i];
-        m_StaffSeleted.push_back(staffSeleted);
-        m_ListStaffSelected.AddString(staffSeleted->iName);
-    }
-
-    BOOL addStaff = TRUE;
-    for (size_t i=0; i<m_CRWDSClientView->m_Staff.size(); i++)
-    {
-        addStaff = TRUE;
-        staffUnseleted = m_CRWDSClientView->m_Staff[i];
-        for (size_t j=0; j<m_SelectedLine->iArrangeStaff.size(); j++)
-        {//添加已选员工
-            staffSeleted = m_SelectedLine->iArrangeStaff[j];
-            if (staffSeleted == staffUnseleted)
-            {//该员工已选择该线路
-                addStaff = FALSE;
-                break;
-            }
-        }
-        if (addStaff)
-        {
-            m_StaffUnseleted.push_back(staffUnseleted);
-            m_ListStaffUnselected.AddString(staffUnseleted->iName);
-        }
-    }
 	*pResult = 0;
 }
 
@@ -315,12 +314,6 @@ void CSchedule::OnBnClickedBtnModifycalender()
 }
 
 
-void CSchedule::OnBnClickedBtnCleanstaff()
-{
-    // TODO: 在此添加控件通知处理程序代码
-}
-
-
 void CSchedule::OnBnClickedBtnAddliststaff()
 {
     // TODO: 在此添加控件通知处理程序代码
@@ -331,7 +324,8 @@ void CSchedule::OnBnClickedBtnAddliststaff()
     }
     StaffInfo* curStaff = m_StaffUnseleted[curStaffIndex];
     //把员工添加到当前选择的路线
-    m_SelectedLine->iArrangeStaff.push_back(curStaff);
+    //m_SelectedLine->iArrangeStaff.push_back(curStaff);
+    m_CRWDSClientView->m_Calendar->iScheduleStaff.push_back(curStaff);
 
     //更改状态
     m_ListStaffUnselected.DeleteString(curStaffIndex);
@@ -352,8 +346,9 @@ void CSchedule::OnBnClickedBtnRemoveliststaff()
     }
     StaffInfo* curStaff = m_StaffSeleted[curStaffIndex];
     //把员工移除当前选择的路线
-    m_SelectedLine->iArrangeStaff.erase(m_SelectedLine->iArrangeStaff.begin()+curStaffIndex);
-
+    //m_SelectedLine->iArrangeStaff.erase(m_SelectedLine->iArrangeStaff.begin()+curStaffIndex);
+    m_CRWDSClientView->m_Calendar->iScheduleStaff.erase(
+                        m_CRWDSClientView->m_Calendar->iScheduleStaff.begin()+curStaffIndex);
     //更改状态
     m_ListStaffSelected.DeleteString(curStaffIndex);
     m_ListStaffUnselected.AddString(curStaff->iName);
@@ -369,3 +364,4 @@ void CSchedule::OnBnClickedBtnRemoveliststaff()
     }
 
 }
+
