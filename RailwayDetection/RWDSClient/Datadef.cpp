@@ -15,7 +15,7 @@ const CString DirectName[] = {
 							  _T("上行"),
 							  _T("下行")
 							 };
-extern const int DirectNameCount = 3;
+const int DirectNameCount = 3;
 
 const CString StrKm = _T("公里");
 
@@ -28,5 +28,10 @@ const CString StrStartNo[] = {
 							  _T("第六天"),
 							  _T("第七天")
 							 };
-extern const int StrStartNoCount = 7;
-extern const CString StrClientCaption = _T("铁路巡查系统");
+const int StrStartNoCount = 7;
+const CString StrClientCaption = _T("铁路巡查系统");
+
+const CString strPictureErrorType[] = {
+                                       _T("未知故障")
+                                      };
+const int strPictureErrorTypeCount = 1;

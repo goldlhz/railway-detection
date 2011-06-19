@@ -352,7 +352,7 @@ void CFileView::OnTvnItemexpandingFileView(NMHDR *pNMHDR, LRESULT *pResult)
             {
                 m_RWDSClientView->m_Line.push_back(curOrg->iLine[i]);
             }
-            GetCalendarSchedule(curOrg->iOrgID, m_RWDSClientView->m_Calendar);
+            GetCalendarSchedule(curOrg->iOrgID, &m_RWDSClientView->m_Staff, m_RWDSClientView->m_Calendar);
         }
     }
     *pResult = 0;

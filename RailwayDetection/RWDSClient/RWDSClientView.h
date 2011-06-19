@@ -27,6 +27,7 @@ class CRWDSClientView : public CView
     friend class COrgTree;
     friend class COrgList;
     friend class CDeviceList;
+    friend class CPitureReview;
 protected: // 仅从序列化创建
 	CRWDSClientView();
 	DECLARE_DYNCREATE(CRWDSClientView)
@@ -139,6 +140,7 @@ public:
     afx_msg void OnUpdateSetStaff(CCmdUI *pCmdUI);
    
     afx_msg void OnUpdateSetDevice(CCmdUI *pCmdUI);
+    afx_msg void OnReviewPicture();
 };
 extern CRWDSClientView* gClientView;
 

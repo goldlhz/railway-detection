@@ -22,28 +22,40 @@ int GetOrgTree(const CString& aLoginCount, vector<OrganizationInfo*>* a_OrgTree)
     OrganizationInfo* org = new OrganizationInfo;
     org->iOrgName = _T("Admin");
     org->iOrgAddress = _T("chengdu");
+    org->iParentID = 0;
     org->iParentOrg = NULL;
     org->iOrgID = 1;
     org->iChildID.push_back(2);
     org->iChildID.push_back(3);
+    org->iBoundaryRail = Baoji_Chengdu;
+    org->iBoundaryStartKM = 0;
+    org->iBoundaryEndKM = 300;
     a_OrgTree->push_back(org);
 
     org = new OrganizationInfo;
     org->iOrgName = _T("Child1");
     org->iOrgAddress = _T("chengdu");
     org->iParentOrg = (*a_OrgTree)[0];
+    org->iParentID = org->iParentOrg->iOrgID;
     (*a_OrgTree)[0]->iChildOrg.push_back(org);
     org->iOrgID = 2;
     org->iChildID.push_back(4);
+    org->iBoundaryRail = Chengdu_Kunming;
+    org->iBoundaryStartKM = 0;
+    org->iBoundaryEndKM = 300;
     a_OrgTree->push_back(org);
 
     org = new OrganizationInfo;
     org->iOrgName = _T("Child2");
     org->iOrgAddress = _T("chengdu");
     org->iParentOrg = (*a_OrgTree)[0];
+    org->iParentID = org->iParentOrg->iOrgID;
     (*a_OrgTree)[0]->iChildOrg.push_back(org);
     org->iOrgID = 3;
     org->iChildID.push_back(5);
+    org->iBoundaryRail = Chengdu_Chongqing;
+    org->iBoundaryStartKM = 0;
+    org->iBoundaryEndKM = 300;
     a_OrgTree->push_back(org);
     return KErrNone;
 }
@@ -183,7 +195,7 @@ int SetOrgStaff( int aOrgID, int aCmd, const StaffInfo* aStaff )
     return KErrNone;
 }
 
-int GetCalendarSchedule(int aOrgID, CalendarSchedule* aSchedule)
+int GetCalendarSchedule(int aOrgID, const vector<StaffInfo*>* aStaffList, CalendarSchedule* aSchedule)
 {
     //for (size_t i=0; i<aLineList.size(); i++)
     //{
@@ -243,6 +255,20 @@ int GetStaffScheduleTrack(int aStaffID, time_t aDate, vector<double>* aRecordLon
     return KErrNone;
 }
 
+int GetPictureInfo( int aOrgID, time_t aStartDate, time_t aEndDate, vector<PictureInfo*>* aPictureList )
+{
+    PictureInfo* picture = new PictureInfo;
+    picture->iPicID = 1;
+    picture->iPicName = _T("516823.jpg");
+    picture->iShootingTime = GetCurrentTime();
+    picture->iErrorType = 0;
 
+    aPictureList->push_back(picture);
+    return KErrNone;
+}
 
+int SavePictureToDirect( int aOrgID, const PictureInfo* aPicture, CString aToDirect )
+{
+    return KErrNone;
+}
 

@@ -24,7 +24,7 @@ int GetOrgStaff(int aOrgID, vector<StaffInfo*>* aStaffList);
 int SetOrgStaff(int aOrgID, int aCmd, const StaffInfo* aStaff);
 
 //获取/设置排班表
-int GetCalendarSchedule(int aOrgID, CalendarSchedule* aSchedule);
+int GetCalendarSchedule(int aOrgID, const vector<StaffInfo*>* aStaffList, CalendarSchedule* aSchedule);
 int SetCalendarSchedule(int aOrgID, const CalendarSchedule* aSchedule);
 
 //获取/设置紧急任务
@@ -40,3 +40,7 @@ int GetStaffCurrentTrack(time_t aDate, RecordStaff* aStaff);
 
 //获取员工预设巡查路线
 int GetStaffScheduleTrack(int aStaffID, time_t aDate, vector<double>* aRecordLon, vector<double>* aRecordLat);
+
+//获取图片信息
+int GetPictureInfo(int aOrgID, time_t aStartDate, time_t aEndDate, vector<PictureInfo*>* aPictureList);
+int SavePictureToDirect(int aOrgID, const PictureInfo* aPicture, CString aToDirect);

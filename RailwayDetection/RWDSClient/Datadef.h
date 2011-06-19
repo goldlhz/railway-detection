@@ -15,6 +15,8 @@ extern const CString StrKm;
 extern const CString StrStartNo[];
 extern const int StrStartNoCount;
 extern const CString StrClientCaption;
+extern const CString strPictureErrorType[];
+extern const int strPictureErrorTypeCount;
 
 #define ENCODERAILWAYFULLNAME(aStr, aRailLine, aKm, aLineDirect)\
 	aStr.Format(RailLineName[aRailLine]+_T("%.2f")+StrKm+DirectName[aLineDirect], aKm);
@@ -76,6 +78,11 @@ enum DeviceType
     KVideo
 };
 
+enum PictureErrorType
+{
+    KUnkownType = 0
+};
+
 typedef struct _Single
 {
     char iBasical;
@@ -126,7 +133,7 @@ typedef struct _Line	//线路
 	LineStartNo iStartNo;//开始天数
 	vector<MapPoint*> iLineKmLonLat;	//每公里处经纬度
 	vector<time_t> iLineKmTime;			//每公里处时间
-    vector<struct _Staff*> iArrangeStaff;   //该线上所有要巡查的员工
+    //vector<struct _Staff*> iArrangeStaff;   //该线上所有要巡查的员工
     CString iLineRemark;//备注
 }LineInfo;
 
@@ -170,13 +177,13 @@ typedef struct _Calendar  //排班表
         iOrgID = 0;
         iStartDay = 0;
         iPeriods = 0;
-        iDateSchedule = NULL;
     }
 	int iCaledarID;
 	int iOrgID;
 	time_t iStartDay;//开始日期
 	int iPeriods;//周期
-	vector<LineInfo*>* iDateSchedule;//该排班下的路线集
+	//vector<LineInfo*>* iScheduleLine;//该排班下的路线集
+    vector<StaffInfo*> iScheduleStaff;
 }CalendarSchedule;
 
 typedef struct _OrgObj	//机构
@@ -187,15 +194,20 @@ typedef struct _OrgObj	//机构
         iOrgLevel = 0;
         iOrgName = _T("");
         iOrgAddress = _T("");
+        iParentID = NULL;
         iParentOrg = NULL;
     }
 	int iOrgID;
     int iOrgLevel;
 	CString iOrgName;
     CString iOrgAddress;
+    int iParentID;
 	struct _OrgObj* iParentOrg;//上级机构
 	vector<int> iChildID;
 	vector<struct _OrgObj*> iChildOrg;//直接下级机构
+    RailLine iBoundaryRail;
+    double iBoundaryStartKM;
+    double iBoundaryEndKM;
     vector<StaffInfo*> iStaff;//该机构的人员
 	vector<DeviceInfo*> iDevice;//该机构拥有的设备
 	vector<LineInfo*> iLine;//该机构配置的路线，若不为最后一级，则为NULL
@@ -225,4 +237,10 @@ typedef struct _RecordStaff//员工所巡查记录
     vector<double> iRecordLat;
 }RecordStaff;
 
-
+typedef struct _PictureInfo//图片信息
+{
+    int iPicID;
+    CString iPicName;
+    time_t iShootingTime;
+    int iErrorType;
+}PictureInfo;

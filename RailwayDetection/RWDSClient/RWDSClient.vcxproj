@@ -143,6 +143,7 @@
     <ClInclude Include="OrgList.h" />
     <ClInclude Include="OrgTree.h" />
     <ClInclude Include="OutputWnd.h" />
+    <ClInclude Include="PitureReview.h" />
     <ClInclude Include="PointList.h" />
     <ClInclude Include="PropertiesWnd.h" />
     <ClInclude Include="RecordStaff.h" />
@@ -172,6 +173,7 @@
     <ClCompile Include="OrgList.cpp" />
     <ClCompile Include="OrgTree.cpp" />
     <ClCompile Include="OutputWnd.cpp" />
+    <ClCompile Include="PitureReview.cpp" />
     <ClCompile Include="PointList.cpp" />
     <ClCompile Include="PropertiesWnd.cpp" />
     <ClCompile Include="RecordStaff.cpp" />

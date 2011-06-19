@@ -39,4 +39,5 @@ public:
     afx_msg void OnBnClickedBtnAddorg();
     afx_msg void OnBnClickedBtnModifyorg();
     afx_msg void OnBnClickedBtnDeleteorg();
+    CComboBox m_ComboBoundaryLine;
 };
