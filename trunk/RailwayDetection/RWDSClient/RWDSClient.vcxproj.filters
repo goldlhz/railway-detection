@@ -192,6 +192,18 @@
     <ClInclude Include="PitureReview.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="cData.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="hXJ.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TCPTransmit.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="hData.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RWDSClient.cpp">
@@ -270,6 +282,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="PitureReview.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="cData.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TCPTransmit.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

@@ -2,112 +2,165 @@
 #include "DataService.h"
 #include "ErrorDefine.h"
 #include "CmdDefine.h"
+#include "cData.h"
 
 
-int VerifyLogin( const CString& aLoginAccount, const CString& aLoginPassword )
+int VerifyLogin( const CString& aLoginAccount, const CString& aLoginPassword, int* orgID, Permission *pPower)
 {
+    cData *cd = new cData();
+	char  *UserName = (LPSTR)(LPCTSTR)aLoginAccount; 
+	char  *PassWord = (LPSTR)(LPCTSTR)aLoginPassword;
+	int iOrgid,p1,p2,p3;
+	int iResult = cd->UserLog(UserName,PassWord,&iOrgid,&p1,&p2,&p3);
+	if(iResult > 0)
+	{
+		*orgID = iOrgid;
+		pPower->iBasical = p1;
+		pPower->iOperate = p2;
+		pPower->iReportForm = p3;
+	}
+	return iResult;
+}
+
+
+
+int GetOrgTree(const int& OrgId, vector<OrganizationInfo*>* a_OrgTree)
+{
+	
+	cData *cd = new cData();
+	lOrg pOrg;
+	int iResult = cd->GetOrgList(OrgId,&pOrg);
+	if(iResult < 1)
+	{
+		return -1;
+	}
+	for(iterOrg iter = pOrg.begin() ; iter !=pOrg.end() ;iter++)
+	{
+		OrganizationInfo* org = new OrganizationInfo;
+		org->iOrgName=      iter->OrgName;
+		org->iOrgAddress =  iter->Address;
+		org->iParentID = iter->UpOrg ;
+		org->iOrgLevel =    iter->iLevel;
+		org->iParentOrg =   NULL;
+		org->iOrgID =      iter->OrgId;
+		org->iBoundaryRail      = (RailLine)iter->LineId ;
+		org->iBoundaryStartKM = iter->startid ;
+		a_OrgTree->push_back(org);
+	}
+
+	for(vector<OrganizationInfo*>::iterator iterOrg = a_OrgTree->begin() ; iterOrg != a_OrgTree->end() ; a_OrgTree++)
+	{
+		CherkOrgType(a_OrgTree,*iterOrg);
+	}
+	delete cd;
+
     return KErrNone;
 }
 
-
-int GetLoginerPermission(const CString& aLoginAccount)
-{//返回权限值
-    return 0x01010101;
-    //return 0;
-}
-
-
-int GetOrgTree(const CString& aLoginCount, vector<OrganizationInfo*>* a_OrgTree)
+void CherkOrgType(vector<OrganizationInfo*>* a_OrgTree,OrganizationInfo* OrgInfo)
 {
-    OrganizationInfo* org = new OrganizationInfo;
-    org->iOrgName = _T("Admin");
-    org->iOrgAddress = _T("chengdu");
-    org->iParentID = 0;
-    org->iParentOrg = NULL;
-    org->iOrgID = 1;
-    org->iChildID.push_back(2);
-    org->iChildID.push_back(3);
-    org->iBoundaryRail = Baoji_Chengdu;
-    org->iBoundaryStartKM = 0;
-    org->iBoundaryEndKM = 300;
-    a_OrgTree->push_back(org);
-
-    org = new OrganizationInfo;
-    org->iOrgName = _T("Child1");
-    org->iOrgAddress = _T("chengdu");
-    org->iParentOrg = (*a_OrgTree)[0];
-    org->iParentID = org->iParentOrg->iOrgID;
-    (*a_OrgTree)[0]->iChildOrg.push_back(org);
-    org->iOrgID = 2;
-    org->iChildID.push_back(4);
-    org->iBoundaryRail = Chengdu_Kunming;
-    org->iBoundaryStartKM = 0;
-    org->iBoundaryEndKM = 300;
-    a_OrgTree->push_back(org);
-
-    org = new OrganizationInfo;
-    org->iOrgName = _T("Child2");
-    org->iOrgAddress = _T("chengdu");
-    org->iParentOrg = (*a_OrgTree)[0];
-    org->iParentID = org->iParentOrg->iOrgID;
-    (*a_OrgTree)[0]->iChildOrg.push_back(org);
-    org->iOrgID = 3;
-    org->iChildID.push_back(5);
-    org->iBoundaryRail = Chengdu_Chongqing;
-    org->iBoundaryStartKM = 0;
-    org->iBoundaryEndKM = 300;
-    a_OrgTree->push_back(org);
-    return KErrNone;
+	for(vector<OrganizationInfo*>::iterator iterOrg = a_OrgTree->begin() ; iterOrg != a_OrgTree->end() ; a_OrgTree++)
+	{
+		//获取下属机构
+		if(OrgInfo->iOrgID == (*iterOrg)->iParentID)
+		{
+			OrgInfo->iChildID.push_back((*iterOrg)->iOrgID);
+		}
+		//获取上级机构
+		if(OrgInfo->iParentID ==(*iterOrg)->iOrgID )
+		{
+			OrgInfo->iParentOrg = *iterOrg;
+			(*iterOrg)->iChildOrg.push_back(OrgInfo);
+		}
+	}
+	return;
 }
-
 
 int SetOrganization(int aCmd, const OrganizationInfo* aOrganization )
 {
-//#define CMD_ORG_ADD 0x3C
-//#define CMD_ORG_MODIFY 0x3D
-//#define CMD_ORG_DELETE 0x3E
+	int iResult;
+	cData *cd = new cData();
+	switch(aCmd)
+	{
+	case CMD_ORG_ADD:
+		{
+
+		
+		AddOrg aOrg;
+		memset(&aOrg,0,sizeof(AddOrg));
+		aOrg.UpOrg = aOrganization->iParentID ;
+		aOrg.iLevel = aOrganization->iOrgLevel ;
+		aOrg.LineId = aOrganization->iBoundaryRail;
+		aOrg.startid = aOrganization->iBoundaryStartKM;
+		aOrg.EndID = aOrganization->iBoundaryEndKM;
+		char *pTemp = (LPSTR)(LPCTSTR)aOrganization->iOrgAddress;
+		memcpy(&aOrg.Address,pTemp,sizeof(pTemp));
+
+		pTemp = (LPSTR)(LPCTSTR)aOrganization->iOrgName;
+		memcpy(&aOrg.OrgName,pTemp,sizeof(pTemp));
+		iResult = cd->AddOrgs(&aOrg);
+		break;
+		}
+	case CMD_ORG_MODIFY:
+		{
+			EditOrg eOrg;
+			memset(&eOrg,0,sizeof(EditOrg));
+			char *pTemp = (LPSTR)(LPCTSTR)aOrganization->iOrgAddress;
+			memcpy(&eOrg.Address,pTemp,sizeof(pTemp));
+
+			pTemp = (LPSTR)(LPCTSTR)aOrganization->iOrgName;
+			memcpy(&eOrg.OrgName,pTemp,sizeof(pTemp));
+
+			eOrg.UpOrg = aOrganization->iParentID ;
+			eOrg.iLevel = aOrganization->iOrgLevel ;
+			eOrg.LineId = aOrganization->iBoundaryRail;
+			eOrg.startid = aOrganization->iBoundaryStartKM;
+			eOrg.EndID = aOrganization->iBoundaryEndKM;
+			eOrg.OrgId = aOrganization->iOrgID ;
+			iResult = cd->EditOrgs(&eOrg);
+			break;
+		}
+	case CMD_ORG_DELETE:
+		DelOrg dOrg;
+		dOrg.OrgId = aOrganization->iOrgID;
+		iResult = cd->DelOrgs(&dOrg);
+		break;
+	default:
+		break;
+	}
     return KErrNone;
 }
 
-
+//获取机构有效巡检范围 比如 成昆铁路 1- 8K出
 int GetOrgPoint(int iOrgID, vector<MapPoint*>* aPointList)
 {
-    //if(iOrgID == 1)
-    //{//不是最后一级机构
-    //    return kErrNotLastOrg;
-    //}
-    MapPoint *pt = new MapPoint;
-    pt->iRailLine = Chengdu_Chongqing; 
-    pt->iKM = 251;
-    pt->iLon = 104.064531;
-    pt->iLat = 30.699965;
-    pt->iDirect = KUpLine;
-    aPointList->push_back(pt);
 
-    pt = new MapPoint;
-    pt->iRailLine = Chengdu_Chongqing; 
-    pt->iKM = 252;
-    pt->iLon = 104.075530;
-    pt->iLat = 30.699484;
-    pt->iDirect = KUpLine;
-    aPointList->push_back(pt);
+	cData *cd = new cData();
+	lOrgLine llist;
+	if(cd->GetOrgPoint(iOrgID,&llist) > 0)
+	{
+		for(iterOrgLine iter = llist.begin() ; iter != llist.end() ; iter++)
+		{
+			MapPoint *pt = new MapPoint;
+			pt->iRailLine = (RailLine)iter->lineid;
+			pt->iKM = iter->gls;
+			pt->iLat = iter->jdu;
+			pt->iLon = iter->wdu;
+	
+			if(iter->iState == 1)
+				pt->iDirect = KDownLine;
+			else
+				pt->iDirect = KUpLine;
 
-    pt = new MapPoint;
-    pt->iRailLine = Chengdu_Chongqing; 
-    pt->iKM = 253;
-    pt->iLon = 104.086526;
-    pt->iLat = 30.699484;
-    pt->iDirect = KUpLine;
-    aPointList->push_back(pt);
-
-    pt = new MapPoint;
-    pt->iRailLine = Chengdu_Chongqing; 
-    pt->iKM = 254;
-    pt->iLon = 104.097521;
-    pt->iLat = 30.699484;
-    pt->iDirect = KUpLine;
-    aPointList->push_back(pt);
-    return KErrNone;
+			aPointList->push_back(pt);
+			delete pt;
+		}
+		return ResultOk;
+	}else
+	{
+		return KErrNone;
+	}
+    
 }
 
 
@@ -124,6 +177,7 @@ int SetOrgPoint( int aOrgID, int aCmd, const MapPoint* aPoint )
     default:
         break;
     }
+
     return KErrNone;
 }
 
@@ -155,83 +209,225 @@ int GetOrgLine(int iOrgID, const vector<MapPoint*>& aPointList, vector<LineInfo*
     line->iLineKmTime.push_back(0);
     aLineList->push_back(line);
     return KErrNone;
+	
 }
 
 int SetOrgLine( int aOrgID, int aCmd, const LineInfo* aLine )
 {
-    return KErrNone;
+    //aLine->
+	//aLine->
+	return KErrNone;
 }
 
 int GetOrgStaff(int aOrgID, vector<StaffInfo*>* aStaffList)
 {
-    StaffInfo* staff = new StaffInfo;
-    staff->iID = 1;
-    staff->iOrgID = aOrgID;
-    staff->iPassword = _T("111");
-    staff->iLoginPermission = TRUE;
-    staff->iName = _T("张三");
-    aStaffList->push_back(staff);
+    
+	cData *cd = new cData();
+	lUser lPoint;
+	if(cd->GetUserList(aOrgID,1,&lPoint) > 0)
+	{
+		for(iterUser iter = lPoint.begin() ; iter != lPoint.end() ; iter++)
+		{
+			StaffInfo* staff = new StaffInfo;
+			staff->iID = iter->Oper;
+			staff->iOrgID = iter->orgid;
+			staff->iPassword = _T("");
+			staff->iLoginPermission = TRUE;
+			staff->iName = iter->name;
+			staff->Pda1 = iter->pda1;
+			staff->Pda2 = iter->pda2;
+			staff->PowerId = iter->PowerGroup ;
+			aStaffList->push_back(staff);
+		}
+		return ResultOk;
+	}
 
-    staff = new StaffInfo;
-    staff->iID = 2;
-    staff->iOrgID = aOrgID;
-    staff->iPassword = _T("");
-    staff->iLoginPermission = FALSE;
-    staff->iName = _T("李四");
-    aStaffList->push_back(staff);
-
-    staff = new StaffInfo;
-    staff->iID = 3;
-    staff->iOrgID = aOrgID;
-    staff->iName = _T("王五");
-    staff->iPassword = _T("");
-    staff->iLoginPermission = FALSE;
-    aStaffList->push_back(staff);
     return KErrNone;
 }
 
 int SetOrgStaff( int aOrgID, int aCmd, const StaffInfo* aStaff )
 {
-    return KErrNone;
-}
+   // aStaff->
+	/*
+	#define CMD_STAFF_ADD 0x36
+	#define CMD_STAFF_MODIFY 0x37
+	#define CMD_STAFF_DELETE 0x38
+	*/
+	int iResult = 0;
+	cData *cd = new cData();
+	switch(aCmd)
+	{
+	case CMD_STAFF_ADD:
+		{
+			AddUser aUser;
+			memset(&aUser,0,sizeof(AddUser));
+			char *pTemp = (LPSTR)(LPCTSTR)aStaff->iName;
+			memcpy(&aUser.name,pTemp,sizeof(pTemp));
 
-int GetCalendarSchedule(int aOrgID, const vector<StaffInfo*>* aStaffList, CalendarSchedule* aSchedule)
+			pTemp = (LPSTR)(LPCTSTR)aStaff->iID;
+			memcpy(&aUser.Oper,pTemp,sizeof(pTemp));
+	
+			aUser.orgid = aStaff->iOrgID;
+			aUser.pda1 = aStaff->Pda1 ;
+			aUser.pda2 = aStaff->Pda2;
+			aUser.PowerGroup = aStaff->PowerId;
+			int iLogin = 1;
+			if(aStaff->iLoginPermission)iLogin = 1;
+			else iLogin = 0;
+			aUser.UserState = iLogin;
+			iResult = cd->AddUsers(&aUser);
+			break;
+		}
+	case CMD_STAFF_MODIFY:
+		{
+			EditUser eUser;
+			memset(&eUser,0,sizeof(EditUser));
+			char *pTemp = (LPSTR)(LPCTSTR)aStaff->iName;
+			memcpy(&eUser.name,pTemp,sizeof(pTemp));
+
+			pTemp = (LPSTR)(LPCTSTR)aStaff->iID;
+			memcpy(&eUser.Oper,pTemp,sizeof(pTemp));
+
+			eUser.orgid = aStaff->iOrgID;
+			eUser.pda1 = aStaff->Pda1 ;
+			eUser.pda2 = aStaff->Pda2;
+			eUser.PowerGroup = aStaff->PowerId;
+			int iLogin = 1;
+			if(aStaff->iLoginPermission)iLogin = 1;
+			else iLogin = 0;
+			eUser.UserState = iLogin;
+			iResult = cd->EditUsers(&eUser);
+			break;
+		}
+	case CMD_STAFF_DELETE:
+		{
+			DelUser dUser;
+			memset(&dUser,0,sizeof(DelUser));
+			char *pTemp ;
+
+			pTemp = (LPSTR)(LPCTSTR)aStaff->iID;
+			memcpy(&dUser.Oper,pTemp,sizeof(pTemp));
+			iResult = cd->DelUsers(&dUser);
+			break;
+		}
+	}
+	return iResult;
+}
+//获取排版下 实际线路ID 
+int GetCalendarSchedule(int aOrgID, const vector<StaffInfo*>* ListStaff, CalendarSchedule* aSchedule)
 {
-    //for (size_t i=0; i<aLineList.size(); i++)
-    //{
-    //     aSchedule->iDateSchedule.push_back(aLineList[i]);
-    //}
-    aSchedule->iCaledarID = 1;
-    aSchedule->iOrgID = aOrgID;
-    aSchedule->iStartDay = 1288915200;
-    aSchedule->iPeriods = 3;
+
+	cData *cd = new cData();
+	OrgPxInfo oInfo ;
+	oInfo.Orgid = aOrgID;
+	GetOrgPxInfo *llist;
+	cd->GetOrgpInfo(oInfo,llist);
+	aSchedule->iCaledarID = llist->id ;
+	aSchedule->iPeriods = llist->cyc;
+	delete cd;
+
     return KErrNone;
 }
-
-int SetCalendarSchedule(int aOrgID, const CalendarSchedule* aSchedule)
+//
+int SetCalendarSchedule(int aOrgID, const CalendarSchedule* aSchedule/*, const <StaffInfo*>*ListStaff*/)
 {
+	//aSchedule->iDateSchedule[0]->iArrangeStaff
+	//aSchedule->iDateSchedule
+	//aSchedule->iDateSchedule
     return KErrNone;
 }
 
 
-int GetEmergencyTask( int aOrgID, vector<EmergencyTaskInfo*>* m_Emergency )
+int GetEmergencyTask( int aOrgID, vector<EmergencyTaskInfo*>* m_EmergencyList )
 {
     return KErrNone;
 }
 
 int SetEmergencyTask( int aOrgID, int aCmd, const EmergencyTaskInfo* aEmergencyTask )
 {
-    return KErrNone;
+   // aEmergencyTask->
+	return KErrNone;
 }
 
 int GetOrgDevice( int aOrgID, vector<DeviceInfo*>* aDeviceList )
 {
-    return KErrNone;
+	cData *cd = new cData();
+	RequestDeviceList rRequest;
+	rRequest.Devicetype = 2;
+	rRequest.Orgid = aOrgID;
+	rRequest.type = 1;
+	lDevice *lPoint;
+	if(cd->GetDeviceList(rRequest,lPoint) < 0)
+	{
+		return KErrNone;
+	}
+	aDeviceList->clear();
+	for(iterDevice iter = lPoint->begin() ; iter !=lPoint->end();iter++)
+	{
+		DeviceInfo dInfo;
+		memset(&dInfo,0,sizeof(DeviceInfo));
+		dInfo.iDeviceType = (DeviceType)iter->DeviceType; 
+		dInfo.iOrgID = aOrgID;
+		dInfo.iDevID = iter->DeviceId;
+
+		char *pTemp ;
+		pTemp = (LPSTR)(LPCTSTR)iter->DevicePid;
+		memcpy(&dInfo.iPhoneNum,pTemp,sizeof(pTemp));
+
+		aDeviceList->push_back(&dInfo);
+	}
+	return ResultOk;
 }
 
 int SetOrgDevice( int aOrgID, int aCmd, const DeviceInfo* aDeviceList )
 {
-    return KErrNone;
+//#define CMD_DEVICE_ADD 0x40
+//#define CMD_DEVICE_MODIFY 0x41
+//#define CMD_DEVICE_DELETE 0x42
+	int iResult;
+	cData *cd = new cData();
+	switch(aCmd)
+	{
+	case CMD_DEVICE_ADD:
+		{
+			AddDevice *aDevice;
+			memset(aDevice,0,sizeof(AddDevice));
+			aDevice->DeviceOrg = aDeviceList->iOrgID;
+			aDevice->DeviceType = aDeviceList->iDeviceType;
+
+			char *pTemp = (LPSTR)(LPCTSTR)aDeviceList->iPhoneNum;
+			memcpy(&aDevice->DevicePid,pTemp,sizeof(pTemp));
+			iResult = cd->AddDevices(aDevice);
+			break;
+		}
+	case CMD_DEVICE_MODIFY:
+		{
+			EditDevice *aDevice;
+			memset(aDevice,0,sizeof(EditDevice));
+			aDevice->DeviceOrg = aDeviceList->iOrgID;
+			aDevice->DeviceType = aDeviceList->iDeviceType;
+			aDevice->DeviceId =aDeviceList->iDevID; 
+			char *pTemp = (LPSTR)(LPCTSTR)aDeviceList->iPhoneNum;
+			memcpy(&aDevice->DevicePid,pTemp,sizeof(pTemp));
+			iResult = cd->EditDevices(aDevice);
+			break;
+		}
+	case CMD_DEVICE_DELETE:
+		{
+			DelDevice dDevice;
+			dDevice.DeviceId = aDeviceList->iDevID;
+			iResult = cd->DelDevices(&dDevice);
+			break;
+		}
+	default:
+		break;
+	}
+	if(iResult < 0)
+	{
+		return KErrNone;
+	}else
+		return ResultOk;
+	
 }
 
 int GetStaffCurrentTrack(time_t aDate, RecordStaff* aStaff)
@@ -271,4 +467,6 @@ int SavePictureToDirect( int aOrgID, const PictureInfo* aPicture, CString aToDir
 {
     return KErrNone;
 }
+
+
 

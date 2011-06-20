@@ -115,9 +115,9 @@ void CStaffList::OnLvnItemchangedStafflist(NMHDR *pNMHDR, LRESULT *pResult)
     }
 
     //设置权限
-    m_PermissionBasical.SetCheck(m_SeletedStaff->iPermission.iSinglePermission.iBasical);
-    m_PermissionOperate.SetCheck(m_SeletedStaff->iPermission.iSinglePermission.iOperate);
-    m_PermissionReportform.SetCheck(m_SeletedStaff->iPermission.iSinglePermission.iReportForm);
+    m_PermissionBasical.SetCheck(m_SeletedStaff->iPermission.iBasical);
+    m_PermissionOperate.SetCheck(m_SeletedStaff->iPermission.iOperate);
+    m_PermissionReportform.SetCheck(m_SeletedStaff->iPermission.iReportForm);
     *pResult = 0;
 }
 
@@ -154,11 +154,13 @@ void CStaffList::OnBnClickedBtnSetpassword()
 int CStaffList::CreateStaffID()
 {
     int staffID = 0;
+    int staffListID;
     for (size_t i=0; i<m_CRWDSClientView->m_Staff.size(); i++)
     {
-        if(m_CRWDSClientView->m_Staff[i]->iID > staffID)
+        staffListID = _ttoi(m_CRWDSClientView->m_Staff[i]->iID);
+        if(staffListID > staffID)
         {
-            staffID = m_CRWDSClientView->m_Staff[i]->iID;
+            staffID = staffListID;
         }
     }
     //增加1作为新编号
@@ -170,7 +172,7 @@ void CStaffList::OnBnClickedBtnAddstaff()
 {
     // TODO: 在此添加控件通知处理程序代码
     StaffInfo* staff = new StaffInfo;
-    staff->iID = CreateStaffID();
+    staff->iID.Format(_T("%d"), CreateStaffID());
     staff->iLoginPermission = FALSE;
     staff->iName = _T("员工");
     CString str;
@@ -202,10 +204,9 @@ void CStaffList::OnBnClickedBtnmodifystaff()
         m_SeletedStaff->iLoginPermission = FALSE;
         m_SeletedStaff->iPassword = _T("");
     }
-    m_SeletedStaff->iPermission.iSinglePermission.iBasical = m_PermissionBasical.GetCheck();
-    m_SeletedStaff->iPermission.iSinglePermission.iOperate = m_PermissionOperate.GetCheck();
-    m_SeletedStaff->iPermission.iSinglePermission.iReportForm = m_PermissionReportform.GetCheck();
-    int iii = m_SeletedStaff->iPermission.iPermissionGroup;
+    m_SeletedStaff->iPermission.iBasical = m_PermissionBasical.GetCheck();
+    m_SeletedStaff->iPermission.iOperate = m_PermissionOperate.GetCheck();
+    m_SeletedStaff->iPermission.iReportForm = m_PermissionReportform.GetCheck();
     SetOrgStaff(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_STAFF_MODIFY, m_SeletedStaff);
     AfxMessageBox(_T("修改成功"), MB_OK);
 }

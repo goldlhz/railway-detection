@@ -85,16 +85,22 @@ enum PictureErrorType
 
 typedef struct _Single
 {
-    char iBasical;
-    char iOperate;
-    char iReportForm;
-}SinglePermission;
-
-typedef union _Permission
-{//操作权限
-    int iPermissionGroup;
-    SinglePermission iSinglePermission;
+    _Single()
+    {
+        iBasical = 0;
+        iOperate = 0;
+        iReportForm = 0;
+    }
+    int iBasical;
+    int iOperate;
+    int iReportForm;
 }Permission;
+
+//typedef union _Permission
+//{//操作权限
+//    int iPermissionGroup;
+//    UserPower iSinglePermission;
+//}Permission;
 
 typedef struct _MapPoint
 {
@@ -111,6 +117,7 @@ typedef struct _MapPoint
 	double iLon;
 	double iLat;
 	LineDirect iDirect;//上下行
+	int   iPointId;//点id 对于数据库数据
 }MapPoint;
 
 struct _Staff;
@@ -141,18 +148,20 @@ typedef struct _Staff
 {
     _Staff()
     {
-        iID = 0;
+       // iID = 0;
         iOrgID = 0;
         iLoginPermission = FALSE;
-        iPermission.iPermissionGroup = 0;
     }
-    int iID;
+    CString iID;
     int iOrgID;
     CString iName;
     CString iPassword;
     vector<LineInfo*> iArrangeLine;//巡查路线
     BOOL iLoginPermission;
     Permission iPermission;
+	int Pda1;
+	int Pda2;//设备id号
+	int PowerId;
 }StaffInfo;
 
 typedef struct _Device	//设备
@@ -177,12 +186,13 @@ typedef struct _Calendar  //排班表
         iOrgID = 0;
         iStartDay = 0;
         iPeriods = 0;
+        //iDateSchedule = NULL;
     }
 	int iCaledarID;
 	int iOrgID;
 	time_t iStartDay;//开始日期
 	int iPeriods;//周期
-	//vector<LineInfo*>* iScheduleLine;//该排班下的路线集
+	//vector<LineInfo*>* iDateSchedule;//该排班下的路线集
     vector<StaffInfo*> iScheduleStaff;
 }CalendarSchedule;
 
@@ -194,7 +204,6 @@ typedef struct _OrgObj	//机构
         iOrgLevel = 0;
         iOrgName = _T("");
         iOrgAddress = _T("");
-        iParentID = NULL;
         iParentOrg = NULL;
     }
 	int iOrgID;
@@ -244,3 +253,5 @@ typedef struct _PictureInfo//图片信息
     time_t iShootingTime;
     int iErrorType;
 }PictureInfo;
+
+

@@ -8,6 +8,7 @@
 #endif
 
 #include "resource.h"       // Ö÷·ûºÅ
+#include "Datadef.h"
 
 
 // CRWDSClientApp:
@@ -22,7 +23,9 @@ public:
 public:
     CString m_LoginAccount;
     CString m_LoginPassword;
-    int m_LoginPermission;
+    Permission m_LoginPermission;
+    int m_LoginOrgID;
+    //int m_LoginPermission;
 // ÖØÐ´
 public:
 	virtual BOOL InitInstance();
