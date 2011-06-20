@@ -32,6 +32,9 @@ private:
     CButton m_BtnSetPassword;
     CListCtrl m_ListCtrl;
     CListBox m_ArrangeLine;
+    CButton m_PermissionBasical;
+    CButton m_PermissionOperate;
+    CButton m_PermissionReportform;
 public:
 
     virtual BOOL OnInitDialog();
@@ -44,7 +47,7 @@ public:
     afx_msg void OnBnClickedBtnmodifystaff();
     afx_msg void OnBnClickedBtnDelstaff();
     
-    CButton m_PermissionBasical;
-    CButton m_PermissionOperate;
-    CButton m_PermissionReportform;
+
+    CComboBox m_ComboStaffDevice;
+    CComboBox m_ComboStaffPermission;
 };
