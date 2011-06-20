@@ -96,12 +96,6 @@ typedef struct _Single
     int iReportForm;
 }Permission;
 
-//typedef union _Permission
-//{//操作权限
-//    int iPermissionGroup;
-//    UserPower iSinglePermission;
-//}Permission;
-
 typedef struct _MapPoint
 {
     _MapPoint()
@@ -140,9 +134,23 @@ typedef struct _Line	//线路
 	LineStartNo iStartNo;//开始天数
 	vector<MapPoint*> iLineKmLonLat;	//每公里处经纬度
 	vector<time_t> iLineKmTime;			//每公里处时间
-    //vector<struct _Staff*> iArrangeStaff;   //该线上所有要巡查的员工
     CString iLineRemark;//备注
 }LineInfo;
+
+typedef struct _Device	//设备
+{
+    _Device()
+    {
+        iDevID = 0;
+        iOrgID = 0;
+        iDeviceType = KPicture;
+    }
+    int iDevID;
+    int iOrgID;//所属机构
+    CString iPhoneNum;
+    DeviceType iDeviceType;
+}DeviceInfo;
+
 
 typedef struct _Staff
 {
@@ -158,25 +166,12 @@ typedef struct _Staff
     CString iPassword;
     vector<LineInfo*> iArrangeLine;//巡查路线
     BOOL iLoginPermission;
-    Permission iPermission;
+    DeviceInfo* iTakeDevice;
+    //Permission iPermission;
 	int Pda1;
 	int Pda2;//设备id号
 	int PowerId;
 }StaffInfo;
-
-typedef struct _Device	//设备
-{
-    _Device()
-    {
-        iDevID = 0;
-        iOrgID = 0;
-        iDeviceType = KPicture;
-    }
-	int iDevID;
-	int iOrgID;//所属机构
-	CString iPhoneNum;
-    DeviceType iDeviceType;
-}DeviceInfo;
 
 typedef struct _Calendar  //排班表
 {
@@ -186,13 +181,11 @@ typedef struct _Calendar  //排班表
         iOrgID = 0;
         iStartDay = 0;
         iPeriods = 0;
-        //iDateSchedule = NULL;
     }
 	int iCaledarID;
 	int iOrgID;
 	time_t iStartDay;//开始日期
 	int iPeriods;//周期
-	//vector<LineInfo*>* iDateSchedule;//该排班下的路线集
     vector<StaffInfo*> iScheduleStaff;
 }CalendarSchedule;
 

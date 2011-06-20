@@ -468,5 +468,3 @@ int SavePictureToDirect( int aOrgID, const PictureInfo* aPicture, CString aToDir
     return KErrNone;
 }
 
-
-

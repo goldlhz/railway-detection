@@ -35,6 +35,8 @@ void CStaffList::DoDataExchange(CDataExchange* pDX)
     DDX_Control(pDX, IDC_CHECK_PERMISSIONBASICAL, m_PermissionBasical);
     DDX_Control(pDX, IDC_CHECK_PERMISSIONOPERATE, m_PermissionOperate);
     DDX_Control(pDX, IDC_CHECK_PERMISSIONREPORTFORM, m_PermissionReportform);
+    DDX_Control(pDX, IDC_COMBO_DEVICE, m_ComboStaffDevice);
+    DDX_Control(pDX, IDC_COMBO_PERMISSION, m_ComboStaffPermission);
 }
 
 
@@ -77,6 +79,17 @@ BOOL CStaffList::OnInitDialog()
         str.Format(_T("%d"), staff->iArrangeLine.size());
         m_ListCtrl.SetItemText(i, 2, str);
     }
+    m_ComboStaffPermission.AddString(_T("设置权限"));
+    m_ComboStaffPermission.AddString(_T("操作权限"));
+    m_ComboStaffPermission.AddString(_T("报表权限"));
+
+    DeviceInfo* device;
+    for(size_t i=0; i<m_CRWDSClientView->m_Device.size(); i++)
+    {
+        device = m_CRWDSClientView->m_Device[i];
+        m_ComboStaffDevice.AddString(device->iPhoneNum);
+        m_ComboStaffDevice.SetItemData(i, (DWORD_PTR)device);
+    }
     return TRUE;  // return TRUE unless you set the focus to a control
     // 异常: OCX 属性页应返回 FALSE
 }
@@ -113,11 +126,20 @@ void CStaffList::OnLvnItemchangedStafflist(NMHDR *pNMHDR, LRESULT *pResult)
     {
         m_ArrangeLine.AddString(m_SeletedStaff->iArrangeLine[i]->iLineName);
     }
-
+    int comboIndex = -1;
+    for(size_t i=0; i<m_ComboStaffDevice.GetCount(); i++)
+    {
+        if((DeviceInfo*)m_ComboStaffDevice.GetItemData(i) == m_SeletedStaff->iTakeDevice)
+        {
+            comboIndex = i;
+            break;
+        }
+    }
+    m_ComboStaffDevice.SetCurSel(comboIndex);
     //设置权限
-    m_PermissionBasical.SetCheck(m_SeletedStaff->iPermission.iBasical);
-    m_PermissionOperate.SetCheck(m_SeletedStaff->iPermission.iOperate);
-    m_PermissionReportform.SetCheck(m_SeletedStaff->iPermission.iReportForm);
+    //m_PermissionBasical.SetCheck(m_SeletedStaff->iPermission.iBasical);
+    //m_PermissionOperate.SetCheck(m_SeletedStaff->iPermission.iOperate);
+    //m_PermissionReportform.SetCheck(m_SeletedStaff->iPermission.iReportForm);
     *pResult = 0;
 }
 
@@ -204,9 +226,9 @@ void CStaffList::OnBnClickedBtnmodifystaff()
         m_SeletedStaff->iLoginPermission = FALSE;
         m_SeletedStaff->iPassword = _T("");
     }
-    m_SeletedStaff->iPermission.iBasical = m_PermissionBasical.GetCheck();
-    m_SeletedStaff->iPermission.iOperate = m_PermissionOperate.GetCheck();
-    m_SeletedStaff->iPermission.iReportForm = m_PermissionReportform.GetCheck();
+    //m_SeletedStaff->iPermission.iBasical = m_PermissionBasical.GetCheck();
+    //m_SeletedStaff->iPermission.iOperate = m_PermissionOperate.GetCheck();
+    //m_SeletedStaff->iPermission.iReportForm = m_PermissionReportform.GetCheck();
     SetOrgStaff(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_STAFF_MODIFY, m_SeletedStaff);
     AfxMessageBox(_T("修改成功"), MB_OK);
 }
