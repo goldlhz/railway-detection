@@ -80,10 +80,10 @@ BOOL CRWDSClientApp::InitInstance()
 		return FALSE;
     m_LoginAccount = login.GetLoginAccount();
     m_LoginPassword = login.GetLoginPassword();
-    if(VerifyLogin(m_LoginAccount, m_LoginPassword) != KErrNone)
+    if(VerifyLogin(m_LoginAccount, m_LoginPassword, &m_LoginOrgID, &m_LoginPermission) != KErrNone)
         return FALSE;
     //获取权限
-    m_LoginPermission = 0x01010101;
+    //m_LoginPermission = 0x01010101;
 
 	// 初始化 OLE 库
 	if (!AfxOleInit())
