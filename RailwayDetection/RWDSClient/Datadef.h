@@ -186,7 +186,8 @@ typedef struct _Calendar  //排班表
 	int iOrgID;
 	time_t iStartDay;//开始日期
 	int iPeriods;//周期
-    vector<StaffInfo*> iScheduleStaff;
+	vector<StaffInfo*> iScheduleStaff;
+	CString iLineRemark;//备注
 }CalendarSchedule;
 
 typedef struct _OrgObj	//机构
@@ -241,10 +242,10 @@ typedef struct _RecordStaff//员工所巡查记录
 
 typedef struct _PictureInfo//图片信息
 {
-    int iPicID;
-    CString iPicName;
-    time_t iShootingTime;
-    int iErrorType;
+	int iPicID;
+	CString iPicName;
+	CString iShootingTime;
+	int iErrorType;
 }PictureInfo;
 
 

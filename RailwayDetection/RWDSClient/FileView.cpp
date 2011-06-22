@@ -266,18 +266,19 @@ void CFileView::OnNMClickFileView(NMHDR *pNMHDR, LRESULT *pResult)
     HTREEITEM childItem = m_wndFileView.GetChildItem(curItem);
     OrganizationInfo* curOrg = (OrganizationInfo*) m_wndFileView.GetItemData(curItem);
     //删除view保存的点线
-    m_RWDSClientView->DeleteAllLine();
-    m_RWDSClientView->DeleteAllMapPoint();
-    m_RWDSClientView->DeleteAllStaff();
+    //m_RWDSClientView->DeleteAllLine();
+    //m_RWDSClientView->DeleteAllMapPoint();
+    //m_RWDSClientView->DeleteAllStaff();
+    m_RWDSClientView->ClearAllElement();
     //获取该机构拥有的点与员工
-    GetOrgPoint(curOrg->iOrgID, &m_RWDSClientView->m_MapPoint);
-    GetOrgStaff(curOrg->iOrgID, &m_RWDSClientView->m_Staff);
-    GetOrgDevice(curOrg->iOrgID, &m_RWDSClientView->m_Device);
+    //GetOrgPoint(curOrg->iOrgID, &m_RWDSClientView->m_MapPoint);
+    //GetOrgStaff(curOrg->iOrgID, &m_RWDSClientView->m_Staff);
+    //GetOrgDevice(curOrg->iOrgID, &m_RWDSClientView->m_Device);
     m_RWDSClientView->m_CurrentOrg = curOrg;
     if (m_wndFileView.GetItemText(childItem).Compare(_T("")) == 0)
     {//从未展开过最后一层机构
         //获取该机构拥有的路线
-        GetOrgLine(curOrg->iOrgID, m_RWDSClientView->m_MapPoint, &m_RWDSClientView->m_Line);
+        //GetOrgLine(curOrg->iOrgID, m_RWDSClientView->m_MapPoint, &m_RWDSClientView->m_Line);
     }
     else
     {
@@ -345,14 +346,14 @@ void CFileView::OnTvnItemexpandingFileView(NMHDR *pNMHDR, LRESULT *pResult)
             m_RWDSClientView->DeleteAllStaff();
             //获取该机构拥有的点/线/员工
             GetOrgPoint(curOrg->iOrgID, &m_RWDSClientView->m_MapPoint);
-            GetOrgLine(curOrg->iOrgID, m_RWDSClientView->m_MapPoint, &curOrg->iLine);
-            GetOrgStaff(curOrg->iOrgID, &m_RWDSClientView->m_Staff);
+            //GetOrgLine(curOrg->iOrgID, m_RWDSClientView->m_MapPoint, &curOrg->iLine);
+            //GetOrgStaff(curOrg->iOrgID, &m_RWDSClientView->m_Staff);
             
             for(size_t i=0; i<curOrg->iLine.size(); i++)
             {
                 m_RWDSClientView->m_Line.push_back(curOrg->iLine[i]);
             }
-            GetCalendarSchedule(curOrg->iOrgID, &m_RWDSClientView->m_Staff, m_RWDSClientView->m_Calendar);
+            //GetCalendarSchedule(curOrg->iOrgID, &m_RWDSClientView->m_Staff, m_RWDSClientView->m_Calendar);
         }
     }
     *pResult = 0;

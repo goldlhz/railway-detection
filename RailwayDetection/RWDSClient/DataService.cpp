@@ -5,20 +5,23 @@
 #include "cData.h"
 
 
-int VerifyLogin( const CString& aLoginAccount, const CString& aLoginPassword, int* orgID, Permission *pPower)
+int VerifyLogin( CString& aLoginAccount, CString& aLoginPassword, int* orgID, Permission *pPower)
 {
     cData *cd = new cData();
 	char  *UserName = (LPSTR)(LPCTSTR)aLoginAccount; 
 	char  *PassWord = (LPSTR)(LPCTSTR)aLoginPassword;
+    //aLoginAccount.GetBuffer();
 	int iOrgid,p1,p2,p3;
-	int iResult = cd->UserLog(UserName,PassWord,&iOrgid,&p1,&p2,&p3);
-	if(iResult > 0)
+	int iResult = cd->UserLog(aLoginAccount.GetBuffer(),aLoginPassword.GetBuffer(),&iOrgid,&p1,&p2,&p3);
+	if(iResult == 0)
 	{
 		*orgID = iOrgid;
 		pPower->iBasical = p1;
 		pPower->iOperate = p2;
 		pPower->iReportForm = p3;
 	}
+    aLoginAccount.ReleaseBuffer();
+    aLoginPassword.ReleaseBuffer();
 	return iResult;
 }
 
@@ -48,7 +51,12 @@ int GetOrgTree(const int& OrgId, vector<OrganizationInfo*>* a_OrgTree)
 		a_OrgTree->push_back(org);
 	}
 
-	for(vector<OrganizationInfo*>::iterator iterOrg = a_OrgTree->begin() ; iterOrg != a_OrgTree->end() ; a_OrgTree++)
+    //for (int i=0; i<a_OrgTree->size(); i++)
+    //{
+    //    CherkOrgType(a_OrgTree,a_OrgTree[i]);
+    //}
+
+	for(vector<OrganizationInfo*>::iterator iterOrg = a_OrgTree->begin() ; iterOrg != a_OrgTree->end() ; iterOrg++)
 	{
 		CherkOrgType(a_OrgTree,*iterOrg);
 	}
@@ -59,7 +67,7 @@ int GetOrgTree(const int& OrgId, vector<OrganizationInfo*>* a_OrgTree)
 
 void CherkOrgType(vector<OrganizationInfo*>* a_OrgTree,OrganizationInfo* OrgInfo)
 {
-	for(vector<OrganizationInfo*>::iterator iterOrg = a_OrgTree->begin() ; iterOrg != a_OrgTree->end() ; a_OrgTree++)
+	for(vector<OrganizationInfo*>::iterator iterOrg = a_OrgTree->begin() ; iterOrg != a_OrgTree->end() ; iterOrg++)
 	{
 		//获取下属机构
 		if(OrgInfo->iOrgID == (*iterOrg)->iParentID)
@@ -153,7 +161,7 @@ int GetOrgPoint(int iOrgID, vector<MapPoint*>* aPointList)
 				pt->iDirect = KUpLine;
 
 			aPointList->push_back(pt);
-			delete pt;
+			//delete pt;
 		}
 		return ResultOk;
 	}else
@@ -166,57 +174,193 @@ int GetOrgPoint(int iOrgID, vector<MapPoint*>* aPointList)
 
 int SetOrgPoint( int aOrgID, int aCmd, const MapPoint* aPoint )
 {
-    switch (aCmd)
+    cData *cd = new cData();
+	int iResult = 0;
+	PointMang pPoint;
+	switch (aCmd)
     {
     case CMD_POINT_ADD:
-        break;
+		{
+			pPoint.iDirect = (int)aPoint->iDirect;
+			pPoint.iKM = aPoint->iKM;
+			pPoint.iLat = aPoint->iLat;
+			pPoint.iLon = aPoint->iLon;
+			pPoint.iRailLine = aPoint->iRailLine;
+			pPoint.itype = 0;//tianjia
+			iResult=cd->setPoint(pPoint);
+			break;
+		}
     case CMD_POINT_MODIFY:
+		{
+			pPoint.iDirect = (int)aPoint->iDirect;
+			pPoint.iKM = aPoint->iKM;
+			pPoint.iLat = aPoint->iLat;
+			pPoint.iLon = aPoint->iLon;
+			pPoint.iRailLine = aPoint->iRailLine;
+			pPoint.itype = 1;//tianjia
+			pPoint.PointId = aPoint->iPointId;
+			iResult=cd->setPoint(pPoint);
         break;
+		}
     case CMD_POINT_DELETE:
-        break;
+        {
+			pPoint.PointId = aPoint->iPointId;
+			pPoint.itype = 2;//tianjia
+			iResult=cd->setPoint(pPoint);
+			break;
+		}
     default:
         break;
     }
-
-    return KErrNone;
+	delete cd;
+	if(iResult==1)
+	{
+		return KErrNone;
+	}else
+		return ResultOk;
 }
 
 int GetOrgLine(int iOrgID, const vector<MapPoint*>& aPointList, vector<LineInfo*>* aLineList)
 {
-    LineInfo *line = new LineInfo;
-    line->iLineID = 1;
-    line->iLineName = _T("成局1段");
-    line->iStartKm = (aPointList)[0]->iKM;
-    line->iStartNo = KFirstDay;
-    line->iLineKmLonLat.push_back(aPointList[0]);
-    line->iLineKmTime.push_back(100);
-    line->iLineKmLonLat.push_back(aPointList[1]);
-    line->iLineKmTime.push_back(100);
-    line->iLineKmLonLat.push_back(aPointList[2]);
-    line->iLineKmTime.push_back(100);
-    line->iLineKmLonLat.push_back(aPointList[3]);
-    line->iLineKmTime.push_back(100);
-    aLineList->push_back(line);
-
-    line = new LineInfo;
-    line->iLineID = 2;
-    line->iLineName = _T("成局2段");
-    line->iStartKm = aPointList[1]->iKM;
-    line->iStartNo = KThirdDay;
-    line->iLineKmLonLat.push_back(aPointList[1]);
-    line->iLineKmTime.push_back(0);
-    line->iLineKmLonLat.push_back(aPointList[3]);
-    line->iLineKmTime.push_back(0);
-    aLineList->push_back(line);
-    return KErrNone;
+    aLineList->clear();
+	lallOrgLine *llist;
+	Orglines ol;
+	ol.orgid = iOrgID;
+	cData *cd = new cData();
+	if(0 == cd->GetOrgLine(ol,llist))
+	{
+		for(riterOrgLine iter = llist->begin() ; iter != llist->end() ; iter++)
+		{
+			LineInfo *line = new LineInfo;
+			memset(line,0,sizeof(LineInfo));
+			line->iLineID = iter->lineid;
+			line->iLineName = iter->line;
+			line->iStartNo = (LineStartNo)iter->lindday;
+			//int rGetLineTime(const rLinePointTime sValue,lrLinePointTimeResult *llist);
+			rLinePointTime sValue;
+			sValue.lineid = line->iLineID ; 
+			lrLinePointTimeResult *llists;
+			if(0 == cd->rGetLineTime(sValue,llists))
+			{
+				
+				for(iterrLinePointTime it = llists->begin() ; it!= llists->end() ;it++)
+				{
+					MapPoint *mp;
+					//mp->iDirect = (LineDirect)it->iDirect;
+					//mp->iKM = it->iKM;
+					//mp->iLat = it->iLat;
+					//mp->iLon = it->iLon;
+					//mp->iRailLine = (RailLine)sValue.lineid;
+					//mp->PointId = it->PointId;
+					
+					bool find= false;
+					for(int i=0; i<aPointList.size(); i++)
+					{
+						
+						if(aPointList[i]->iPointId == it->PointId)
+						{
+						find = true;
+						mp = aPointList[i];
+						break;
+						}
+					}
+					if(find)
+						line->iLineKmLonLat.push_back(mp);
+					//CString *csTime = it->time;
+					//delete mp;
+				}
+				
+			}
+			//line->iLineKmLonLat.push_back(aPointList[0]);
+			//line->iLineKmTime.push_back(100);
+			//line->iLineKmLonLat.push_back(aPointList[1]);
+			//line->iLineKmTime.push_back(100);
+			//line->iLineKmLonLat.push_back(aPointList[2]);
+			//line->iLineKmTime.push_back(100);
+			//line->iLineKmLonLat.push_back(aPointList[3]);
+			//line->iLineKmTime.push_back(100);
+			aLineList->push_back(line);
+			//delete line;
+		}
+	}
+	
+	return 1;
 	
 }
 
 int SetOrgLine( int aOrgID, int aCmd, const LineInfo* aLine )
 {
-    //aLine->
-	//aLine->
-	return KErrNone;
+//#define CMD_LINE_ADD 0x33
+//#define CMD_LINE_MODIFY 0x34
+//#define CMD_LINE_DELETE 0x35
+	cData *cd = new cData();
+	MangLine Ml;
+	int iResult = 0;
+	memset(&Ml,0,sizeof(MangLine));
+	switch(aCmd)
+	{
+	case CMD_LINE_ADD:
+		{
+			Ml.type = 0;
+			Ml.day = aLine->iStartNo;
+			Ml.orgid = aLine->iOrgID;
+			char *pTemp = (LPSTR)(LPCTSTR)aLine->iLineName;
+			memcpy(&Ml.cName,pTemp,sizeof(pTemp));
+
+			iResult = cd->SetMangLine(Ml);
+			break;
+		}
+	case CMD_LINE_MODIFY:
+		{
+			Ml.type = 1;
+			Ml.day = aLine->iStartNo;
+			Ml.orgid = aLine->iOrgID;
+			Ml.id = aLine->iLineID;
+			char *pTemp = (LPSTR)(LPCTSTR)aLine->iLineName;
+			memcpy(&Ml.cName,pTemp,sizeof(pTemp));
+
+			iResult = cd->SetMangLine(Ml);
+			if(iResult == 0) //增加点和时间
+			{	
+				Sleep(2);
+				int iPointSize = aLine->iLineKmLonLat.size();
+				for(int i = 0;i < iPointSize ;i++)
+				{//
+					int iPoint = aLine->iLineKmLonLat[i]->iPointId;
+					time_t* sec = (time_t*)aLine->iLineKmTime[i];
+					int iHour,iMin;
+					CTime t(*sec);
+					iHour = t.GetHour();
+					iMin = t.GetMinute();
+					CString cs;
+					cs.Format(_T("%d:%d"),iHour,iMin);
+					xj pb;
+					memset(&pb,0,sizeof(xj));
+					pb.type = 0;
+					pb.lineid = aLine->iLineID;
+					pb.pointed = iPoint;
+					char *pTemp = (LPSTR)(LPCTSTR)cs;
+					memcpy(&pb.time,pTemp,sizeof(pTemp));
+					cd->SetxjTime(pb);
+				}
+				//;
+			}
+			break;
+		}
+	case CMD_LINE_DELETE:
+		{
+			Ml.type = 2;
+			Ml.id = aLine->iLineID;
+			iResult = cd->SetMangLine(Ml);
+			break;
+		}
+	}
+    delete cd;
+	if(iResult==1)
+	{
+		return KErrNone;
+	}else
+		return ResultOk;
 }
 
 int GetOrgStaff(int aOrgID, vector<StaffInfo*>* aStaffList)
@@ -324,6 +468,29 @@ int GetCalendarSchedule(int aOrgID, const vector<StaffInfo*>* ListStaff, Calenda
 	cd->GetOrgpInfo(oInfo,llist);
 	aSchedule->iCaledarID = llist->id ;
 	aSchedule->iPeriods = llist->cyc;
+	aSchedule->iLineRemark = llist->content;
+	rOrgPB pb;
+	pb.orgid = aOrgID;
+	lUser lPoint;
+	if(cd->rGetOPb(pb,&lPoint) > 0)
+	{
+		for(iterUser iter = lPoint.begin() ; iter != lPoint.end() ; iter++)
+		{
+			StaffInfo* staff = new StaffInfo;
+			staff->iID = iter->Oper;
+			staff->iOrgID = iter->orgid;
+			staff->iPassword = _T("");
+			staff->iLoginPermission = TRUE;
+			staff->iName = iter->name;
+			staff->Pda1 = iter->pda1;
+			staff->Pda2 = iter->pda2;
+			staff->PowerId = iter->PowerGroup ;
+			aSchedule->iScheduleStaff.push_back(staff);
+		}
+		return ResultOk;
+	}
+
+	//int cData::rGetOPb(const rOrgPB sValue,lUser *lPoint)
 	delete cd;
 
     return KErrNone;
@@ -331,9 +498,32 @@ int GetCalendarSchedule(int aOrgID, const vector<StaffInfo*>* ListStaff, Calenda
 //
 int SetCalendarSchedule(int aOrgID, const CalendarSchedule* aSchedule/*, const <StaffInfo*>*ListStaff*/)
 {
-	//aSchedule->iDateSchedule[0]->iArrangeStaff
-	//aSchedule->iDateSchedule
-	//aSchedule->iDateSchedule
+	cData *cd = new cData();
+	pb *p = new pb();
+	memset(p,0,sizeof(pb));
+	p->cyc = aSchedule->iPeriods;
+	p->id = aSchedule->iCaledarID;
+	p->orgid = aSchedule->iOrgID;
+	p->type = 1;
+	char *pTemp = (LPSTR)(LPCTSTR)aSchedule->iLineRemark;
+	memcpy(&p->content,pTemp,sizeof(pTemp));
+	cd->SetpxPb(*p);
+	int iOrder = 1;
+	for(vector<StaffInfo*>::iterator iter = ((CalendarSchedule*)aSchedule)->iScheduleStaff.begin();iter != aSchedule->iScheduleStaff.end();iter++)
+	{
+		pbpp pp;
+		memset(&pp,0,sizeof(pbpp));
+		pp.ppid = aSchedule->iCaledarID;
+		pp.px = iOrder;
+
+		char *pTemp ;
+		pTemp = (LPSTR)(LPCTSTR)(*iter)->iID;
+		memcpy(&pp.ryid,pTemp,sizeof(pTemp));
+		cd->SetpxOrder(pp);
+		iOrder++;
+	}
+
+	delete cd;
     return KErrNone;
 }
 
@@ -453,14 +643,32 @@ int GetStaffScheduleTrack(int aStaffID, time_t aDate, vector<double>* aRecordLon
 
 int GetPictureInfo( int aOrgID, time_t aStartDate, time_t aEndDate, vector<PictureInfo*>* aPictureList )
 {
-    PictureInfo* picture = new PictureInfo;
-    picture->iPicID = 1;
-    picture->iPicName = _T("516823.jpg");
-    picture->iShootingTime = GetCurrentTime();
-    picture->iErrorType = 0;
+	CString sStart = Time2Strings(aStartDate);
+	CString eTimes = Time2Strings(aEndDate);
+	GetPic pc;
+	memset(&pc,0,sizeof(GetPic));
+	pc.Orgid = aOrgID;
 
-    aPictureList->push_back(picture);
-    return KErrNone;
+	char *pTemp = (LPSTR)(LPCTSTR)sStart;
+	memcpy(&pc.stime,pTemp,sizeof(pTemp));
+
+	pTemp = (LPSTR)(LPCTSTR)eTimes;
+	memcpy(&pc.etime,pTemp,sizeof(pTemp));
+	//int GetOrgPic(GetPic const sValue,lPicList *llist);
+	lPicList *llist;
+	cData *cd = new cData();
+	cd->GetOrgPic(pc,llist);
+	for(iterPic iter = llist->begin();iter != llist->end() ;iter++)
+	{
+		PictureInfo *pInfo;
+		memset(pInfo,0,sizeof(PictureInfo));
+		pInfo->iErrorType = iter->itype ;
+		//pInfo.iPicID = iter->
+		pInfo->iPicName = iter->name;
+		pInfo->iShootingTime = iter->time;
+		aPictureList->push_back(pInfo);
+	}
+	return 1;
 }
 
 int SavePictureToDirect( int aOrgID, const PictureInfo* aPicture, CString aToDirect )
@@ -468,3 +676,76 @@ int SavePictureToDirect( int aOrgID, const PictureInfo* aPicture, CString aToDir
     return KErrNone;
 }
 
+long Time2Strings1(CString sec)
+{
+	//int   nTemp=atoi((LPTSTR)(LPCTSTR)sec);
+	//int iPoint = sec.FindOneOf(_T(":"));
+	//int iLength = sec.GetLength();
+	//long lRet = 0;
+	////int t1 = (int)(sec.Mid(1,iPoint-1));
+	//int t1 = atoi(sec.Mid(1,iPoint-1))；
+	//sec.Mid(1，1)；
+	//sec.Mid()
+	////atoi((lpcstr)sec.Mid(1,iPoint-1)) ;
+	return 1;
+}
+long Time2Strings2(CString sec);
+CString Time2Strings(long sec)
+{
+	if(sec==0){
+		return _T("");
+	}
+
+	time_t tm = sec;
+
+	CTime t(tm);
+	int year = t.GetYear();
+	int month = t.GetMonth();
+	int day = t.GetDay();
+	int hour = t.GetHour();
+	int minute = t.GetMinute();
+	int second = t.GetSecond();
+
+	CString strYear;
+	CString strMonth;
+	CString strDay;
+	CString strHour;
+	CString strMinute;
+	CString strSecond;
+
+	int year2 = year%100;
+	//strYear.Format("%d",year2);
+	strYear.Format(_T("%d"),year);
+	if((year2>=0)&&(year2<=9)){
+		strYear = _T("0") + strYear;
+	}
+	//strMonth.Format("%d",month);
+	strMonth.Format(_T("%d"),month);
+	//if((month>=0)&&(month<=9)){
+	//	strMonth = "0" + strMonth;
+	//}
+	//strDay.Format("%d",day);
+	strDay.Format(_T("%d"),day);
+	//if((day>=0)&&(day<=9)){
+	//	strDay = "0"+strDay;
+	//}
+	//strHour.Format("%d",hour);
+	//if((hour>=0)&&(hour<=9)){
+	//	strHour = "0"+strHour;
+	//}
+	//strMinute.Format("%d",minute);
+	//if((minute>=0)&&(minute<=9)){
+	//	strMinute = "0"+strMinute;
+	//}
+	//strSecond.Format("%d",second);
+	//if((second>=0)&&(second<=9)){
+	//	strSecond = "0"+strSecond;
+	//}
+
+	CString result = strYear+"-"+strMonth+"-"+strDay;
+
+
+
+	return result;
+
+}

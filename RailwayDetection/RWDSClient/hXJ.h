@@ -109,7 +109,7 @@ typedef struct
 {
 	unsigned  int type;//0 add 1 edit 2 del
 	unsigned  int ppid;
-	unsigned  int ryid;
+	char ryid[20];
 	unsigned  int px;
 }pbpp;
 
@@ -197,6 +197,7 @@ typedef struct
 	char userid[20];
 	char dates[20];
 	char xj[20];
+	unsigned  int sTotlePoint;
 	unsigned  int sGetPoint;
 	unsigned  int cPoint;
 	unsigned  int lPoint;
@@ -217,5 +218,62 @@ typedef struct
 	unsigned  int Pagesize;
 	char param [1024*3];
 }realpiclist;
+///点设置
+typedef struct
+{
+	unsigned  int itype; // 0 添加 1 修改 2 删除
+	unsigned  int PointId;//修改、删除时有效
+	unsigned  int iRailLine;//线路id
+	double iKM;//公里处
+	double iLon;//经度
+	double iLat;//纬度
+	int iDirect;//上下行标志
+}PointMang;
+
+typedef struct
+{
+	unsigned  int iResult;//修改结果 0成功 1失败
+}pointResult;
+//获取机构线路
+typedef struct
+{
+	unsigned  int orgid;
+}Orglines;
+
+typedef struct
+{
+	unsigned  int totlePacket;
+	unsigned  int CurrentPacket;
+	unsigned  int lineid;
+	unsigned  int lindday;
+	char line[30];
+}allOrgLineResult;
+typedef list <allOrgLineResult> lallOrgLine;
+typedef lallOrgLine::iterator riterOrgLine;
+
+///获取机构线路下的点时间
+typedef struct
+{
+	unsigned  int lineid;
+}rLinePointTime;
+
+typedef struct
+{
+	unsigned  int totlePacket;
+	unsigned  int CurrentPacket;
+	float iKM;//
+	float iLon;
+	float iLat;
+	int iDirect;//
+	int   PointId;
+	char time[20];
+}rLinePointTimeResult;
+typedef list <rLinePointTimeResult> lrLinePointTimeResult;
+typedef lrLinePointTimeResult::iterator iterrLinePointTime;
+//请求机构下属排版人员列表
+typedef struct
+{
+	unsigned  int orgid;
+}rOrgPB;
 
 #endif

@@ -2,7 +2,7 @@
 #include "Datadef.h"
 
 //登录验证
-int VerifyLogin( const CString& aLoginAccount, const CString& aLoginPassword, int* orgID, Permission *pPower);
+int VerifyLogin( CString& aLoginAccount, CString& aLoginPassword, int* orgID, Permission *pPower);
 
 //获取登录者权限
 int GetLoginerPermission(const CString& aLoginAccount);
@@ -44,3 +44,6 @@ int GetStaffScheduleTrack(int aStaffID, time_t aDate, vector<double>* aRecordLon
 //获取图片信息
 int GetPictureInfo(int aOrgID, time_t aStartDate, time_t aEndDate, vector<PictureInfo*>* aPictureList);
 int SavePictureToDirect(int aOrgID, const PictureInfo* aPicture, CString aToDirect);
+CString Time2Strings(long sec);
+long Time2Strings1(CString sec);
+long Time2Strings2(CString sec);

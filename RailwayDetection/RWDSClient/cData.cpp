@@ -6,7 +6,7 @@
 
 
 const int port = 9527 ;
-const char* destIp = "124.161.252.238\0";
+const char* destIp = "118.122.95.196\0";
 cData::cData(void)
 {
 	cs = new CTCPClient();
@@ -43,7 +43,9 @@ int cData::UserLog(char * UserName,char *UserPwd,int *Orgid,int *p1,int *p2,int 
 	BuildDataPackShell(pDataBuffer, &bs);
 	memcpy(pDataBuffer+7,&lqust,sizeof(lqust));
 	memcpy(cTempBuf, (char*)pDataBuffer, 53);
-
+    char c[42];
+    memset(c,0,42);
+    memcpy(c, (char*)pDataBuffer+7,42);
 	int iResult = cs->Write(pDataBuffer,11 + sizeof(LoginRerquest));
 	if(iResult < iSocketState)
 	{
@@ -52,11 +54,11 @@ int cData::UserLog(char * UserName,char *UserPwd,int *Orgid,int *p1,int *p2,int 
 	LoginRerquestResult ls;
 	memset(cTempBuf,0,sizeof(cTempBuf));
 	int it = 11 + sizeof(LoginRerquestResult);
-	Sleep(10);
+	Sleep(100);
 	LoginRerquestResult lr;
 	memset(&lr,0,sizeof(lr));
 	iResult = cs->Read(cTempBuf,it);
-	
+	//cs->WaitForData(1)
 	if(iResult < 0)
 	{
 		return -1;
@@ -481,7 +483,7 @@ int cData::GetOrgList(int Orgid,lOrg *plOrg)
 		int it = 11 + sizeof(RequestOrgResult);
 		char cTempBuf[11 + sizeof(RequestOrgResult)];
 		memset(cTempBuf,0,it);
-		Sleep(2);
+		Sleep(50);
 		iResult = cs->Read(cTempBuf,it);
 
 	    if(iResult < 1)
@@ -1173,11 +1175,171 @@ bool cData::getPic(const Getrealpic sValue)
 			iTotleCount = lr.totlePacket;
 		}
 	}
-	//if(llist->size() != iTotleCount)
-	//{
-	//	return ErrListCount;
-	//}
 	return true;
+}
+
+int cData::setPoint(const PointMang sValue)
+{
+	char pDataBuffer[11 + sizeof(PointMang)];
+	memset(pDataBuffer,0,sizeof(pDataBuffer));
+	BaseStruct bs;
+	bs.nBodyLength = sizeof(PointMang);
+	bs.nMsgNumber = SetPoint_PACK;
+	BuildDataPackShell(pDataBuffer, &bs);
+	memcpy(pDataBuffer+7,&sValue,sizeof(PointMang));
+
+	int iResult = cs->Write(pDataBuffer,11 + sizeof(PointMang));
+	if(iResult < iSocketState)
+	{
+		return -1;
+	}
+
+	pointResult lr;
+	int it = 11 + sizeof(pointResult);
+	char cTempBuf[11 + sizeof(pointResult)];
+	memset(cTempBuf,0,it);
+	memset(&lr,0,sizeof(lr));
+	iResult = cs->Read(cTempBuf,it);
+
+	if(iResult < 0)
+	{
+		return -1;
+	}
+	DepressPacket(lr,SetPoint_PACK,cTempBuf);
+
+	return lr.iResult;
+}
+
+int cData::GetOrgLine(const Orglines sValue,lallOrgLine *llist)
+{
+	char pDataBuffer[11 + sizeof(Orglines)];
+	memset(pDataBuffer,0,sizeof(pDataBuffer));
+	BaseStruct bs;
+	bs.nBodyLength = sizeof(Orglines);
+	bs.nMsgNumber = GETORGLINE;
+	BuildDataPackShell(pDataBuffer, &bs);
+	memcpy(pDataBuffer+7,&sValue,sizeof(Orglines));
+
+	int iResult = cs->Write(pDataBuffer,11 + sizeof(Orglines));
+	if(iResult < iSocketState)
+	{
+		return ErrSocket;
+	}
+	allOrgLineResult lr;
+	int iTotleCount = 0;
+	llist->clear();
+	while(1)
+	{
+		Sleep(WaitListDataTime);
+
+		int it = 11 + sizeof(allOrgLineResult);
+		char cTempBuf[11 + sizeof(allOrgLineResult)];
+		memset(cTempBuf,0,it);
+
+		iResult = cs->Read(cTempBuf,it);
+
+		if(iResult < NoData)
+		{
+			break;
+		}
+		memset(&lr,0,sizeof(lr));
+		if(DepressPacket(lr,GETORGLINE,cTempBuf))
+		{
+			llist->push_back(lr);
+			iTotleCount = lr.totlePacket;
+			return 0;
+		}
+	}
+	return 1;
+}
+
+//获取线路点时间
+int cData::rGetLineTime(const rLinePointTime sValue,lrLinePointTimeResult *llist)
+{
+	char pDataBuffer[11 + sizeof(rLinePointTime)];
+	memset(pDataBuffer,0,sizeof(pDataBuffer));
+	BaseStruct bs;
+	bs.nBodyLength = sizeof(rLinePointTime);
+	bs.nMsgNumber = GETLINETIME;
+	BuildDataPackShell(pDataBuffer, &bs);
+	memcpy(pDataBuffer+7,&sValue,sizeof(rLinePointTime));
+
+	int iResult = cs->Write(pDataBuffer,11 + sizeof(rLinePointTime));
+	if(iResult < iSocketState)
+	{
+		return ErrSocket;
+	}
+	rLinePointTimeResult lr;
+	int iTotleCount = 0;
+	llist->clear();
+	while(1)
+	{
+		Sleep(WaitListDataTime);
+
+		int it = 11 + sizeof(allOrgLineResult);
+		char cTempBuf[11 + sizeof(allOrgLineResult)];
+		memset(cTempBuf,0,it);
+
+		iResult = cs->Read(cTempBuf,it);
+
+		if(iResult < NoData)
+		{
+			break;
+		}
+		memset(&lr,0,sizeof(lr));
+		if(DepressPacket(lr,GETLINETIME,cTempBuf))
+		{
+			llist->push_back(lr);
+			iTotleCount = lr.totlePacket;
+			return 0;
+		}
+	}
+	return 1;
+}
+int cData::rGetOPb(const rOrgPB sValue,lUser *lPoint)
+{
+
+	char pDataBuffer[11 + sizeof(rOrgPB)];
+	memset(pDataBuffer,0,sizeof(pDataBuffer));
+	BaseStruct bs;
+	bs.nBodyLength = sizeof(rOrgPB);
+	bs.nMsgNumber = ASKWORKERLIST_PACK;
+	BuildDataPackShell(pDataBuffer, &bs);
+	memcpy(pDataBuffer+7,&sValue,sizeof(rOrgPB));
+
+	int iResult = cs->Write(pDataBuffer,11 + sizeof(rOrgPB));
+	if(iResult < iSocketState)
+	{
+		return -1;
+	}
+	int iTotleCount = 0;
+	lPoint->clear();
+	while(1)
+	{
+
+		RequestUserListResult lr;
+		int it = 11 + sizeof(RequestUserListResult);
+		char cTempBuf[11 + sizeof(RequestUserListResult)];
+		memset(cTempBuf,0,it);
+		Sleep(2);
+		iResult = cs->Read(cTempBuf,it);
+
+		if(iResult < 1)
+		{
+			break;
+		}
+		memset(&lr,0,sizeof(lr));
+		if(DepressPacket(lr,ASKORGLIST_PACK,cTempBuf))
+		{
+			lPoint->push_back(lr);
+			iTotleCount = lr.iTotle ;
+		}
+	}
+	if(lPoint->size() != iTotleCount)
+	{
+		return -2;
+	}
+	return 1;
 }
 ////////////////////////////////////////////////////
 template<typename T>

@@ -25,6 +25,7 @@
 #include "OrgList.h"
 #include "DeviceList.h"
 #include "PitureReview.h"
+#include "ErrorDefine.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -306,7 +307,7 @@ int CRWDSClientView::OnCreate(LPCREATESTRUCT lpCreateStruct)
     //获取初始化数据
     m_Org.clear();
     GetOrgTree(theApp.m_LoginOrgID, &m_Org);
-    OrganizationInfo* org = m_Org[0];
+    //OrganizationInfo* org = m_Org[0];
 	MapxCleanAllFeature(m_SymbolLayer);
 
     //获取权限
@@ -963,6 +964,14 @@ void CRWDSClientView::DeleteAllStaff()
         m_Staff.erase(m_Staff.begin());
         delete staff;
     }
+}
+
+void CRWDSClientView::ClearAllElement()
+{
+    m_MapPoint.clear();
+    m_Line.clear();
+    m_Staff.clear();
+    m_Device.clear();
 }
 
 void CRWDSClientView::OnResetOrg()

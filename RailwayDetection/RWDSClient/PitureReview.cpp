@@ -73,9 +73,9 @@ void CPitureReview::OnBnClickedBtnDownloadpicture()
     {
         picture = m_PictureList[i];
         m_ListCtrl.InsertItem(i, picture->iPicName);
-        CTime shootingTime(picture->iShootingTime);
-        CString str = shootingTime.Format(_T("%Y-%m-%d %H:%M:%S"));//2011-1-1 12:00:00
-        m_ListCtrl.SetItemText(i, 1, str);
+        //CTime shootingTime(picture->iShootingTime);
+        //CString str = shootingTime.Format(_T("%Y-%m-%d %H:%M:%S"));//2011-1-1 12:00:00
+        m_ListCtrl.SetItemText(i, 1, picture->iShootingTime);
         m_ListCtrl.SetItemText(i, 2, strPictureErrorType[picture->iErrorType]);
         m_ListCtrl.SetItemData(i, (DWORD_PTR)picture);
     }
