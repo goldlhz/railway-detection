@@ -56,8 +56,8 @@ enum LineDirect
 
 enum LineStartNo
 {
-	KUndefine=-1,
-	KFirstDay=0,
+	KUndefine=0,
+	KFirstDay,
 	KSecondDay,
 	KThirdDay,
 	KFourthDay,

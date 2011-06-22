@@ -20,6 +20,7 @@ const int DirectNameCount = 3;
 const CString StrKm = _T("公里");
 
 const CString StrStartNo[] = {
+                              _T("未指定"),
 							  _T("第一天"),
 							  _T("第二天"),
 							  _T("第三天"),
