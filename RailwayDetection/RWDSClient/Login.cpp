@@ -5,6 +5,8 @@
 #include "RWDSClient.h"
 #include "Login.h"
 #include "afxdialogex.h"
+#include "DataService.h"
+#include "ErrorDefine.h"
 
 
 // CLogin 对话框
@@ -47,6 +49,12 @@ void CLogin::OnBnClickedOk()
         AfxMessageBox(_T("请输入账户名"));
         return;
     }
+    GetDlgItem(IDC_STATIC_LOGININFO)->SetWindowText(_T("正在验证身份，请稍后"));
+    if(VerifyLogin(m_LoginAccount, m_LoginPassword, &m_LoginOrgID, &m_LoginPermission) != KErrNone)
+    {
+        GetDlgItem(IDC_STATIC_LOGININFO)->SetWindowText(_T("登录失败，用户名或密码错误"));
+        return;
+    }
     CDialogEx::OnOK();
 }
 
@@ -75,4 +83,14 @@ CString CLogin::GetLoginPassword()
 void CLogin::SetLoginPassword( const CString& aPassword )
 {
     m_LoginPassword = aPassword;
+}
+
+int CLogin::GetLoginOrgID()
+{
+    return m_LoginOrgID;
+}
+
+Permission CLogin::GetLoginPermission()
+{
+    return m_LoginPermission;
 }

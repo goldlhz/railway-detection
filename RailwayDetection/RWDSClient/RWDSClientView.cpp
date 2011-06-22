@@ -102,15 +102,15 @@ CRWDSClientView::CRWDSClientView()
     m_StaffRecord = NULL;
     //m_StaffCurrentTrack = NULL;
     m_DisplayFlag = KNone;
-	m_Calendar = new CalendarSchedule;
+	//m_Calendar = new CalendarSchedule;
     //m_Calendar->iScheduleLine = &m_Line;
-    m_MapLoaded = FALSE;
+    m_MapLoaded = TRUE;
     m_CurrentOrg = NULL;
 }
 
 CRWDSClientView::~CRWDSClientView()
 {
-	delete m_Calendar;
+	//delete m_Calendar;
 }
 
 BOOL CRWDSClientView::PreCreateWindow(CREATESTRUCT& cs)
@@ -782,86 +782,48 @@ void CRWDSClientView::OnSymbolDelete()
 }
 
 
-void CRWDSClientView::OnSetPoint()
-{
-	// TODO: 在此添加命令处理程序代码
-	//if (m_CurrentPermission.iSinglePermission.iBasical)
-	//{
-	//}
-	CPointList setPoint(this);
-	setPoint.DoModal();
-}
-
-void CRWDSClientView::OnSetLine()
-{
-	// TODO: 在此添加命令处理程序代码
-	CLineList lineList(this);
-	lineList.DoModal();
-}
-
-
-void CRWDSClientView::OnSetSchedule()
-{
-	// TODO: 在此添加命令处理程序代码
-	CSchedule schedule(this);
-	schedule.DoModal();
-}
-
-
 void CRWDSClientView::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: 在此添加命令处理程序代码
-	static BOOL displayLastPoint = TRUE;
-	switch(nIDEvent)
-	{
-	case TIMERNTRACK:
-		//获取线路的当前巡查位置
-		//for(size_t i=0; i<m_CurrentLinePosition.size(); i++)
-		//{
-		//	//GetCurrentPosition(m_CurrentLinePosition[i]->iLineID, m_CurrentLinePosition[i]);
-		//}
-		if (m_MapPoint.size() == 0)
-		{
-			break;
-		}
-		MapPoint* point;
-		
-		MapxCleanAllFeature(m_TrackLayer);
-		size_t i;
-		for (i=0; i<m_MapPoint.size()-1; i++)
-		{
-			point =m_MapPoint[i];
-			MapxDrawCircle(point->iLon-0.001, point->iLat-0.001, m_TrackLayer, miColorYellow);
-		}
-		if (displayLastPoint)
-		{
-			point = m_MapPoint[i];
-			MapxDrawCircle(point->iLon-0.001, point->iLat-0.001, m_TrackLayer, miColorYellow);
-			displayLastPoint = FALSE;
-		}
-		else
-			displayLastPoint = TRUE;
-		break;
-	default:
-		break;
-	}
-	CView::OnTimer(nIDEvent);
-}
-
-
-void CRWDSClientView::OnSetStaff()
-{
     // TODO: 在此添加命令处理程序代码
-    CStaffList setStaff(this);
-    setStaff.DoModal();
-}
+    static BOOL displayLastPoint = TRUE;
+    switch(nIDEvent)
+    {
+    case TIMERNTRACK:
+        //获取线路的当前巡查位置
+        //for(size_t i=0; i<m_CurrentLinePosition.size(); i++)
+        //{
+        //	//GetCurrentPosition(m_CurrentLinePosition[i]->iLineID, m_CurrentLinePosition[i]);
+        //}
+        if (m_CurrentOrg)
+        {
 
+            if (m_CurrentOrg->iMapPoint.size() == 0)
+            {
+                break;
+            }
+        }
+        MapPoint* point;
 
-void CRWDSClientView::OnSetEmergencytask()
-{
-    // TODO: 在此添加命令处理程序代码
-    CEmergencyTask task(this);
-    task.DoModal();
+        MapxCleanAllFeature(m_TrackLayer);
+        size_t i;
+        for (i=0; i<m_CurrentOrg->iMapPoint.size()-1; i++)
+        {
+            point =m_CurrentOrg->iMapPoint[i];
+            MapxDrawCircle(point->iLon-0.001, point->iLat-0.001, m_TrackLayer, miColorYellow);
+        }
+        if (displayLastPoint)
+        {
+            point = m_CurrentOrg->iMapPoint[i];
+            MapxDrawCircle(point->iLon-0.001, point->iLat-0.001, m_TrackLayer, miColorYellow);
+            displayLastPoint = FALSE;
+        }
+        else
+            displayLastPoint = TRUE;
+        break;
+    default:
+        break;
+    }
+    CView::OnTimer(nIDEvent);
 }
 
 
@@ -876,21 +838,21 @@ void CRWDSClientView::OnReviewRecordstaff()
     // TODO: 在此添加命令处理程序代码
     m_DisplayFlag = KStaffLog;
     CRecordStaff rstaff(this);
-    if(rstaff.DoModal() == IDOK)
+    if(m_CurrentOrg && rstaff.DoModal() == IDOK)
     {
         if (!m_StaffRecord)
         {
             m_StaffRecord = new RecordStaff;
         }
         int recordSelect = rstaff.GetSelect();
-        m_StaffRecord->iStaff = m_Staff[recordSelect];
+        m_StaffRecord->iStaff = m_CurrentOrg->iStaff[recordSelect];
 
         //获取员工巡查记录
         GetStaffCurrentTrack(rstaff.GetPickDateTime(), m_StaffRecord);
         vector<double> recordLon;
         vector<double> recordLat;
         GetStaffScheduleTrack(_ttoi(m_StaffRecord->iStaff->iID), rstaff.GetPickDateTime(), 
-                              &recordLon, &recordLat);
+            &recordLon, &recordLat);
 
         MapxCleanAllFeature(m_SymbolLayer);
         MapxCleanAllFeature(m_TrackLayer);
@@ -899,20 +861,20 @@ void CRWDSClientView::OnReviewRecordstaff()
         LineInfo* line = NULL;
         double centerX = 0.0;
         double centerY = 0.0;
-        for (size_t i=0; i<m_StaffRecord->iStaff->iArrangeLine.size(); i++)
-        {//显示该员工所设计的路线
-            line = m_StaffRecord->iStaff->iArrangeLine[i];
-            for (size_t j=0; j<line->iLineKmLonLat.size(); j++)
-            {
-                point = line->iLineKmLonLat[j];
-                MapxDrawCircle(point->iLon, point->iLat, m_SymbolLayer);
-                if (centerX == 0 || centerY == 0)
-                {
-                    centerX = point->iLon;
-                    centerY = point->iLat;
-                }
-            }
-        }
+        //for (size_t i=0; i<m_StaffRecord->iStaff->iArrangeLine.size(); i++)
+        //{//显示该员工所设计的路线
+        //    line = m_StaffRecord->iStaff->iArrangeLine[i];
+        //    for (size_t j=0; j<line->iLineKmLonLat.size(); j++)
+        //    {
+        //        point = line->iLineKmLonLat[j];
+        //        MapxDrawCircle(point->iLon, point->iLat, m_SymbolLayer);
+        //        if (centerX == 0 || centerY == 0)
+        //        {
+        //            centerX = point->iLon;
+        //            centerY = point->iLat;
+        //        }
+        //    }
+        //}
 
         for (size_t i=0; i<m_StaffRecord->iRecordLon.size() && i<m_StaffRecord->iRecordLat.size() ; i++)
         {//描绘员工巡查路线
@@ -935,58 +897,155 @@ void CRWDSClientView::OnReviewRecordstaff()
 
 void CRWDSClientView::DeleteAllMapPoint()
 {
-    MapPoint* point = NULL;
-    while(m_MapPoint.size() > 0)
+    if (!m_CurrentOrg)
     {
-        point = m_MapPoint[0];
-        m_MapPoint.erase(m_MapPoint.begin());
+        return;
+    }
+    MapPoint* point = NULL;
+    while(m_CurrentOrg->iMapPoint.size() > 0)
+    {
+        point = m_CurrentOrg->iMapPoint[0];
+        m_CurrentOrg->iMapPoint.erase(m_CurrentOrg->iMapPoint.begin());
         delete point;
     }
 }
 
 void CRWDSClientView::DeleteAllLine()
 {
-    LineInfo* line = NULL;
-    while(m_Line.size() > 0)
+    if (!m_CurrentOrg)
     {
-        line = m_Line[0];
-        m_Line.erase(m_Line.begin());
+        return;
+    }
+    LineInfo* line = NULL;
+    while(m_CurrentOrg->iLine.size() > 0)
+    {
+        line = m_CurrentOrg->iLine[0];
+        m_CurrentOrg->iLine.erase(m_CurrentOrg->iLine.begin());
         delete line;
     }
 }
 
 void CRWDSClientView::DeleteAllStaff()
 {
-    StaffInfo* staff = NULL;
-    while (m_Staff.size() > 0)
+    if (!m_CurrentOrg)
     {
-        staff = m_Staff[0];
-        m_Staff.erase(m_Staff.begin());
+        return;
+    }
+    StaffInfo* staff = NULL;
+    while (m_CurrentOrg->iStaff.size() > 0)
+    {
+        staff = m_CurrentOrg->iStaff[0];
+        m_CurrentOrg->iStaff.erase(m_CurrentOrg->iStaff.begin());
         delete staff;
     }
 }
 
 void CRWDSClientView::ClearAllElement()
 {
-    m_MapPoint.clear();
-    m_Line.clear();
-    m_Staff.clear();
-    m_Device.clear();
+    //m_MapPoint.clear();
+    //m_Line.clear();
+    //m_Staff.clear();
+    //m_Device.clear();
+    //m_Calendar->iScheduleStaff.clear();
 }
 
-void CRWDSClientView::OnResetOrg()
+void CRWDSClientView::AddElementFromOrg(OrganizationInfo* aOrg)
+{
+    //m_Calendar = aOrg->iCalendar;
+    //for (size_t i=0; i<aOrg->iMapPoint.size(); i++)
+    //{
+    //    m_MapPoint.push_back(aOrg->iMapPoint[i]);
+    //}
+
+    //for (size_t i=0; i<aOrg->iLine.size(); i++)
+    //{
+    //    m_Line.push_back(aOrg->iLine[i]);
+    //}
+
+    //for (size_t i=0; i<aOrg->iStaff.size(); i++)
+    //{
+    //    m_Staff.push_back(aOrg->iStaff[i]);
+    //}
+
+    //for (size_t i=0; i<aOrg->iDevice.size(); i++)
+    //{
+    //    m_Device.push_back(aOrg->iDevice[i]);
+    //}
+}
+
+void CRWDSClientView::OnSetPoint()
+{
+	// TODO: 在此添加命令处理程序代码
+    if (!m_CurrentOrg)
+    {
+        AfxMessageBox(_T("请选择机构"));
+        return;
+    }
+	CPointList setPoint(this);
+	setPoint.DoModal();
+}
+
+void CRWDSClientView::OnSetLine()
+{
+	// TODO: 在此添加命令处理程序代码
+    if (!m_CurrentOrg)
+    {
+        AfxMessageBox(_T("请选择机构"));
+        return;
+    }
+	CLineList lineList(this);
+	lineList.DoModal();
+}
+
+
+void CRWDSClientView::OnSetSchedule()
+{
+	// TODO: 在此添加命令处理程序代码
+    if (!m_CurrentOrg)
+    {
+        AfxMessageBox(_T("请选择机构"));
+            return;
+    }
+	CSchedule schedule(this);
+	schedule.DoModal();
+}
+
+void CRWDSClientView::OnSetStaff()
 {
     // TODO: 在此添加命令处理程序代码
-    CMainFrame* pMain=static_cast<CMainFrame*>(AfxGetApp()->m_pMainWnd);
-    pMain->m_wndFileView.TreeVisitForDeleteItemData(pMain->m_wndFileView.m_wndFileView.GetRootItem());
-    pMain->m_wndFileView.CleanFileView();
-    pMain->m_wndFileView.FillFileView();
+    if (!m_CurrentOrg)
+    {
+        AfxMessageBox(_T("请选择机构"));
+            return;
+    }
+    CStaffList setStaff(this);
+    setStaff.DoModal();
 }
+
+
+void CRWDSClientView::OnSetEmergencytask()
+{
+    // TODO: 在此添加命令处理程序代码
+    if (!m_CurrentOrg)
+    {
+        AfxMessageBox(_T("请选择机构"));
+            return;
+    }
+    CEmergencyTask task(this);
+    task.DoModal();
+}
+
+
 
 
 void CRWDSClientView::OnSetOrganization()
 {
     // TODO: 在此添加命令处理程序代码
+    if (!m_CurrentOrg)
+    {
+        AfxMessageBox(_T("请选择机构"));
+        return;
+    }
     COrgList org(this);
     org.DoModal();
 }
@@ -994,10 +1053,14 @@ void CRWDSClientView::OnSetOrganization()
 void CRWDSClientView::OnSetDevice()
 {
     // TODO: 在此添加命令处理程序代码
+    if (!m_CurrentOrg)
+    {
+        AfxMessageBox(_T("请选择机构"));
+            return;
+    }
     CDeviceList device(this);
     device.DoModal();
 }
-
 
 void CRWDSClientView::OnUpdateSetEmergencytask(CCmdUI *pCmdUI)
 {
@@ -1067,6 +1130,15 @@ void CRWDSClientView::OnUpdateSetDevice(CCmdUI *pCmdUI)
     }
 }
 
+void CRWDSClientView::OnResetOrg()
+{
+    // TODO: 在此添加命令处理程序代码
+    CMainFrame* pMain=static_cast<CMainFrame*>(AfxGetApp()->m_pMainWnd);
+    pMain->m_wndFileView.TreeVisitForDeleteItemData(pMain->m_wndFileView.m_wndFileView.GetRootItem());
+    pMain->m_wndFileView.CleanFileView();
+    pMain->m_wndFileView.FillFileView();
+    m_CurrentOrg = NULL;
+}
 
 void CRWDSClientView::OnReviewPicture()
 {

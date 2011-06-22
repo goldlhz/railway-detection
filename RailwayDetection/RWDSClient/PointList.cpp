@@ -67,7 +67,7 @@ BOOL CPointList::OnInitDialog()
 		m_ComboRailLine.AddString(RailLineName[i]);
 	}
 
-	int count = m_CRWDSClientView->m_MapPoint.size();
+	int count = m_CRWDSClientView->m_CurrentOrg->iMapPoint.size();
 	CString km;
 	CString lon;
 	CString lat;
@@ -75,15 +75,15 @@ BOOL CPointList::OnInitDialog()
 
 	for (int i=0; i<count; i++)
 	{
-		km.Format(_T("%f"), m_CRWDSClientView->m_MapPoint[i]->iKM);
-		lon.Format(_T("%f"), m_CRWDSClientView->m_MapPoint[i]->iLon);
-		lat.Format(_T("%f"), m_CRWDSClientView->m_MapPoint[i]->iLat);
-		if (m_CRWDSClientView->m_MapPoint[i]->iDirect == KUpLine)
+		km.Format(_T("%f"), m_CRWDSClientView->m_CurrentOrg->iMapPoint[i]->iKM);
+		lon.Format(_T("%f"), m_CRWDSClientView->m_CurrentOrg->iMapPoint[i]->iLon);
+		lat.Format(_T("%f"), m_CRWDSClientView->m_CurrentOrg->iMapPoint[i]->iLat);
+		if (m_CRWDSClientView->m_CurrentOrg->iMapPoint[i]->iDirect == KUpLine)
 			direct = _T("上行");
 		else
 			direct = _T("下行");
 
-		m_ListCtrl.InsertItem(i, RailLineName[m_CRWDSClientView->m_MapPoint[i]->iRailLine]);
+		m_ListCtrl.InsertItem(i, RailLineName[m_CRWDSClientView->m_CurrentOrg->iMapPoint[i]->iRailLine]);
 		m_ListCtrl.SetItemText(i, 1, km);
 		m_ListCtrl.SetItemText(i, 2, lon);
 		m_ListCtrl.SetItemText(i, 3, lat);
@@ -101,7 +101,7 @@ void CPointList::OnBnClickedBtnPointadd()
 	point->iLon = 100;
 	point->iLat = 30;
 	point->iDirect = KDownLine;
-	m_CRWDSClientView->m_MapPoint.push_back(point);
+	m_CRWDSClientView->m_CurrentOrg->iMapPoint.push_back(point);
     SetOrgPoint(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_POINT_ADD, point);
 
 	CString km;
@@ -143,7 +143,7 @@ void CPointList::OnBnClickedBtnPointmodify()
 		return;
 	}
 	m_Modifying = TRUE;
-	MapPoint* point = m_CRWDSClientView->m_MapPoint[select];
+	MapPoint* point = m_CRWDSClientView->m_CurrentOrg->iMapPoint[select];
 	CString str;
 	m_ListCtrl.SetItemText(select, 0, RailLineName[m_ComboRailLine.GetCurSel()]);
 	point->iRailLine = static_cast<RailLine>(m_ComboRailLine.GetCurSel());
@@ -188,14 +188,14 @@ void CPointList::OnBnClickedBtnPointdelete()
 	{
 		return;
 	}
-	MapPoint* point = m_CRWDSClientView->m_MapPoint[select];
-	m_CRWDSClientView->m_MapPoint.erase(m_CRWDSClientView->m_MapPoint.begin()+select);
+	MapPoint* point = m_CRWDSClientView->m_CurrentOrg->iMapPoint[select];
+	m_CRWDSClientView->m_CurrentOrg->iMapPoint.erase(m_CRWDSClientView->m_CurrentOrg->iMapPoint.begin()+select);
     LineInfo* line = NULL;
-	for(size_t i=0; i<m_CRWDSClientView->m_Line.size(); i++)
+	for(size_t i=0; i<m_CRWDSClientView->m_CurrentOrg->iLine.size(); i++)
 	{//删除线中设置的点
-		for (size_t j=0; j<m_CRWDSClientView->m_Line[i]->iLineKmLonLat.size(); j++)
+		for (size_t j=0; j<m_CRWDSClientView->m_CurrentOrg->iLine[i]->iLineKmLonLat.size(); j++)
 		{
-            line = m_CRWDSClientView->m_Line[i];
+            line = m_CRWDSClientView->m_CurrentOrg->iLine[i];
 			if(point == line->iLineKmLonLat[j])
 			{
 				line->iLineKmLonLat.erase(line->iLineKmLonLat.begin()+j);
@@ -205,17 +205,17 @@ void CPointList::OnBnClickedBtnPointdelete()
 		}
 	}
 
-    for(size_t i=0; i<m_CRWDSClientView->m_Emergency.size(); i++)
+    for(size_t i=0; i<m_CRWDSClientView->m_CurrentOrg->iEmergency.size(); i++)
     {//删除线紧急任务中设置的点
-        if (point == m_CRWDSClientView->m_Emergency[i]->iBeginKm)
+        if (point == m_CRWDSClientView->m_CurrentOrg->iEmergency[i]->iBeginKm)
         {
-            m_CRWDSClientView->m_Emergency[i]->iBeginKm = NULL;
+            m_CRWDSClientView->m_CurrentOrg->iEmergency[i]->iBeginKm = NULL;
         }
-        if (point == m_CRWDSClientView->m_Emergency[i]->iEndKm)
+        if (point == m_CRWDSClientView->m_CurrentOrg->iEmergency[i]->iEndKm)
         {
-            m_CRWDSClientView->m_Emergency[i]->iEndKm = NULL;
+            m_CRWDSClientView->m_CurrentOrg->iEmergency[i]->iEndKm = NULL;
         }
-        SetEmergencyTask(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_EMERGENCY_MODIFY, m_CRWDSClientView->m_Emergency[i]);
+        SetEmergencyTask(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_EMERGENCY_MODIFY, m_CRWDSClientView->m_CurrentOrg->iEmergency[i]);
     }
     SetOrgPoint(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_POINT_DELETE, point);
 	delete point;
@@ -248,7 +248,7 @@ void CPointList::OnLvnItemchangedPointlist(NMHDR *pNMHDR, LRESULT *pResult)
 	{
 		return;
 	}
-	m_ComboRailLine.SetCurSel(m_CRWDSClientView->m_MapPoint[select]->iRailLine);
+	m_ComboRailLine.SetCurSel(m_CRWDSClientView->m_CurrentOrg->iMapPoint[select]->iRailLine);
 	GetDlgItem(IDC_EDIT_KM)->SetWindowText(m_ListCtrl.GetItemText(select, 1));
 	GetDlgItem(IDC_EDIT_LON)->SetWindowText(m_ListCtrl.GetItemText(select, 2));
 	GetDlgItem(IDC_EDIT_LAT)->SetWindowText(m_ListCtrl.GetItemText(select, 3));

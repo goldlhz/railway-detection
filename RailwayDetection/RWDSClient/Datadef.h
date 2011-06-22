@@ -164,7 +164,7 @@ typedef struct _Staff
     int iOrgID;
     CString iName;
     CString iPassword;
-    vector<LineInfo*> iArrangeLine;//巡查路线
+    //vector<LineInfo*> iArrangeLine;//巡查路线
     BOOL iLoginPermission;
     DeviceInfo* iTakeDevice;
     //Permission iPermission;
@@ -190,32 +190,6 @@ typedef struct _Calendar  //排班表
 	CString iLineRemark;//备注
 }CalendarSchedule;
 
-typedef struct _OrgObj	//机构
-{
-    _OrgObj()
-    {
-        iOrgID = 0;
-        iOrgLevel = 0;
-        iOrgName = _T("");
-        iOrgAddress = _T("");
-        iParentOrg = NULL;
-    }
-	int iOrgID;
-    int iOrgLevel;
-	CString iOrgName;
-    CString iOrgAddress;
-    int iParentID;
-	struct _OrgObj* iParentOrg;//上级机构
-	vector<int> iChildID;
-	vector<struct _OrgObj*> iChildOrg;//直接下级机构
-    RailLine iBoundaryRail;
-    double iBoundaryStartKM;
-    double iBoundaryEndKM;
-    vector<StaffInfo*> iStaff;//该机构的人员
-	vector<DeviceInfo*> iDevice;//该机构拥有的设备
-	vector<LineInfo*> iLine;//该机构配置的路线，若不为最后一级，则为NULL
-}OrganizationInfo;
-
 typedef struct _Emergency
 {
     int iTaskID;
@@ -228,6 +202,39 @@ typedef struct _Emergency
     CString iEmergencyRemark;
     vector<StaffInfo*> iAppointStaff;
 }EmergencyTaskInfo;
+
+typedef struct _OrgObj	//机构
+{
+    inline _OrgObj()
+    {
+        iOrgID = 0;
+        iOrgLevel = 0;
+        iOrgName = _T("");
+        iOrgAddress = _T("");
+        iParentOrg = NULL;
+        iDataSet = FALSE;
+        iCalendar = new CalendarSchedule;
+    }
+	int iOrgID;
+    int iOrgLevel;
+	CString iOrgName;
+    CString iOrgAddress;
+    int iParentID;
+	struct _OrgObj* iParentOrg;//上级机构
+	vector<int> iChildID;
+	vector<struct _OrgObj*> iChildOrg;//直接下级机构
+    RailLine iBoundaryRail;
+    double iBoundaryStartKM;
+    double iBoundaryEndKM;
+    vector<MapPoint*> iMapPoint;
+    vector<StaffInfo*> iStaff;//该机构的人员
+	vector<DeviceInfo*> iDevice;//该机构拥有的设备
+	vector<LineInfo*> iLine;//该机构配置的路线，若不为最后一级，则为NULL
+    CalendarSchedule* iCalendar;//该机构的排班表
+    vector<EmergencyTaskInfo*> iEmergency;
+    BOOL iDataSet;
+}OrganizationInfo;
+
 
 typedef struct _RecordStaff//员工所巡查记录
 {

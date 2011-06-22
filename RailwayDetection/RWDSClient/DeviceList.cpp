@@ -44,9 +44,9 @@ END_MESSAGE_MAP()
 BOOL CDeviceList::CheckDivceId(int aDeviceID)
 {
     DeviceInfo* device = NULL;
-    for(size_t i=0; i<m_CRWDSClientView->m_Device.size(); i++)
+    for(size_t i=0; i<m_CRWDSClientView->m_CurrentOrg->iDevice.size(); i++)
     {
-        device = m_CRWDSClientView->m_Device[i];
+        device = m_CRWDSClientView->m_CurrentOrg->iDevice[i];
         if (aDeviceID == device->iDevID)
         {
             break;
@@ -71,13 +71,13 @@ BOOL CDeviceList::OnInitDialog()
     m_ListCtrl.InsertColumn(0, _T("设备编号"), LVCFMT_LEFT, clientRect.Width()/4);
     m_ListCtrl.InsertColumn(1, _T("电话号码"), LVCFMT_LEFT, clientRect.Width()/4*3);
 
-    for (size_t i=0; i<m_CRWDSClientView->m_Device.size(); i++)
+    for (size_t i=0; i<m_CRWDSClientView->m_CurrentOrg->iDevice.size(); i++)
     {
         CString str;
-        str.Format(_T("%d"), m_CRWDSClientView->m_Device[i]->iDevID);
+        str.Format(_T("%d"), m_CRWDSClientView->m_CurrentOrg->iDevice[i]->iDevID);
         m_ListCtrl.InsertItem(i, str);
-        m_ListCtrl.SetItemText(i, 1, m_CRWDSClientView->m_Device[i]->iPhoneNum);
-        m_ListCtrl.SetItemData(i, (DWORD_PTR)m_CRWDSClientView->m_Device[i]);
+        m_ListCtrl.SetItemText(i, 1, m_CRWDSClientView->m_CurrentOrg->iDevice[i]->iPhoneNum);
+        m_ListCtrl.SetItemData(i, (DWORD_PTR)m_CRWDSClientView->m_CurrentOrg->iDevice[i]);
     }
     m_ComboDeviceType.AddString(_T("图像"));
     m_ComboDeviceType.AddString(_T("视频"));
@@ -134,8 +134,8 @@ void CDeviceList::OnBnClickedBtnDeviceadd()
     device->iPhoneNum = strNum;
     device->iDeviceType = type;
     device->iOrgID = m_CRWDSClientView->m_CurrentOrg->iOrgID;
+    //m_CRWDSClientView->m_CurrentOrg->iDevice.push_back(device);
     m_CRWDSClientView->m_CurrentOrg->iDevice.push_back(device);
-    m_CRWDSClientView->m_Device.push_back(device);
     int ctrlIndex = m_ListCtrl.GetItemCount();
     m_ListCtrl.InsertItem(ctrlIndex, strID);
     m_ListCtrl.SetItemText(ctrlIndex, 1, strNum);
@@ -176,14 +176,6 @@ void CDeviceList::OnBnClickedBtnDevicedelete()
     }
     if (AfxMessageBox(_T("确认删除?"), MB_OKCANCEL) == IDOK)
     {
-        for (size_t i=0; i<m_CRWDSClientView->m_Device.size(); i++)
-        {//删除view中的list
-            if (device == m_CRWDSClientView->m_Device[i])
-            {
-                m_CRWDSClientView->m_Device.erase(m_CRWDSClientView->m_Device.begin()+i);
-                break;
-            }
-        }
         for (size_t i=0; i<m_CRWDSClientView->m_CurrentOrg->iDevice.size(); i++)
         {//删除org里保存的device
             if (device == m_CRWDSClientView->m_CurrentOrg->iDevice[i])
