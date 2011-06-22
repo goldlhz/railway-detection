@@ -354,6 +354,10 @@ typedef lPicList::iterator iterPic;
 #define GETORGPXINFO_PACK				0X2B
 #define GETORGMONTHPX_PACK				0X2a
 #define GETpic_PACK				        0X29
+#define SetPoint_PACK				    0X2C
+#define GETORGLINE                      0x2d
+#define GETLINETIME                     0x2e
+#define GETORGPBSTAFF                   0x2f
 
 #define NoSocket                        0x00
 #define NoData                          0x01

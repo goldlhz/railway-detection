@@ -60,6 +60,7 @@ public:
     void DeleteAllMapPoint();
     void DeleteAllLine();
     void DeleteAllStaff();
+    void ClearAllElement();
 	CString GetModulePath();
 	void DecimalGeoToStandardGeo(double dX, double dY, int *iXd, int *iXm, int *iXs, int *iYd, int *iYm, int *iYs);
 	void MapxDrawCircle(double aMapLon, double aMapLat, CString aLayerName, ColorConstants aColor = miColorBlue);
@@ -141,6 +142,7 @@ public:
    
     afx_msg void OnUpdateSetDevice(CCmdUI *pCmdUI);
     afx_msg void OnReviewPicture();
+
 };
 extern CRWDSClientView* gClientView;
 

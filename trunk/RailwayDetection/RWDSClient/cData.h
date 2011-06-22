@@ -52,6 +52,14 @@ public:
 	int GetOrgMonthPx(getorgpx const sValue,lOrgMonth *llist);
 	//获取图片
 	bool getPic(const Getrealpic sValue);
+	//点设置
+	int setPoint(const PointMang sValue);
+	//获取机构下属线
+	int GetOrgLine(const Orglines sValue,lallOrgLine *llist);
+	//获取线路点时间
+	int rGetLineTime(const rLinePointTime sValue,lrLinePointTimeResult *llist);
+	//获取排版人员
+	int rGetOPb(const rOrgPB sValue,lUser *lPoint);
 private:
 	CTCPClient *cs;
 	void CreateConn();
