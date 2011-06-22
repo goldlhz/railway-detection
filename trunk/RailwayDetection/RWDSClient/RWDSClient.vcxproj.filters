@@ -204,6 +204,9 @@
     <ClInclude Include="hData.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Report.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RWDSClient.cpp">
@@ -288,6 +291,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="TCPTransmit.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Report.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
