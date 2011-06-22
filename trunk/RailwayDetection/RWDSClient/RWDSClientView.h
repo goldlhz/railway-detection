@@ -61,6 +61,7 @@ public:
     void DeleteAllLine();
     void DeleteAllStaff();
     void ClearAllElement();
+    void AddElementFromOrg(OrganizationInfo* aOrg);
 	CString GetModulePath();
 	void DecimalGeoToStandardGeo(double dX, double dY, int *iXd, int *iXm, int *iXs, int *iYd, int *iYm, int *iYs);
 	void MapxDrawCircle(double aMapLon, double aMapLat, CString aLayerName, ColorConstants aColor = miColorBlue);
@@ -80,16 +81,10 @@ protected:
 	double  m_MouseLon;
 	double  m_MouseLat;
 	CPoint  m_RightClkPoint;
-	vector<MapPoint*> m_MapPoint;//点集
-	vector<LineInfo*> m_Line;//线集
+
 	vector<OrganizationInfo*> m_Org;
-	CalendarSchedule* m_Calendar;//日程安排
-	vector<LineInfo*> m_CurrentLinePosition;
-	vector<StaffInfo*> m_Staff;//员工
-    vector<EmergencyTaskInfo*> m_Emergency;//紧急任务
-    vector<DeviceInfo*> m_Device;
+
     RecordStaff* m_StaffRecord;//查看人员巡查记录
-    //RecordStaff* m_StaffCurrentTrack;//查看员工实时巡查
 	CFileView* m_FileView;
     DisplayFlag m_DisplayFlag;
     OrganizationInfo* m_CurrentOrg;//当前选中的机构

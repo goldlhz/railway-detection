@@ -62,7 +62,7 @@ BOOL CLineList::OnInitDialog()
 	m_ListCtrl.InsertColumn(3, _T("结束(KM)"), LVCFMT_LEFT, clientRect.Width()/4);
 	//m_ListCtrl.InsertColumn(4, _T("终端"), LVCFMT_LEFT, clientRect.Width()/5);
 
-	int count = m_CRWDSClientView->m_Line.size();
+	int count = m_CRWDSClientView->m_CurrentOrg->iLine.size();
 	CString id;
 	CString name;
 	CString startKm;
@@ -70,12 +70,12 @@ BOOL CLineList::OnInitDialog()
 
 	for (int i=0; i<count; i++)
 	{
-		id.Format(_T("%d"), m_CRWDSClientView->m_Line[i]->iLineID);
-		name = m_CRWDSClientView->m_Line[i]->iLineName;
-		if (m_CRWDSClientView->m_Line[i]->iLineKmLonLat.size() > 0)
+		id.Format(_T("%d"), m_CRWDSClientView->m_CurrentOrg->iLine[i]->iLineID);
+		name = m_CRWDSClientView->m_CurrentOrg->iLine[i]->iLineName;
+		if (m_CRWDSClientView->m_CurrentOrg->iLine[i]->iLineKmLonLat.size() > 0)
 		{
-			startKm.Format(_T("%.0f"), m_CRWDSClientView->m_Line[i]->iLineKmLonLat[0]->iKM);
-			endKm.Format(_T("%.0f"), m_CRWDSClientView->m_Line[i]->iLineKmLonLat[m_CRWDSClientView->m_Line[i]->iLineKmLonLat.size()-1]->iKM);
+			startKm.Format(_T("%.0f"), m_CRWDSClientView->m_CurrentOrg->iLine[i]->iLineKmLonLat[0]->iKM);
+			endKm.Format(_T("%.0f"), m_CRWDSClientView->m_CurrentOrg->iLine[i]->iLineKmLonLat[m_CRWDSClientView->m_CurrentOrg->iLine[i]->iLineKmLonLat.size()-1]->iKM);
 		}
 		else
 		{
@@ -114,12 +114,12 @@ void CLineList::OnBnClickedBtnLineadd()
 	LineInfo* line = new LineInfo;
 	line->iLineID = 1;
 	line->iLineName = _T("线路");
-	line->iStartKm = m_CRWDSClientView->m_MapPoint[0]->iKM;
-	line->iLineKmLonLat.push_back(m_CRWDSClientView->m_MapPoint[0]);
+	line->iStartKm = m_CRWDSClientView->m_CurrentOrg->iMapPoint[0]->iKM;
+	line->iLineKmLonLat.push_back(m_CRWDSClientView->m_CurrentOrg->iMapPoint[0]);
 	line->iLineKmTime.push_back(0);
 	line->iStartNo = KFirstDay;
     GetDlgItem(IDC_EDIT_LINEREMARK)->GetWindowText(line->iLineRemark);
-	m_CRWDSClientView->m_Line.push_back(line);
+	m_CRWDSClientView->m_CurrentOrg->iLine.push_back(line);
     SetOrgLine(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_LINE_ADD, line);
 
 	CString id;
@@ -149,7 +149,7 @@ void CLineList::OnClickedBtnLinemodify()
 	{
 		return;
 	}
-	LineInfo* line = m_CRWDSClientView->m_Line[select];
+	LineInfo* line = m_CRWDSClientView->m_CurrentOrg->iLine[select];
     GetDlgItem(IDC_EDIT_LINENAME)->GetWindowText(line->iLineName);
     GetDlgItem(IDC_EDIT_LINEREMARK)->GetWindowText(line->iLineRemark);
 	AfxMessageBox(_T("修改成功"), MB_OK);
@@ -163,28 +163,28 @@ void CLineList::OnClickedBtnLinedelete()
 	int select = m_ListCtrl.GetSelectionMark();
 	if (select < 0)
 		return;
-	LineInfo* line = m_CRWDSClientView->m_Line[select];
-	m_CRWDSClientView->m_Line.erase(m_CRWDSClientView->m_Line.begin()+select);
+	LineInfo* line = m_CRWDSClientView->m_CurrentOrg->iLine[select];
+	m_CRWDSClientView->m_CurrentOrg->iLine.erase(m_CRWDSClientView->m_CurrentOrg->iLine.begin()+select);
 
 	m_ListCtrl.DeleteItem(select);
 	m_ListAllPoint.ResetContent();
 	m_ListSelectedPoint.ResetContent();
 
     //清除员工设置的线
-    StaffInfo* staff;
-    for (size_t i=0; i<m_CRWDSClientView->m_Staff.size(); i++)
-    {
-        staff = m_CRWDSClientView->m_Staff[i];
-        for (size_t j=0; j<staff->iArrangeLine.size(); j++)
-        {
-            if(line == staff->iArrangeLine[j])
-            {
-                staff->iArrangeLine.erase(staff->iArrangeLine.begin()+j);
-                SetOrgStaff(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_STAFF_MODIFY, staff);
-                break;
-            }
-        }
-    }
+    //StaffInfo* staff;
+    //for (size_t i=0; i<m_CRWDSClientView->m_CurrentOrg->iStaff.size(); i++)
+    //{
+    //    staff = m_CRWDSClientView->m_CurrentOrg->iStaff[i];
+    //    for (size_t j=0; j<staff->iArrangeLine.size(); j++)
+    //    {
+    //        if(line == staff->iArrangeLine[j])
+    //        {
+    //            staff->iArrangeLine.erase(staff->iArrangeLine.begin()+j);
+    //            SetOrgStaff(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_STAFF_MODIFY, staff);
+    //            break;
+    //        }
+    //    }
+    //}
     SetOrgLine(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_LINE_DELETE, line);
     delete line;
 }
@@ -213,34 +213,34 @@ void CLineList::OnLvnItemchangedLinelist(NMHDR *pNMHDR, LRESULT *pResult)
 	m_ListSelectedPoint.ResetContent();
 	m_Selected.clear();
 	m_Unselected.clear();
-    LineInfo* line = m_CRWDSClientView->m_Line[select];
+    LineInfo* line = m_CRWDSClientView->m_CurrentOrg->iLine[select];
     GetDlgItem(IDC_EDIT_LINEREMARK)->SetWindowText(line->iLineRemark);
     GetDlgItem(IDC_EDIT_LINENAME)->SetWindowText(line->iLineName);
     str.Format(_T("%d"), line->iLineID);
     GetDlgItem(IDC_EDIT_LINEID)->SetWindowText(str);
-	for (size_t i=0; i<m_CRWDSClientView->m_MapPoint.size(); i++)
+	for (size_t i=0; i<m_CRWDSClientView->m_CurrentOrg->iMapPoint.size(); i++)
 	{//根据已选点与未选点加载界面
 		bool addSelect = FALSE;
 		for (size_t j=0; j<line->iLineKmLonLat.size(); j++)
 		{
-			if (m_CRWDSClientView->m_MapPoint[i] == line->iLineKmLonLat[j])
+			if (m_CRWDSClientView->m_CurrentOrg->iMapPoint[i] == line->iLineKmLonLat[j])
 			{
 				addSelect = TRUE;
 				break;
 			}
 		}
-		ENCODERAILWAYFULLNAME(str, m_CRWDSClientView->m_MapPoint[i]->iRailLine, 
-                              m_CRWDSClientView->m_MapPoint[i]->iKM, 
-                              m_CRWDSClientView->m_MapPoint[i]->iDirect);
+		ENCODERAILWAYFULLNAME(str, m_CRWDSClientView->m_CurrentOrg->iMapPoint[i]->iRailLine, 
+                              m_CRWDSClientView->m_CurrentOrg->iMapPoint[i]->iKM, 
+                              m_CRWDSClientView->m_CurrentOrg->iMapPoint[i]->iDirect);
 		if (addSelect)
 		{
 			m_ListSelectedPoint.AddString(str);
-			m_Selected.push_back(m_CRWDSClientView->m_MapPoint[i]);
+			m_Selected.push_back(m_CRWDSClientView->m_CurrentOrg->iMapPoint[i]);
 		}
 		else
 		{
 			m_ListAllPoint.AddString(str);
-			m_Unselected.push_back(m_CRWDSClientView->m_MapPoint[i]);
+			m_Unselected.push_back(m_CRWDSClientView->m_CurrentOrg->iMapPoint[i]);
 		}
 	}
 
@@ -299,7 +299,7 @@ void CLineList::OnBnClickedBtnAdd1()
 	{
 		return;
 	}
-	LineInfo* line = m_CRWDSClientView->m_Line[select];
+	LineInfo* line = m_CRWDSClientView->m_CurrentOrg->iLine[select];
 	line->iLineKmLonLat.push_back(point);
 	line->iLineKmTime.push_back(0);//为新加点设置时间
     SetOrgLine(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_LINE_MODIFY, line);
@@ -333,7 +333,7 @@ void CLineList::OnBnClickedBtnRemove1()
 	{
 		return;
 	}
-	LineInfo* line = m_CRWDSClientView->m_Line[select];
+	LineInfo* line = m_CRWDSClientView->m_CurrentOrg->iLine[select];
 	line->iLineKmLonLat.erase(line->iLineKmLonLat.begin()+index);
 	line->iLineKmTime.erase(line->iLineKmTime.begin()+index);
 

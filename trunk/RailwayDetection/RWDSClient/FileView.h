@@ -28,7 +28,7 @@ public:
     void TreeVisitForDeleteItemData(HTREEITEM aItem);
 	void OnChangeVisualStyle();
 	void SetRWDSClientView(CRWDSClientView* aRWDSClientView);
-
+    void GetOrgData(OrganizationInfo* aOrg);
 // Ьиад
 protected:
 
@@ -60,6 +60,7 @@ protected:
 	afx_msg void OnTvnItemexpandingFileView(NMHDR *pNMHDR, LRESULT *pResult);
 
 	DECLARE_MESSAGE_MAP()
-    
+
+
 };
 

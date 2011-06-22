@@ -1,5 +1,6 @@
 #pragma once
 #include "resource.h"
+#include "Datadef.h"
 
 // CLogin 对话框
 
@@ -18,9 +19,13 @@ public:
     void SetLoginAccount(const CString& aAccount);
     CString GetLoginPassword();
     void SetLoginPassword(const CString& aPassword);
+    int GetLoginOrgID();
+    Permission GetLoginPermission();
 private:
     CString m_LoginAccount;
     CString m_LoginPassword;
+    int m_LoginOrgID;
+    Permission m_LoginPermission;
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 

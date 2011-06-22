@@ -48,9 +48,9 @@ BOOL CRecordStaff::OnInitDialog()
     // TODO:  在此添加额外的初始化
     if (m_CRWDSClientView->m_DisplayFlag == KStaffLog)
     {
-        for(size_t i=0; i<m_CRWDSClientView->m_Staff.size(); i++)
+        for(size_t i=0; i<m_CRWDSClientView->m_CurrentOrg->iStaff.size(); i++)
         {
-            m_ComboRecord.AddString(m_CRWDSClientView->m_Staff[i]->iName);
+            m_ComboRecord.AddString(m_CRWDSClientView->m_CurrentOrg->iStaff[i]->iName);
         }
     }
     else if (m_CRWDSClientView->m_DisplayFlag == KDeviceLog)

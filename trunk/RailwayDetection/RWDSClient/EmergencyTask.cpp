@@ -75,19 +75,19 @@ BOOL CEmergencyTask::OnInitDialog()
     m_ComboEmergencyStatus.AddString(_T("结束"));
 
     CString str;
-    for(size_t i=0; i<m_CRWDSClientView->m_MapPoint.size(); i++)
+    for(size_t i=0; i<m_CRWDSClientView->m_CurrentOrg->iMapPoint.size(); i++)
     {
         
-        ENCODERAILWAYFULLNAME(str, m_CRWDSClientView->m_MapPoint[i]->iRailLine, 
-                              m_CRWDSClientView->m_MapPoint[i]->iKM, 
-                              m_CRWDSClientView->m_MapPoint[i]->iDirect);
+        ENCODERAILWAYFULLNAME(str, m_CRWDSClientView->m_CurrentOrg->iMapPoint[i]->iRailLine, 
+                              m_CRWDSClientView->m_CurrentOrg->iMapPoint[i]->iKM, 
+                              m_CRWDSClientView->m_CurrentOrg->iMapPoint[i]->iDirect);
         m_Combo_StartKM.AddString(str);
         //m_Combo_StartKM.SetItemData(i, reinterpret_cast<DWORD_PTR>(m_CRWDSClientView->m_MapPoint[i]));
         m_Combo_EndKM.AddString(str);
         //m_Combo_EndKM.SetItemData(i, reinterpret_cast<DWORD_PTR>(m_CRWDSClientView->m_MapPoint[i]));
     }
 
-    int count = m_CRWDSClientView->m_Emergency.size();
+    int count = m_CRWDSClientView->m_CurrentOrg->iEmergency.size();
     CString id;
     CString name;
     CString startKm;
@@ -95,19 +95,19 @@ BOOL CEmergencyTask::OnInitDialog()
     CString flag;
     for (int i=0; i<count; i++)
     {
-        id.Format(_T("%d"), m_CRWDSClientView->m_Emergency[i]->iTaskID);
-        name = m_CRWDSClientView->m_Emergency[i]->iTaskName;
-        if (m_CRWDSClientView->m_Emergency[i]->iBeginKm)
+        id.Format(_T("%d"), m_CRWDSClientView->m_CurrentOrg->iEmergency[i]->iTaskID);
+        name = m_CRWDSClientView->m_CurrentOrg->iEmergency[i]->iTaskName;
+        if (m_CRWDSClientView->m_CurrentOrg->iEmergency[i]->iBeginKm)
         {
-            startKm.Format(_T("%.0f"), m_CRWDSClientView->m_Emergency[i]->iBeginKm->iKM);
+            startKm.Format(_T("%.0f"), m_CRWDSClientView->m_CurrentOrg->iEmergency[i]->iBeginKm->iKM);
         }
         else
         {
             startKm = _T("");
         }
-        if (m_CRWDSClientView->m_Emergency[i]->iEndKm)
+        if (m_CRWDSClientView->m_CurrentOrg->iEmergency[i]->iEndKm)
         {
-            endKm.Format(_T("%.0f"), m_CRWDSClientView->m_Emergency[i]->iEndKm->iKM);
+            endKm.Format(_T("%.0f"), m_CRWDSClientView->m_CurrentOrg->iEmergency[i]->iEndKm->iKM);
         }
         else
         {
@@ -118,7 +118,7 @@ BOOL CEmergencyTask::OnInitDialog()
         m_ListCtrl.SetItemText(i, 1, id);
         m_ListCtrl.SetItemText(i, 2, startKm);
         m_ListCtrl.SetItemText(i, 3, endKm);
-        if (m_CRWDSClientView->m_Emergency[i]->iStatus == KNormal)
+        if (m_CRWDSClientView->m_CurrentOrg->iEmergency[i]->iStatus == KNormal)
         {
             flag = _T("正常");
         }
@@ -146,7 +146,7 @@ void CEmergencyTask::OnLvnItemchangedEmergencylist(NMHDR *pNMHDR, LRESULT *pResu
         return;
     }
     CString str;
-    EmergencyTaskInfo* task = m_CRWDSClientView->m_Emergency[select];
+    EmergencyTaskInfo* task = m_CRWDSClientView->m_CurrentOrg->iEmergency[select];
     m_SeletedTask = task;
     GetDlgItem(IDC_EDIT_EMERGENCYREMARK)->SetWindowText(task->iEmergencyRemark);
     GetDlgItem(IDC_EDIT_EMERGENCYNAME)->SetWindowText(task->iTaskName);
@@ -174,13 +174,13 @@ void CEmergencyTask::OnLvnItemchangedEmergencylist(NMHDR *pNMHDR, LRESULT *pResu
     m_Combo_StartKM.SetCurSel(-1);
     m_Combo_EndKM.SetCurSel(-1);
 
-    for (size_t i=0; i<m_CRWDSClientView->m_MapPoint.size(); i++)
+    for (size_t i=0; i<m_CRWDSClientView->m_CurrentOrg->iMapPoint.size(); i++)
     {
-        if (m_CRWDSClientView->m_MapPoint[i] == task->iBeginKm)
+        if (m_CRWDSClientView->m_CurrentOrg->iMapPoint[i] == task->iBeginKm)
         {
             m_Combo_StartKM.SetCurSel(i);
         }
-        if (m_CRWDSClientView->m_MapPoint[i] == task->iEndKm)
+        if (m_CRWDSClientView->m_CurrentOrg->iMapPoint[i] == task->iEndKm)
         {
             m_Combo_EndKM.SetCurSel(i);
         }
@@ -192,11 +192,11 @@ void CEmergencyTask::OnLvnItemchangedEmergencylist(NMHDR *pNMHDR, LRESULT *pResu
 int CEmergencyTask::CreateEmergencyTaskID()
 {
     int taskID = 0;
-    for (size_t i=0; i<m_CRWDSClientView->m_Emergency.size(); i++)
+    for (size_t i=0; i<m_CRWDSClientView->m_CurrentOrg->iEmergency.size(); i++)
     {
-        if(m_CRWDSClientView->m_Emergency[i]->iTaskID > taskID)
+        if(m_CRWDSClientView->m_CurrentOrg->iEmergency[i]->iTaskID > taskID)
         {
-            taskID = m_CRWDSClientView->m_Emergency[i]->iTaskID;
+            taskID = m_CRWDSClientView->m_CurrentOrg->iEmergency[i]->iTaskID;
         }
     }
     //增加1作为新编号
@@ -216,7 +216,7 @@ void CEmergencyTask::OnBnClickedBtnEmergencyadd()
     task->iBeginTime = 10;
     task->iEndTime = 10;
     task->iEmergencyRemark = _T("");
-    m_CRWDSClientView->m_Emergency.push_back(task);
+    m_CRWDSClientView->m_CurrentOrg->iEmergency.push_back(task);
 
     SetEmergencyTask(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_EMERGENCY_ADD, task);
 
@@ -253,7 +253,7 @@ void CEmergencyTask::OnBnClickedBtnEmergencymodify()
     {
         return;
     }
-    EmergencyTaskInfo* task = m_CRWDSClientView->m_Emergency[select];
+    EmergencyTaskInfo* task = m_CRWDSClientView->m_CurrentOrg->iEmergency[select];
     m_SeletedTask = task;
     GetDlgItem(IDC_EDIT_EMERGENCYNAME)->GetWindowText(task->iTaskName);
     
@@ -261,12 +261,12 @@ void CEmergencyTask::OnBnClickedBtnEmergencymodify()
     CString str;
     if (m_Combo_StartKM.GetCurSel() > -1)
     {
-        task->iBeginKm = m_CRWDSClientView->m_MapPoint[m_Combo_StartKM.GetCurSel()];
+        task->iBeginKm = m_CRWDSClientView->m_CurrentOrg->iMapPoint[m_Combo_StartKM.GetCurSel()];
         
     }
     if (m_Combo_EndKM.GetCurSel() > -1)
     {
-        task->iEndKm = m_CRWDSClientView->m_MapPoint[m_Combo_EndKM.GetCurSel()];
+        task->iEndKm = m_CRWDSClientView->m_CurrentOrg->iMapPoint[m_Combo_EndKM.GetCurSel()];
 
     }
     GetDlgItem(IDC_EDIT_EMERGENCYREMARK)->GetWindowText(task->iEmergencyRemark);
@@ -321,9 +321,9 @@ void CEmergencyTask::OnBnClickedBtnEmergencydelete()
     if (select < 0)
         return;
 
-    EmergencyTaskInfo* task = m_CRWDSClientView->m_Emergency[select];
+    EmergencyTaskInfo* task = m_CRWDSClientView->m_CurrentOrg->iEmergency[select];
 
-    m_CRWDSClientView->m_Emergency.erase(m_CRWDSClientView->m_Emergency.begin()+select);
+    m_CRWDSClientView->m_CurrentOrg->iEmergency.erase(m_CRWDSClientView->m_CurrentOrg->iEmergency.begin()+select);
 
     SetEmergencyTask(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_EMERGENCY_DELETE, task);
 

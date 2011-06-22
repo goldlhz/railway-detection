@@ -223,7 +223,7 @@ int SetOrgPoint( int aOrgID, int aCmd, const MapPoint* aPoint )
 int GetOrgLine(int iOrgID, const vector<MapPoint*>& aPointList, vector<LineInfo*>* aLineList)
 {
     aLineList->clear();
-	lallOrgLine *llist;
+	lallOrgLine *llist = NULL;
 	Orglines ol;
 	ol.orgid = iOrgID;
 	cData *cd = new cData();
@@ -239,7 +239,7 @@ int GetOrgLine(int iOrgID, const vector<MapPoint*>& aPointList, vector<LineInfo*
 			//int rGetLineTime(const rLinePointTime sValue,lrLinePointTimeResult *llist);
 			rLinePointTime sValue;
 			sValue.lineid = line->iLineID ; 
-			lrLinePointTimeResult *llists;
+			lrLinePointTimeResult *llists = NULL;
 			if(0 == cd->rGetLineTime(sValue,llists))
 			{
 				
@@ -254,7 +254,7 @@ int GetOrgLine(int iOrgID, const vector<MapPoint*>& aPointList, vector<LineInfo*
 					//mp->PointId = it->PointId;
 					
 					bool find= false;
-					for(int i=0; i<aPointList.size(); i++)
+					for(size_t i=0; i<aPointList.size(); i++)
 					{
 						
 						if(aPointList[i]->iPointId == it->PointId)
@@ -464,7 +464,7 @@ int GetCalendarSchedule(int aOrgID, const vector<StaffInfo*>* ListStaff, Calenda
 	cData *cd = new cData();
 	OrgPxInfo oInfo ;
 	oInfo.Orgid = aOrgID;
-	GetOrgPxInfo *llist;
+	GetOrgPxInfo *llist = NULL;
 	cd->GetOrgpInfo(oInfo,llist);
 	aSchedule->iCaledarID = llist->id ;
 	aSchedule->iPeriods = llist->cyc;
@@ -546,7 +546,7 @@ int GetOrgDevice( int aOrgID, vector<DeviceInfo*>* aDeviceList )
 	rRequest.Devicetype = 2;
 	rRequest.Orgid = aOrgID;
 	rRequest.type = 1;
-	lDevice *lPoint;
+	lDevice *lPoint = NULL;
 	if(cd->GetDeviceList(rRequest,lPoint) < 0)
 	{
 		return KErrNone;
@@ -580,7 +580,7 @@ int SetOrgDevice( int aOrgID, int aCmd, const DeviceInfo* aDeviceList )
 	{
 	case CMD_DEVICE_ADD:
 		{
-			AddDevice *aDevice;
+			AddDevice *aDevice = new AddDevice;
 			memset(aDevice,0,sizeof(AddDevice));
 			aDevice->DeviceOrg = aDeviceList->iOrgID;
 			aDevice->DeviceType = aDeviceList->iDeviceType;
@@ -592,7 +592,7 @@ int SetOrgDevice( int aOrgID, int aCmd, const DeviceInfo* aDeviceList )
 		}
 	case CMD_DEVICE_MODIFY:
 		{
-			EditDevice *aDevice;
+			EditDevice *aDevice = new EditDevice;
 			memset(aDevice,0,sizeof(EditDevice));
 			aDevice->DeviceOrg = aDeviceList->iOrgID;
 			aDevice->DeviceType = aDeviceList->iDeviceType;
@@ -655,12 +655,12 @@ int GetPictureInfo( int aOrgID, time_t aStartDate, time_t aEndDate, vector<Pictu
 	pTemp = (LPSTR)(LPCTSTR)eTimes;
 	memcpy(&pc.etime,pTemp,sizeof(pTemp));
 	//int GetOrgPic(GetPic const sValue,lPicList *llist);
-	lPicList *llist;
+	lPicList *llist = NULL;
 	cData *cd = new cData();
 	cd->GetOrgPic(pc,llist);
 	for(iterPic iter = llist->begin();iter != llist->end() ;iter++)
 	{
-		PictureInfo *pInfo;
+		PictureInfo *pInfo = new PictureInfo;
 		memset(pInfo,0,sizeof(PictureInfo));
 		pInfo->iErrorType = iter->itype ;
 		//pInfo.iPicID = iter->
