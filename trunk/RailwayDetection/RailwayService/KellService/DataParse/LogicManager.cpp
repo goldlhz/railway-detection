@@ -216,7 +216,7 @@ int CLogicManager::SetLogicData(DWORD dNumberOfBytes,
 			break;
 
 		case GETORGSCHEDUELIST_PACK:
-			nBackCode = DealGetSchedueListPack(dNumberOfBytes, pcBuffer, pDatabase);
+			nBackCode = DealGetSchedueListPack(dNumberOfBytes, pKeyOverPire, pDatabase, pWorkThread, pFunSendData);
 			pKeyOverPire->pireOverLappedex.wsaWSABUF.len = nBackCode;
 			break;
 
@@ -250,6 +250,29 @@ int CLogicManager::SetLogicData(DWORD dNumberOfBytes,
 
 		case GETORGSCHWORKER_PACK:
 			nBackCode =  DealGetOrgSchWorkerPack(dNumberOfBytes, 
+				pKeyOverPire, 
+				pDatabase,
+				pWorkThread,
+				pFunSendData);
+			pKeyOverPire->pireOverLappedex.wsaWSABUF.len = nBackCode;
+			break;
+
+		case WORKERPOLLQUERY_PACK:
+			nBackCode =  DealWorkerPollQueryPack(dNumberOfBytes, 
+				pKeyOverPire, 
+				pDatabase,
+				pWorkThread,
+				pFunSendData);
+			pKeyOverPire->pireOverLappedex.wsaWSABUF.len = nBackCode;
+			break;
+
+		case URGENCYMISSIONDELETE_PACK:
+			nBackCode = DealUrgencyMissionDeletePack(dNumberOfBytes, pcBuffer, pDatabase);
+			pKeyOverPire->pireOverLappedex.wsaWSABUF.len = nBackCode;
+			break;
+
+		case WORKERPOLL_PACK:
+			nBackCode =  DealWorkerPollPack(dNumberOfBytes, 
 				pKeyOverPire, 
 				pDatabase,
 				pWorkThread,
@@ -1564,25 +1587,82 @@ int  CLogicManager::DealGetPicDataPack(DWORD dNumberOfBytes,
 
 
 int  CLogicManager::DealGetSchedueListPack(DWORD dNumberOfBytes, 
-	char  * pBuffer, 
-	CADODatabase* pDatabase)
+	LPOverKeyPire pKeyOverPire, 
+	CADODatabase* pDatabase,
+	void* pWorkThread,
+	void* pFunDealSendData)
 {
+	FPDealSendData DealSendData = (FPDealSendData)pFunDealSendData;
+
+	char * pBuffer = pKeyOverPire->pireOverLappedex.wsaBuffer;
+
 	if(m_DataPackPares.PackGetOrgSchedueListUpPack(pBuffer, m_getOrgSchedueListUpPack))
 	{
 		if(m_AccessBaseData.InitAccesser(pDatabase))
 		{
-			m_AccessBaseData.UpLoadGetOrgSchedueListPack(m_getOrgSchedueListUpPack, m_getOrgSchedueListDownPack);
-			m_DataPackPares.PackGetOrgSchedueListDownBuild(pBuffer, m_getOrgSchedueListDownPack);
+			auto_ptr<CADORecordset> pRecordset(m_AccessBaseData.UpLoadGetOrgSchedueListPack(m_getOrgSchedueListUpPack));
+			if(pRecordset.get())
+			{
+				DWORD nHadSendRecord;
+				DWORD nTitleRecord = pRecordset->GetRecordCount();
 
-			return m_getOrgSchedueListDownPack.nBodyLength + 11;
+				if(nTitleRecord > 0)
+				{
+					CString strTemp;
+					int     nTemp;
+
+					pRecordset->MoveFirst();
+					for (nHadSendRecord = 1; !pRecordset->IsEOF(); ++nHadSendRecord, pRecordset->MoveNext())
+					{
+						m_getOrgSchedueListDownPack.gDataBodyPack.nTotlePacket = nTitleRecord;
+						m_getOrgSchedueListDownPack.gDataBodyPack.nCurrentPacket = nHadSendRecord;
+						
+						pRecordset->GetFieldValue("r", strTemp);
+						m_getOrgSchedueListDownPack.gDataBodyPack.strUserID = strTemp;
+						strTemp.LockBuffer();
+
+						pRecordset->GetFieldValue("r1", strTemp);
+						m_getOrgSchedueListDownPack.gDataBodyPack.strDates = strTemp;
+						strTemp.LockBuffer();
+
+						pRecordset->GetFieldValue("r2", strTemp);
+						m_getOrgSchedueListDownPack.gDataBodyPack.strXJ = strTemp;
+						strTemp.LockBuffer();
+
+						pRecordset->GetFieldValue("r3", nTemp);
+						m_getOrgSchedueListDownPack.gDataBodyPack.nSTotlePoint = nTemp;
+
+						pRecordset->GetFieldValue("r4", nTemp);
+						m_getOrgSchedueListDownPack.gDataBodyPack.nSGetPoint = nTemp;
+
+						pRecordset->GetFieldValue("r5", nTemp);
+						m_getOrgSchedueListDownPack.gDataBodyPack.nCPoint = nTemp;
+
+						pRecordset->GetFieldValue("r6", nTemp);
+						m_getOrgSchedueListDownPack.gDataBodyPack.nLPoint = nTemp;
+
+						m_getOrgSchedueListDownPack.nBodyLength = 84;
+						m_DataPackPares.PackGetOrgSchedueListDownBuild(pBuffer, m_getOrgSchedueListDownPack);
+						pKeyOverPire->pireOverLappedex.wsaWSABUF.len = m_getOrgSchedueListDownPack.nBodyLength + 11;
+
+						nTemp = DealSendData(pKeyOverPire, pWorkThread);
+						if(0 != nTemp)
+							return -2;
+					}
+					return 0;
+				}
+			}
 		}
 	}
 
 	m_DataPackPares.FillGetOrgSchedueListFailPack(m_getOrgSchedueListDownPack);
 	m_DataPackPares.PackGetOrgSchedueListDownBuild(pBuffer, m_getOrgSchedueListDownPack);
+	pKeyOverPire->pireOverLappedex.wsaWSABUF.len = m_getUrgencyMissionListDownPack.nBodyLength + 11;
 
-	return m_getOrgSchedueListDownPack.nBodyLength + 11;
+	DealSendData(pKeyOverPire, pWorkThread);
+	return 0;
 }
+
 
 int  CLogicManager::DealGetSchedueInfoPack(DWORD dNumberOfBytes, 
 	char  * pBuffer, 
@@ -1836,6 +1916,108 @@ int  CLogicManager::DealGetOrgSchWorkerPack(DWORD dNumberOfBytes,
 	return 0;
 }
 
+int  CLogicManager::DealWorkerPollQueryPack(DWORD dNumberOfBytes, 
+	LPOverKeyPire pKeyOverPire, 
+	CADODatabase* pDatabase,
+	void* pWorkThread,
+	void* pFunDealSendData)
+{
+	return 0;
+}
+
+int  CLogicManager::DealUrgencyMissionDeletePack(DWORD dNumberOfBytes, 
+	char  * pBuffer, 
+	CADODatabase* pDatabase)
+{
+	if(m_DataPackPares.PackUrgencyMissionDeleteUpPack(pBuffer, m_urgencyMissionDeleteUpPack))
+	{
+		if(m_AccessBaseData.InitAccesser(pDatabase))
+		{
+			m_AccessBaseData.UpLoadUrgencyMissionDeletePack(m_urgencyMissionDeleteUpPack, m_urgencyMissionDeleteDownPack);
+			m_DataPackPares.PackUrgencyMissionDeleteDownBuild(pBuffer, m_urgencyMissionDeleteDownPack);
+			return m_urgencyMissionDeleteDownPack.nBodyLength + 11;
+		}
+	}
+
+	m_DataPackPares.FillUrgencyMissionDeleteFailPack(m_urgencyMissionDeleteDownPack);
+	m_DataPackPares.PackUrgencyMissionDeleteDownBuild(pBuffer, m_urgencyMissionDeleteDownPack);
+	return m_urgencyMissionDeleteDownPack.nBodyLength + 11;
+}
+
+int  CLogicManager::DealWorkerPollPack(DWORD dNumberOfBytes, 
+	LPOverKeyPire pKeyOverPire, 
+	CADODatabase* pDatabase,
+	void* pWorkThread,
+	void* pFunDealSendData)
+{
+	FPDealSendData DealSendData = (FPDealSendData)pFunDealSendData;
+
+	char * pBuffer = pKeyOverPire->pireOverLappedex.wsaBuffer;
+
+	if(m_DataPackPares.PackWorkerPollUpPack(pBuffer, m_workerPollUpPack))
+	{
+		if(m_AccessBaseData.InitAccesser(pDatabase))
+		{
+			auto_ptr<CADORecordset> pRecordset(m_AccessBaseData.UploadWorkerPollPack(m_workerPollUpPack));
+			if(pRecordset.get())
+			{
+				DWORD nHadSendRecord;
+				DWORD nTitleRecord = pRecordset->GetRecordCount();
+
+				if(nTitleRecord > 0)
+				{
+					CString strTemp;
+					int     nTemp;
+
+					pRecordset->MoveFirst();
+					for (nHadSendRecord = 1; !pRecordset->IsEOF(); ++nHadSendRecord, pRecordset->MoveNext())
+					{
+						m_workerPollDownPack.gDataBodyPack.nTotlePacket = nTitleRecord;
+						m_workerPollDownPack.gDataBodyPack.nCurrentPacket = nHadSendRecord;
+
+						pRecordset->GetFieldValue(_T("R_pointid"), nTemp);
+						m_workerPollDownPack.gDataBodyPack.nPointID = nTemp;
+
+						pRecordset->GetFieldValue(_T("r_pxdate"), strTemp);
+						m_workerPollDownPack.gDataBodyPack.strDate = strTemp.GetBuffer();
+						strTemp.LockBuffer();
+
+						pRecordset->GetFieldValue(_T("R_arrTime"), strTemp);
+						m_workerPollDownPack.gDataBodyPack.strArrtime = strTemp.GetBuffer();
+						strTemp.LockBuffer();
+
+						pRecordset->GetFieldValue(_T("R_realtime"), strTemp);
+						m_workerPollDownPack.gDataBodyPack.strRealTime = strTemp.GetBuffer();
+						strTemp.LockBuffer();
+
+						pRecordset->GetFieldValue(_T("R_pid"), strTemp);
+						m_workerPollDownPack.gDataBodyPack.strPID = strTemp.GetBuffer();
+						strTemp.LockBuffer();
+
+						pRecordset->GetFieldValue(_T("P_state"), nTemp);
+						m_workerPollDownPack.gDataBodyPack.nPointState = nTemp;
+
+
+						m_workerPollDownPack.nBodyLength = 96;
+						m_DataPackPares.PackWorkerPollDownBuild(pBuffer, m_workerPollDownPack);
+						pKeyOverPire->pireOverLappedex.wsaWSABUF.len = m_workerPollDownPack.nBodyLength + 11;
+
+						nTemp = DealSendData(pKeyOverPire, pWorkThread);
+						if(0 != nTemp)
+							return -2;
+					}
+					return 0;
+				}
+			}
+		}
+	}
+	m_DataPackPares.FillWorkerPollFailPack(m_workerPollDownPack);
+	m_DataPackPares.PackWorkerPollDownBuild(pBuffer, m_workerPollDownPack);
+	pKeyOverPire->pireOverLappedex.wsaWSABUF.len = m_workerPollDownPack.nBodyLength + 11;
+
+	DealSendData(pKeyOverPire, pWorkThread);
+	return 0;
+}
 
 void CLogicManager::FillPicStoreStruct(GPSPIC_Pack& gpsPicUpLoadPack, string strTel)
 {

@@ -171,6 +171,17 @@ public:
 	bool PackGetOrgSchWorkerDownBuild(char* pDataBuffer, GetOrgSchWorker_Download_Pack& getOrgSchWorkerDownLoadPack);
 	void FillGetOrgSchWorkerFailPack(GetOrgSchWorker_Download_Pack& getOrgSchWorkerDownLoadPack);
 
+	bool PackWorkerPollQueryUpPack(const char* pDataBuffer, WorkerPollQuery_Upload_Pack& workerPollQureyUpLoadPack);
+	bool PackWorkerPollQueryDownBuild(char* pDataBuffer, WorkerPollQuery_Download_Pack& workerPollQureyDownLoadPack);
+	void FillWorkerPollQueryFailPack(WorkerPollQuery_Download_Pack& workerPollQureyDownLoadPack);
+
+	bool PackUrgencyMissionDeleteUpPack(const char* pDataBuffer, UrgencyMissionDelete_Upload_Pack& urgencyMissionDeleteUpLoadPack);
+	bool PackUrgencyMissionDeleteDownBuild(char* pDataBuffer, UrgencyMissionDelete_Download_Pack& urgencyMissionDeleteDownLoadPack);
+	void FillUrgencyMissionDeleteFailPack(UrgencyMissionDelete_Download_Pack& urgencyMissionDeleteDownLoadPack);
+
+	bool PackWorkerPollUpPack(const char* pDataBuffer, WorkerPoll_Upload_Pack& workerPollUpLoadPack);
+	bool PackWorkerPollDownBuild(char* pDataBuffer, WorkerPoll_Download_Pack& workerPollDownLoadPack);
+	void FillWorkerPollFailPack(WorkerPoll_Download_Pack& workerPollDownLoadPack);
 private:
 	int ParseGPSPackHttpShell(const char* pDataBuffer, char* outBuffer, 
 		string& strGPSContext, DWORD& nPackLength, string& strTel);
@@ -294,6 +305,15 @@ private:
 
 	bool ParseGetOrgSchWorkerPackData(const char* pDataBuffer, GetOrgSchWorker_Upload_Pack& getOrgSchWorkerUpLoadPack);
 	bool BuildGetOrgSchWorkerPackData(char* pDataBuffer, const GetOrgSchWorker_Download_Pack& getOrgSchWorkerDownLoadPack);
+
+	bool ParseWorkerPollQueryPackData(const char* pDataBuffer, WorkerPollQuery_Upload_Pack& workerPollQueryUpLoadPack);
+	bool BuildWorkerPollQueryPackData(char* pDataBuffer, const WorkerPollQuery_Download_Pack& workerPollQueryDownLoadPack);
+
+	bool ParseUrgencyMissionDeletePackData(const char* pDataBuffer, UrgencyMissionDelete_Upload_Pack& urgencyMissionDeleteUpLoadPack);
+	bool BuildUrgencyMissionDeletePackData(char* pDataBuffer, const UrgencyMissionDelete_Download_Pack& urgencyMissionDeleteDownLoadPack);
+
+	bool ParseWorkerPollPackData(const char* pDataBuffer, WorkerPoll_Upload_Pack& workerPollUpLoadPack);
+	bool BuildWorkerPollPackData(char* pDataBuffer, const WorkerPoll_Download_Pack& workerPollDownLoadPack);
 private: 
 	unsigned int GetContextLength(vector<string>& vecGPSLine);
 	string		 GetContextTel(vector<string>& vecGPSLine);
