@@ -42,9 +42,6 @@
     <ClInclude Include="Resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DataParse\ProtocolDefine.h">
-      <Filter>DataParse</Filter>
-    </ClInclude>
     <ClInclude Include="DataParse\DataPackParse.h">
       <Filter>DataParse</Filter>
     </ClInclude>
@@ -55,9 +52,6 @@
       <Filter>IOCP</Filter>
     </ClInclude>
     <ClInclude Include="IOCP\BaseThread.h">
-      <Filter>IOCP</Filter>
-    </ClInclude>
-    <ClInclude Include="IOCP\IOCPDefine.h">
       <Filter>IOCP</Filter>
     </ClInclude>
     <ClInclude Include="IOCP\IOCPManager.h">
@@ -83,6 +77,12 @@
     </ClInclude>
     <ClInclude Include="Common\GobalConfig.h">
       <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="DataParse\LogicManager.h">
+      <Filter>DataParse</Filter>
+    </ClInclude>
+    <ClInclude Include="DataParse\base64.h">
+      <Filter>DataParse</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -124,6 +124,12 @@
     </ClCompile>
     <ClCompile Include="Common\GobalConfig.cpp">
       <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="DataParse\LogicManager.cpp">
+      <Filter>DataParse</Filter>
+    </ClCompile>
+    <ClCompile Include="DataParse\base64.cpp">
+      <Filter>DataParse</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

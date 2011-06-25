@@ -21,7 +21,13 @@ public:
 
 	unsigned int GetListenPort(){return m_nServerPort;};
 
-	bool InitGoblaConfig(HMODULE hInstance);
+	string       GetHost(){return m_strHost;};
+	string       GetDatabase(){return m_strDatabase;};
+	string       GetUserName(){return m_strUserName;};
+	string       GetPassword(){return m_strPassword;};
+	string		 GetPicFilePath(){return m_strPicFilePath;};
+
+	bool InitGlbConfig(HMODULE hInstance);
 
 private:
 	unsigned int m_nMemoryDownLine;
@@ -37,5 +43,11 @@ private:
 	unsigned int m_nSocketRecycleSize;
 
 	unsigned int m_nServerPort;
+
+	string       m_strHost;
+	string       m_strDatabase;
+	string       m_strUserName;
+	string       m_strPassword;
+	string		 m_strPicFilePath;
 };
 

@@ -23,12 +23,13 @@ CGobalConfig::~CGobalConfig(void)
 {
 }
 
-bool CGobalConfig::InitGoblaConfig(HMODULE hInstance)
+bool CGobalConfig::InitGlbConfig(HMODULE hInstance)
 {
 	ASSERT(hInstance);
-	
+	char strBuffer[MAX_PATH];
+
 	int nErrorCode = 0;
-	wstring strIniPath = CCommonFunction::GetLogPluginPath(hInstance);
+	string strIniPath = CCommonFunction::GetLogPluginPath(hInstance);
 
 	if(strIniPath.empty())
 		strIniPath = _T(".\\System.ini");
@@ -52,6 +53,26 @@ bool CGobalConfig::InitGoblaConfig(HMODULE hInstance)
 	m_nSocketRecycleSize = GetPrivateProfileInt(_T("SocketPool"), _T("SocketRecycleSize"), m_nSocketRecycleSize, strIniPath.c_str());
 
 	m_nServerPort = GetPrivateProfileInt(_T("Server"), _T("ServerPort"), m_nServerPort, strIniPath.c_str());
+
+	memset(strBuffer, 0x00, MAX_PATH);
+	GetPrivateProfileString(_T("Database"), _T("Host"), _T("127.0.0.1"), strBuffer, MAX_PATH, strIniPath.c_str());
+	m_strHost = strBuffer;
+
+	memset(strBuffer, 0x00, MAX_PATH);
+	GetPrivateProfileString(_T("Database"), _T("UserName"), _T("sa"), strBuffer, MAX_PATH, strIniPath.c_str());
+	m_strUserName = strBuffer;
+
+	memset(strBuffer, 0x00, MAX_PATH);
+	GetPrivateProfileString(_T("Database"), _T("Password"), _T("123"), strBuffer, MAX_PATH, strIniPath.c_str());
+	m_strPassword = strBuffer;
+
+	memset(strBuffer, 0x00, MAX_PATH);
+	GetPrivateProfileString(_T("Database"), _T("Database"), _T("xj"), strBuffer, MAX_PATH, strIniPath.c_str());
+	m_strDatabase = strBuffer;
+
+	memset(strBuffer, 0x00, MAX_PATH);
+	GetPrivateProfileString(_T("Server"), _T("PicFilePath"), _T("c:\\"), strBuffer, MAX_PATH, strIniPath.c_str());
+	m_strPicFilePath = strBuffer;
 
 	return true;
 }

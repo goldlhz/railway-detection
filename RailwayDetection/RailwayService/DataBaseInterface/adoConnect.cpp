@@ -1,14 +1,3 @@
-//
-//  MODULE: AdoLink.cpp
-//
-//	AUTHOR: Carlos Antollini 
-//
-//  mailto: cantollini@hotmail.com
-//
-//	Date: 07/02/2003
-//
-//	Version 2.10
-//
 #include "stdafx.h"
 #include "adoConnect.h"
 

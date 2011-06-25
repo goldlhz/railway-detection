@@ -19,14 +19,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
     <UseOfMfc>Dynamic</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
     <UseOfMfc>Dynamic</UseOfMfc>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -53,13 +53,15 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.\DataParse;.\Common;.\iocp\;..\LogPluginManager\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include;..\DataBaseInterface;.\DataParse;.\Common;.\iocp\;..\LogPluginManager\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>LogPluginManager.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>DataBaseInterface.lib;LogPluginManager.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\Bin\BinD\</AdditionalLibraryDirectories>
+      <StackReserveSize>10485760</StackReserveSize>
+      <StackCommitSize>40960</StackCommitSize>
     </Link>
     <PostBuildEvent>
       <Command>copy ..\ConfigFileLib\System.ini ..\Bin\BinD\System.ini
@@ -74,7 +76,7 @@ copy ..\ConfigFileLib\loger.ini ..\Bin\BinD\LogPlugin\loger.ini</Command>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.\DataParse;.\Common;.\iocp\;..\LogPluginManager\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include;..\DataBaseInterface;.\DataParse;.\Common;.\iocp\;..\LogPluginManager\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -82,7 +84,9 @@ copy ..\ConfigFileLib\loger.ini ..\Bin\BinD\LogPlugin\loger.ini</Command>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>..\Bin\BinR\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>LogPluginManager.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>DataBaseInterface.lib;LogPluginManager.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <StackReserveSize>10485760</StackReserveSize>
+      <StackCommitSize>40960</StackCommitSize>
     </Link>
     <PostBuildEvent>
       <Command>copy ..\ConfigFileLib\System.ini ..\Bin\BinR\System.ini
@@ -95,13 +99,13 @@ copy ..\ConfigFileLib\loger.ini ..\Bin\BinR\LogPlugin\loger.ini</Command>
     <None Include="small.ico" />
   </ItemGroup>
   <ItemGroup>
- 	<ClInclude Include="Common\CommonFunction.h" /> 
+    <ClInclude Include="Common\CommonFunction.h" />
     <ClInclude Include="Common\GobalConfig.h" />
+    <ClInclude Include="DataParse\base64.h" />
     <ClInclude Include="DataParse\DataPackParse.h" />
-    <ClInclude Include="DataParse\ProtocolDefine.h" />
+    <ClInclude Include="DataParse\LogicManager.h" />
     <ClInclude Include="IOCP\BaseSocket.h" />
     <ClInclude Include="IOCP\BaseThread.h" />
-    <ClInclude Include="IOCP\IOCPDefine.h" />
     <ClInclude Include="IOCP\IOCPManager.h" />
     <ClInclude Include="IOCP\ListenThread.h" />
     <ClInclude Include="IOCP\MemoryPool.h" />
@@ -114,9 +118,11 @@ copy ..\ConfigFileLib\loger.ini ..\Bin\BinR\LogPlugin\loger.ini</Command>
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Common\CommonFunction.cpp" />  
-    <ClCompile Include="Common\GobalConfig.cpp" />	
-	<ClCompile Include="DataParse\DataPackParse.cpp" />
+    <ClCompile Include="Common\CommonFunction.cpp" />
+    <ClCompile Include="Common\GobalConfig.cpp" />
+    <ClCompile Include="DataParse\base64.cpp" />
+    <ClCompile Include="DataParse\DataPackParse.cpp" />
+    <ClCompile Include="DataParse\LogicManager.cpp" />
     <ClCompile Include="IOCP\BaseSocket.cpp" />
     <ClCompile Include="IOCP\BaseThread.cpp" />
     <ClCompile Include="IOCP\IOCPManager.cpp" />
