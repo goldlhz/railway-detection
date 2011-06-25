@@ -1229,6 +1229,9 @@ int  CLogicManager::DealGetLinePointPack(DWORD dNumberOfBytes,
 						m_getLinePointDownPack.gDataBodyPack.nTotalPacket = nTitleRecord;
 						m_getLinePointDownPack.gDataBodyPack.nCurrentPacket = nHadSendRecord;
 
+						pRecordset->GetFieldValue("Pit_id", nTemp);
+						m_getLinePointDownPack.gDataBodyPack.nPointID = nTemp;
+
 						pRecordset->GetFieldValue("Pit_j", dTemp);
 						m_getLinePointDownPack.gDataBodyPack.fJDU = (float)dTemp;
 
@@ -1244,7 +1247,7 @@ int  CLogicManager::DealGetLinePointPack(DWORD dNumberOfBytes,
 						pRecordset->GetFieldValue("Pit_TLid", nTemp);
 						m_getLinePointDownPack.gDataBodyPack.nLineID = nTemp;
 
-						m_getLinePointDownPack.nBodyLength = 28;
+						m_getLinePointDownPack.nBodyLength = 32;
 						m_DataPackPares.PackGetLinePointDownBuild(pBuffer, m_getLinePointDownPack);
 						pKeyOverPire->pireOverLappedex.wsaWSABUF.len = m_getLinePointDownPack.nBodyLength + 11;
 
