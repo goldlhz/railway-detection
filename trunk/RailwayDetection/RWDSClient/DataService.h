@@ -47,3 +47,5 @@ int SavePictureToDirect(int aOrgID, const PictureInfo* aPicture, CString aToDire
 CString Time2Strings(long sec);
 long Time2Strings1(CString sec);
 long Time2Strings2(CString sec);
+void StringToChar(char *p,CString sVal);
+void StringRelease(CString sVAL);

@@ -35,6 +35,8 @@ protected:
     CListBox m_ListStaffUnselected;
     vector<StaffInfo*> m_StaffSeleted;
     vector<StaffInfo*> m_StaffUnseleted;//选择的线有哪些员工可以走
+	BOOL m_ModifyArrvieTime;
+	vector<LineInfo*> m_ModifyLineArrvieTime;
 public:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnLvnItemchangedSchedulelist(NMHDR *pNMHDR, LRESULT *pResult);
@@ -49,4 +51,6 @@ public:
     afx_msg void OnBnClickedBtnRemoveliststaff();
     //afx_msg void OnBnClickedBtnConfirmstaff();
 
+	afx_msg void OnBnClickedBtnCancel();
+	afx_msg void OnBnClickedBtnSave();
 };

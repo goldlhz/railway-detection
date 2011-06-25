@@ -188,7 +188,7 @@ typedef struct _Calendar  //排班表
 	time_t iStartDay;//开始日期
 	int iPeriods;//周期
 	vector<StaffInfo*> iScheduleStaff;
-	CString iLineRemark;//备注
+	CString iScheduleRemark;//备注
 }CalendarSchedule;
 
 typedef struct _Emergency

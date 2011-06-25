@@ -6,6 +6,7 @@
 #include "Schedule.h"
 #include "afxdialogex.h"
 #include "DataService.h"
+#include "CmdDefine.h"
 
 
 // CSchedule 对话框
@@ -41,6 +42,8 @@ BEGIN_MESSAGE_MAP(CSchedule, CDialogEx)
     //ON_BN_CLICKED(IDC_BTN_CLEANSTAFF, &CSchedule::OnBnClickedBtnCleanstaff)
     ON_BN_CLICKED(IDC_BTN_ADDLISTSTAFF, &CSchedule::OnBnClickedBtnAddliststaff)
     ON_BN_CLICKED(IDC_BTN_REMOVELISTSTAFF, &CSchedule::OnBnClickedBtnRemoveliststaff)
+	ON_BN_CLICKED(IDC_BTN_CANCEL, &CSchedule::OnBnClickedBtnCancel)
+	ON_BN_CLICKED(IDC_BTN_SAVE, &CSchedule::OnBnClickedBtnSave)
 END_MESSAGE_MAP()
 
 
@@ -116,6 +119,7 @@ BOOL CSchedule::OnInitDialog()
 	((CDateTimeCtrl*)GetDlgItem(IDC_DATETIMEPICKER_STARTDAY))->SetTime(&startTime);
 
     AddStaffToListBox();
+	GetDlgItem(IDC_EDIT_SCHEDULEREMARK)->SetWindowText(m_CRWDSClientView->m_CurrentOrg->iCalendar->iScheduleRemark);
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// 异常: OCX 属性页应返回 FALSE
 }
@@ -271,6 +275,23 @@ void CSchedule::OnBnClickedBtnModifytime()
 	{
 		m_ListCtrl.SetItemText(ctrlIndex, 3, str);
 	}
+
+	//保存修改过到达时间
+	BOOL pushback = TRUE;
+	for (size_t i=0; i<m_ModifyLineArrvieTime.size(); i++)
+	{
+		if (m_SelectedLine == m_ModifyLineArrvieTime[i])
+		{
+			pushback = FALSE;
+			break;
+		}
+	}
+	if (pushback)
+	{
+		m_ModifyLineArrvieTime.push_back(m_SelectedLine);
+		//m_ModifyArrvieTime = TRUE;
+	}
+	
 }
 
 void CSchedule::OnBnClickedBtnModifycalender()
@@ -307,7 +328,8 @@ void CSchedule::OnBnClickedBtnModifycalender()
 		m_SelectedLine->iStartNo = KUndefine;
 	}
 	m_ComboStartDay.SetCurSel(m_SelectedLine->iStartNo);
-
+	GetDlgItem(IDC_EDIT_SCHEDULEREMARK)->GetWindowText(m_CRWDSClientView->m_CurrentOrg->iCalendar->iScheduleRemark);
+	//传排班表
     SetCalendarSchedule(m_CRWDSClientView->m_CurrentOrg->iOrgID, m_CRWDSClientView->m_CurrentOrg->iCalendar);
 	
     AfxMessageBox(_T("修改成功"));
@@ -364,3 +386,21 @@ void CSchedule::OnBnClickedBtnRemoveliststaff()
 
 }
 
+
+
+void CSchedule::OnBnClickedBtnCancel()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	OnCancel();
+}
+
+
+void CSchedule::OnBnClickedBtnSave()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	for( size_t i=0; i<m_ModifyLineArrvieTime.size(); i++)
+	{
+		SetOrgLine(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_LINE_MODIFY, m_ModifyLineArrvieTime[i]);
+	}
+	m_ModifyLineArrvieTime.clear();
+}

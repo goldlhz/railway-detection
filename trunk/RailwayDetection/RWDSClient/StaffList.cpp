@@ -69,8 +69,8 @@ BOOL CStaffList::OnInitDialog()
     for (size_t i=0; i<m_CRWDSClientView->m_CurrentOrg->iStaff.size(); i++)
     {
         staff = m_CRWDSClientView->m_CurrentOrg->iStaff[i];
-        str.Format(_T("%d"), staff->iID);
-        m_ListCtrl.InsertItem(i, str);
+        //str.Format(_T("%d"), staff->iID);
+        m_ListCtrl.InsertItem(i, staff->iID);
         m_ListCtrl.SetItemText(i, 1, staff->iName);
         //str.Format(_T("%d"), staff->iArrangeLine.size());
         //m_ListCtrl.SetItemText(i, 2, str);
@@ -106,8 +106,8 @@ void CStaffList::OnLvnItemchangedStafflist(NMHDR *pNMHDR, LRESULT *pResult)
     }
     m_SeletedStaff = m_CRWDSClientView->m_CurrentOrg->iStaff[select];
     CString str;
-    str.Format(_T("%d"), m_SeletedStaff->iID);
-    GetDlgItem(IDC_EDIT_STAFFID)->SetWindowText(str);
+    //str.Format(_T("%d"), m_SeletedStaff->iID);
+    GetDlgItem(IDC_EDIT_STAFFID)->SetWindowText(m_SeletedStaff->iID);
     GetDlgItem(IDC_EDIT_STAFFNAME)->SetWindowText(m_SeletedStaff->iName);
     if (m_SeletedStaff->iLoginPermission)
     {
@@ -192,13 +192,14 @@ void CStaffList::OnBnClickedBtnAddstaff()
 {
     // TODO: 在此添加控件通知处理程序代码
     StaffInfo* staff = new StaffInfo;
-    staff->iID.Format(_T("%d"), CreateStaffID());
+    //staff->iID.Format(_T("%d"), CreateStaffID());
+	staff->iID = _T("12345678");
     staff->iLoginPermission = FALSE;
     staff->iName = _T("员工");
     CString str;
-    str.Format(_T("%d"), staff->iID);
+    //str.Format(_T("%d"), staff->iID);
     int mask = m_ListCtrl.GetItemCount();
-    m_ListCtrl.InsertItem(mask, str);
+    m_ListCtrl.InsertItem(mask, staff->iID);
     m_ListCtrl.SetItemText(mask, 1, staff->iName);
     staff->iTakeDevice = (DeviceInfo*)m_ComboStaffDevice.GetItemData(m_ComboStaffDevice.GetCurSel());
     staff->iPermissionGroup = m_ComboStaffPermission.GetCurSel();

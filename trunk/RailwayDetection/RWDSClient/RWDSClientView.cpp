@@ -26,6 +26,7 @@
 #include "DeviceList.h"
 #include "PitureReview.h"
 #include "ErrorDefine.h"
+#include "VoiceList.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -80,6 +81,7 @@ BEGIN_MESSAGE_MAP(CRWDSClientView, CView)
     ON_UPDATE_COMMAND_UI(ID_SET_STAFF, &CRWDSClientView::OnUpdateSetStaff)
     ON_UPDATE_COMMAND_UI(ID_SET_DEVICE, &CRWDSClientView::OnUpdateSetDevice)
     ON_COMMAND(ID_REVIEW_PICTURE, &CRWDSClientView::OnReviewPicture)
+	ON_COMMAND(ID_REVIEW_VOICE, &CRWDSClientView::OnReviewVoice)
 END_MESSAGE_MAP()
 
 BEGIN_EVENTSINK_MAP(CRWDSClientView, CView)
@@ -480,11 +482,12 @@ CString CRWDSClientView::LoadMapInfoFromFile()
 {
     CFile pFile;
     CFileException e;
+	CString curDir;
+	curDir = GetModulePath();
     CString mapPath = _T("");
-    if(!pFile.Open(_T("map.cfg"), CFile::modeRead, &e))
+    if(!pFile.Open(curDir + _T("\\map.cfg"), CFile::modeRead, &e))
     {//return default
-        CString curDir;
-        curDir = GetModulePath();
+
         mapPath = curDir + _T("\\map\\") + m_MapName;
     }
     else
@@ -1149,4 +1152,12 @@ void CRWDSClientView::OnReviewPicture()
     }
     CPitureReview picture(this);
     picture.DoModal();
+}
+
+
+void CRWDSClientView::OnReviewVoice()
+{
+	// TODO: 在此添加命令处理程序代码
+	CVoiceList voice;
+	voice.DoModal();
 }

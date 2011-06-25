@@ -5,6 +5,7 @@
 #include "Resource.h"
 #include "RWDSClient.h"
 #include "DataService.h"
+#include "MessageInfo.h"
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -115,13 +116,15 @@ void CFileView::TreeVisitForDeleteItemData(HTREEITEM aItem)
         HTREEITEM item = m_wndFileView.GetChildItem(aItem);
 
         OrganizationInfo* curOrg = (OrganizationInfo*) m_wndFileView.GetItemData(aItem);
-        curOrg->iLine.clear();
+        DeleteAllOrgData(curOrg);
 
         while (item != NULL)
         {
             TreeVisitForDeleteItemData(item);
             item = m_wndFileView.GetNextItem(item, TVGN_NEXT);
         }
+		//刷新机构后需要重新加载
+		curOrg->iDataSet = FALSE;
     }
 }
 
@@ -280,13 +283,37 @@ void CFileView::OnNMClickFileView(NMHDR *pNMHDR, LRESULT *pResult)
     *pResult = 0;
 }
 
+
 void CFileView::GetOrgData(OrganizationInfo* aOrg)
 {
+	CMessageInfo* messageBox = new CMessageInfo(this);
+	messageBox->Create(IDD_FLASHWND);
+	messageBox->CenterWindow();
+	messageBox->ShowWindow(SW_NORMAL);
+	Sleep(10);
     GetOrgPoint(aOrg->iOrgID, &aOrg->iMapPoint);
     GetOrgLine(aOrg->iOrgID, aOrg->iMapPoint, &aOrg->iLine);
     GetOrgStaff(aOrg->iOrgID, &aOrg->iStaff);
     GetOrgDevice(aOrg->iOrgID, &aOrg->iDevice);
     GetCalendarSchedule(aOrg->iOrgID, &aOrg->iStaff, aOrg->iCalendar);
+	messageBox->DestroyWindow();
+	delete messageBox;
+}
+
+void CFileView::DeleteAllOrgData(OrganizationInfo* aOrg)
+{
+	aOrg->iChildID.clear();
+	aOrg->iChildOrg.clear();
+	aOrg->iMapPoint.clear();
+	aOrg->iStaff.clear();
+	aOrg->iDevice.clear();
+	aOrg->iLine.clear();
+	aOrg->iCalendar->iScheduleStaff.clear();
+	aOrg->iEmergency.clear();
+	//for (size_t i=0; i<aOrg->iLine.size(); i++)
+	//{
+	//	aOrg->iLine[i];
+	//}
 }
 
 void CFileView::OnNMDblclkFileView(NMHDR *pNMHDR, LRESULT *pResult)
@@ -315,10 +342,13 @@ void CFileView::OnNMDblclkFileView(NMHDR *pNMHDR, LRESULT *pResult)
 		str.Format(_T("%02d:%02d"), arrTime.GetHour(), arrTime.GetMinute());
 		m_RWDSClientView->MapxSetText(line->iLineKmLonLat[i]->iLon-0.0001, line->iLineKmLonLat[i]->iLat-0.0005, str);
 	}
-	int centerPoint = line->iLineKmLonLat.size()/2;
-	m_RWDSClientView->m_MapX.SetCenterX(line->iLineKmLonLat[centerPoint]->iLon);
-	m_RWDSClientView->m_MapX.SetCenterY(line->iLineKmLonLat[centerPoint]->iLat);
-	m_RWDSClientView->m_MapX.SetZoom(m_RWDSClientView->m_InitZoom/256);
+	if (line->iLineKmLonLat.size() > 0)
+	{
+		int centerPoint = line->iLineKmLonLat.size()/2;
+		m_RWDSClientView->m_MapX.SetCenterX(line->iLineKmLonLat[centerPoint]->iLon);
+		m_RWDSClientView->m_MapX.SetCenterY(line->iLineKmLonLat[centerPoint]->iLat);
+		m_RWDSClientView->m_MapX.SetZoom(m_RWDSClientView->m_InitZoom/256);
+	}
 	*pResult = 0;
 }
 

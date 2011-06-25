@@ -6,7 +6,7 @@
 
 
 const int port = 9527 ;
-const char* destIp = "118.122.95.196\0";
+const char* destIp = "192.168.1.101\0";
 cData::cData(void)
 {
 	cs = new CTCPClient();
@@ -43,9 +43,7 @@ int cData::UserLog(char * UserName,char *UserPwd,int *Orgid,int *p1,int *p2,int 
 	BuildDataPackShell(pDataBuffer, &bs);
 	memcpy(pDataBuffer+7,&lqust,sizeof(lqust));
 	memcpy(cTempBuf, (char*)pDataBuffer, 53);
-    char c[42];
-    memset(c,0,42);
-    memcpy(c, (char*)pDataBuffer+7,42);
+
 	int iResult = cs->Write(pDataBuffer,11 + sizeof(LoginRerquest));
 	if(iResult < iSocketState)
 	{
@@ -54,11 +52,11 @@ int cData::UserLog(char * UserName,char *UserPwd,int *Orgid,int *p1,int *p2,int 
 	LoginRerquestResult ls;
 	memset(cTempBuf,0,sizeof(cTempBuf));
 	int it = 11 + sizeof(LoginRerquestResult);
-	Sleep(100);
+	Sleep(10);
 	LoginRerquestResult lr;
 	memset(&lr,0,sizeof(lr));
 	iResult = cs->Read(cTempBuf,it);
-	//cs->WaitForData(1)
+	
 	if(iResult < 0)
 	{
 		return -1;
@@ -483,7 +481,7 @@ int cData::GetOrgList(int Orgid,lOrg *plOrg)
 		int it = 11 + sizeof(RequestOrgResult);
 		char cTempBuf[11 + sizeof(RequestOrgResult)];
 		memset(cTempBuf,0,it);
-		Sleep(50);
+		Sleep(2);
 		iResult = cs->Read(cTempBuf,it);
 
 	    if(iResult < 1)
@@ -537,7 +535,7 @@ int cData::GetUserList(int Orgid, int iType,lUser *lPoint)
 		int it = 11 + sizeof(RequestUserListResult);
 		char cTempBuf[11 + sizeof(RequestUserListResult)];
 		memset(cTempBuf,0,it);
-		Sleep(2);
+		Sleep(50);
 		iResult = cs->Read(cTempBuf,it);
 
 		if(iResult < 1)
@@ -545,7 +543,7 @@ int cData::GetUserList(int Orgid, int iType,lUser *lPoint)
 			break;
 		}
 		memset(&lr,0,sizeof(lr));
-		if(DepressPacket(lr,ASKORGLIST_PACK,cTempBuf))
+		if(DepressPacket(lr,ASKWORKERLIST_PACK,cTempBuf))
 		{
 			lPoint->push_back(lr);
 			iTotleCount = lr.iTotle ;
@@ -577,10 +575,10 @@ int cData::GetDeviceList(RequestDeviceList rs,lDevice *lPoint)
 	RequestDeviceListResult lr;
 
 	int iTotleCount = 0;
-
+	lPoint->clear();
 	while(1)
 	{
-		Sleep(2);
+		Sleep(5);
 
 		int it = 11 + sizeof(RequestDeviceListResult);
 		char cTempBuf[11 + sizeof(RequestDeviceListResult)];
@@ -593,7 +591,7 @@ int cData::GetDeviceList(RequestDeviceList rs,lDevice *lPoint)
 			break;
 		}
 		memset(&lr,0,sizeof(lr));
-		if(DepressPacket(lr,ASKORGLIST_PACK,cTempBuf))
+		if(DepressPacket(lr,ASKDEIVCELIST_PACK,cTempBuf))
 		{
 			lPoint->push_back(lr);
 			iTotleCount = lr.iTotle ;
@@ -747,7 +745,7 @@ int cData::SetxjTime(xj const sValue)
 	memset(pDataBuffer,0,sizeof(pDataBuffer));
 	BaseStruct bs;
 	bs.nBodyLength = sizeof(xj);
-	bs.nMsgNumber = SETTINGLINE_PACK;
+	bs.nMsgNumber = SETTINGPOLLINGTIME_PACK;
 	BuildDataPackShell(pDataBuffer, &bs);
 	memcpy(pDataBuffer+7,&sValue,sizeof(xj));
 
@@ -768,7 +766,7 @@ int cData::SetxjTime(xj const sValue)
 	{
 		return -1;
 	}
-	DepressPacket(lr,SETTINGLINE_PACK	,cTempBuf);
+	DepressPacket(lr,SETTINGPOLLINGTIME_PACK	,cTempBuf);
 
 	return lr.result;
 }
@@ -779,7 +777,7 @@ int cData::SetMangLine(MangLine const sValue)
 	memset(pDataBuffer,0,sizeof(pDataBuffer));
 	BaseStruct bs;
 	bs.nBodyLength = sizeof(MangLine);
-	bs.nMsgNumber = SETTINGPOLLINGTIME_PACK;
+	bs.nMsgNumber = SETTINGLINE_PACK;
 	BuildDataPackShell(pDataBuffer, &bs);
 	memcpy(pDataBuffer+7,&sValue,sizeof(MangLine));
 
@@ -788,7 +786,7 @@ int cData::SetMangLine(MangLine const sValue)
 	{
 		return -1;
 	}
-
+	Sleep(2);
 	BaseResult lr;
 	int it = 11 + sizeof(BaseResult);
 	char cTempBuf[11 + sizeof(BaseResult)];
@@ -800,9 +798,11 @@ int cData::SetMangLine(MangLine const sValue)
 	{
 		return -1;
 	}
-	DepressPacket(lr,SETTINGPOLLINGTIME_PACK	,cTempBuf);
+	if(DepressPacket(lr,SETTINGLINE_PACK,cTempBuf))
 
 	return lr.result;
+	else
+		return -1;
 }
 //排班设计le
 int	cData::SetpxPb(pb const sValue)
@@ -1025,7 +1025,7 @@ int cData::GetOrgpInfo(OrgPxInfo const sValue,GetOrgPxInfo *llist)
 	{
 		return -1;
 	}
-
+	Sleep(2);
 	GetOrgPxInfo lr;
 	int it = 11 + sizeof(GetOrgPxInfo);
 	char cTempBuf[11 + sizeof(GetOrgPxInfo)];
@@ -1247,10 +1247,14 @@ int cData::GetOrgLine(const Orglines sValue,lallOrgLine *llist)
 		{
 			llist->push_back(lr);
 			iTotleCount = lr.totlePacket;
-			return 0;
 		}
+		
 	}
+
+	if(lr.totlePacket >0 && lr.totlePacket == iTotleCount)
 	return 1;
+	else
+		return 0;
 }
 
 //获取线路点时间
@@ -1276,8 +1280,8 @@ int cData::rGetLineTime(const rLinePointTime sValue,lrLinePointTimeResult *llist
 	{
 		Sleep(WaitListDataTime);
 
-		int it = 11 + sizeof(allOrgLineResult);
-		char cTempBuf[11 + sizeof(allOrgLineResult)];
+		int it = 11 + sizeof(rLinePointTimeResult);
+		char cTempBuf[11 + sizeof(rLinePointTimeResult)];
 		memset(cTempBuf,0,it);
 
 		iResult = cs->Read(cTempBuf,it);
@@ -1291,10 +1295,10 @@ int cData::rGetLineTime(const rLinePointTime sValue,lrLinePointTimeResult *llist
 		{
 			llist->push_back(lr);
 			iTotleCount = lr.totlePacket;
-			return 0;
+	
 		}
 	}
-	return 1;
+	return 0;
 }
 int cData::rGetOPb(const rOrgPB sValue,lUser *lPoint)
 {
@@ -1303,7 +1307,7 @@ int cData::rGetOPb(const rOrgPB sValue,lUser *lPoint)
 	memset(pDataBuffer,0,sizeof(pDataBuffer));
 	BaseStruct bs;
 	bs.nBodyLength = sizeof(rOrgPB);
-	bs.nMsgNumber = ASKWORKERLIST_PACK;
+	bs.nMsgNumber = GETORGPBSTAFF;
 	BuildDataPackShell(pDataBuffer, &bs);
 	memcpy(pDataBuffer+7,&sValue,sizeof(rOrgPB));
 
@@ -1329,7 +1333,7 @@ int cData::rGetOPb(const rOrgPB sValue,lUser *lPoint)
 			break;
 		}
 		memset(&lr,0,sizeof(lr));
-		if(DepressPacket(lr,ASKORGLIST_PACK,cTempBuf))
+		if(DepressPacket(lr,GETORGPBSTAFF,cTempBuf))
 		{
 			lPoint->push_back(lr);
 			iTotleCount = lr.iTotle ;
