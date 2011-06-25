@@ -29,12 +29,8 @@ void CStaffList::DoDataExchange(CDataExchange* pDX)
 {
     CDialogEx::DoDataExchange(pDX);
     DDX_Control(pDX, IDC_STAFFLIST, m_ListCtrl);
-    DDX_Control(pDX, IDC_LIST_ARRANGELINE, m_ArrangeLine);
     DDX_Control(pDX, IDC_CHECK_LOGINPERMISSION, m_CheckLoginPermission);
     DDX_Control(pDX, IDC_BTN_SETPASSWORD, m_BtnSetPassword);
-    DDX_Control(pDX, IDC_CHECK_PERMISSIONBASICAL, m_PermissionBasical);
-    DDX_Control(pDX, IDC_CHECK_PERMISSIONOPERATE, m_PermissionOperate);
-    DDX_Control(pDX, IDC_CHECK_PERMISSIONREPORTFORM, m_PermissionReportform);
     DDX_Control(pDX, IDC_COMBO_DEVICE, m_ComboStaffDevice);
     DDX_Control(pDX, IDC_COMBO_PERMISSION, m_ComboStaffPermission);
 }
@@ -83,12 +79,14 @@ BOOL CStaffList::OnInitDialog()
     m_ComboStaffPermission.AddString(_T("操作权限"));
     m_ComboStaffPermission.AddString(_T("报表权限"));
 
+    int comboIndex = m_ComboStaffDevice.AddString(_T("未指定"));
+    m_ComboStaffDevice.SetItemData(comboIndex, NULL);
     DeviceInfo* device;
     for(size_t i=0; i<m_CRWDSClientView->m_CurrentOrg->iDevice.size(); i++)
     {
         device = m_CRWDSClientView->m_CurrentOrg->iDevice[i];
-        m_ComboStaffDevice.AddString(device->iPhoneNum);
-        m_ComboStaffDevice.SetItemData(i, (DWORD_PTR)device);
+        comboIndex = m_ComboStaffDevice.AddString(device->iPhoneNum);
+        m_ComboStaffDevice.SetItemData(comboIndex, (DWORD_PTR)device);
     }
     return TRUE;  // return TRUE unless you set the focus to a control
     // 异常: OCX 属性页应返回 FALSE
@@ -135,11 +133,11 @@ void CStaffList::OnLvnItemchangedStafflist(NMHDR *pNMHDR, LRESULT *pResult)
             break;
         }
     }
+
     m_ComboStaffDevice.SetCurSel(comboIndex);
-    //设置权限
-    //m_PermissionBasical.SetCheck(m_SeletedStaff->iPermission.iBasical);
-    //m_PermissionOperate.SetCheck(m_SeletedStaff->iPermission.iOperate);
-    //m_PermissionReportform.SetCheck(m_SeletedStaff->iPermission.iReportForm);
+    
+    m_ComboStaffPermission.SetCurSel(m_SeletedStaff->iPermissionGroup);
+    
     *pResult = 0;
 }
 
@@ -202,8 +200,8 @@ void CStaffList::OnBnClickedBtnAddstaff()
     int mask = m_ListCtrl.GetItemCount();
     m_ListCtrl.InsertItem(mask, str);
     m_ListCtrl.SetItemText(mask, 1, staff->iName);
-    //str.Format(_T("%d"), staff->iArrangeLine.size());
-    //m_ListCtrl.SetItemText(mask, 2, str);
+    staff->iTakeDevice = (DeviceInfo*)m_ComboStaffDevice.GetItemData(m_ComboStaffDevice.GetCurSel());
+    staff->iPermissionGroup = m_ComboStaffPermission.GetCurSel();
     //保存
     m_CRWDSClientView->m_CurrentOrg->iStaff.push_back(staff);
 
@@ -226,9 +224,11 @@ void CStaffList::OnBnClickedBtnmodifystaff()
         m_SeletedStaff->iLoginPermission = FALSE;
         m_SeletedStaff->iPassword = _T("");
     }
-    //m_SeletedStaff->iPermission.iBasical = m_PermissionBasical.GetCheck();
-    //m_SeletedStaff->iPermission.iOperate = m_PermissionOperate.GetCheck();
-    //m_SeletedStaff->iPermission.iReportForm = m_PermissionReportform.GetCheck();
+    //为员工指定设备
+    m_SeletedStaff->iTakeDevice = (DeviceInfo*)m_ComboStaffDevice.GetItemData(m_ComboStaffDevice.GetCurSel());
+    //为员工指定权限
+    m_SeletedStaff->iPermissionGroup = m_ComboStaffPermission.GetCurSel();
+
     SetOrgStaff(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_STAFF_MODIFY, m_SeletedStaff);
     AfxMessageBox(_T("修改成功"), MB_OK);
 }
@@ -248,7 +248,7 @@ void CStaffList::OnBnClickedBtnDelstaff()
     GetDlgItem(IDC_EDIT_STAFFID)->SetWindowText(_T(""));
     GetDlgItem(IDC_EDIT_STAFFNAME)->SetWindowText(_T(""));
     m_CheckLoginPermission.SetCheck(BST_UNCHECKED);
-    m_ArrangeLine.ResetContent();
+    //m_ArrangeLine.ResetContent();
 
     for (size_t i=0; i<m_CRWDSClientView->m_CurrentOrg->iCalendar->iScheduleStaff.size(); i++)
     {//删除线路安排的员工
@@ -273,7 +273,7 @@ void CStaffList::OnBnClickedBtnDelstaff()
             }
         }
     }
-    SetEmergencyTask(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_EMERGENCY_MODIFY, task);
+    //SetEmergencyTask(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_EMERGENCY_MODIFY, task);
 
     for (size_t i=0; i<m_CRWDSClientView->m_CurrentOrg->iStaff.size(); i++)
     {//删除机构链表
@@ -284,7 +284,7 @@ void CStaffList::OnBnClickedBtnDelstaff()
         }
     }
     SetOrgStaff(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_STAFF_DELETE, m_SeletedStaff);
-    //m_SeletedStaff->iArrangeLine.clear();
+
     delete m_SeletedStaff;
     m_SeletedStaff = NULL;
 }

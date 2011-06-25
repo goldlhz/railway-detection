@@ -96,7 +96,6 @@ void CFileView::OnSize(UINT nType, int cx, int cy)
 
 void CFileView::FillFileView()
 {
-    int i = m_RWDSClientView->m_TestValue;
     OrganizationInfo* org = m_RWDSClientView->m_Org[0];
     HTREEITEM hRoot = m_wndFileView.InsertItem(org->iOrgName, 8, 8);
     m_wndFileView.SetItemData(hRoot, (DWORD_PTR)org);
@@ -259,11 +258,16 @@ void CFileView::OnNMClickFileView(NMHDR *pNMHDR, LRESULT *pResult)
 {
     // TODO: 在此添加控件通知处理程序代码
     HTREEITEM curItem = reinterpret_cast<LPNMTREEVIEW>(pNMHDR)->itemNew.hItem;
+    HTREEITEM curItem1 = reinterpret_cast<LPNMTREEVIEW>(pNMHDR)->itemOld.hItem;
     if (!m_wndFileView.ItemHasChildren(curItem))
     {
         return;
     }
     HTREEITEM childItem = m_wndFileView.GetChildItem(curItem);
+    if (!childItem)
+    {
+        return;
+    }
     OrganizationInfo* curOrg = (OrganizationInfo*) m_wndFileView.GetItemData(curItem);
 
     m_RWDSClientView->m_CurrentOrg = curOrg;
