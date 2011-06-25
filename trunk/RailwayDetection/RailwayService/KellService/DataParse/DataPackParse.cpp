@@ -1274,7 +1274,7 @@ void CDataPackParse::FillGetLinePointFailPack(GetLinePoint_Download_Pack& getLin
 {
 	getLinePointDownLoadPack.nBeginIdentify = PACK_IDENTIFY;
 	getLinePointDownLoadPack.nMsgNumber = GETLINEPOINT_PACK;
-	getLinePointDownLoadPack.nBodyLength = 28;
+	getLinePointDownLoadPack.nBodyLength = 32;
 
 	getLinePointDownLoadPack.gDataBodyPack.nTotalPacket = 0;
 	getLinePointDownLoadPack.gDataBodyPack.nCurrentPacket = 0;
@@ -2709,11 +2709,12 @@ bool CDataPackParse::BuildGetLinePointPackData(char* pDataBuffer, const GetLineP
 	{
 		*((unsigned int*)(pDataBuffer)) = getLinePointDownLoadPack.gDataBodyPack.nTotalPacket;
 		*((unsigned int*)(pDataBuffer + 4)) = getLinePointDownLoadPack.gDataBodyPack.nCurrentPacket;
-		*((float*)(pDataBuffer + 8)) = getLinePointDownLoadPack.gDataBodyPack.fJDU;
-		*((float*)(pDataBuffer + 12)) = getLinePointDownLoadPack.gDataBodyPack.fWDU;
-		*((float*)(pDataBuffer + 16)) = getLinePointDownLoadPack.gDataBodyPack.fGls;
-		*((unsigned int*)(pDataBuffer + 20)) = getLinePointDownLoadPack.gDataBodyPack.nState;
-		*((unsigned int*)(pDataBuffer + 24)) = getLinePointDownLoadPack.gDataBodyPack.nLineID;
+		*((unsigned int*)(pDataBuffer + 8)) = getLinePointDownLoadPack.gDataBodyPack.nPointID;
+		*((float*)(pDataBuffer + 12)) = getLinePointDownLoadPack.gDataBodyPack.fJDU;
+		*((float*)(pDataBuffer + 16)) = getLinePointDownLoadPack.gDataBodyPack.fWDU;
+		*((float*)(pDataBuffer + 20)) = getLinePointDownLoadPack.gDataBodyPack.fGls;
+		*((unsigned int*)(pDataBuffer + 24)) = getLinePointDownLoadPack.gDataBodyPack.nState;
+		*((unsigned int*)(pDataBuffer + 28)) = getLinePointDownLoadPack.gDataBodyPack.nLineID;
 
 		return true;
 	}
