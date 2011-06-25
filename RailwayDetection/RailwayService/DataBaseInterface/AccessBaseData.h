@@ -102,8 +102,7 @@ public:
 	bool UpLoadGetPicDataPack(const GetPicData_Upload_Pack& getPicDataUpPack,
 		GPSPIC_Pack& gpsPicPack);
 
-	bool UpLoadGetOrgSchedueListPack(const GetOrgSchedueList_Upload_Pack& getOrgSchedueListUpPack,
-		GetOrgSchedueList_Download_Pack& getOrgSchedueListDownPack);
+	CADORecordset* UpLoadGetOrgSchedueListPack(const GetOrgSchedueList_Upload_Pack& getOrgSchedueListUpPack);
 
 	bool UpLoadGetOrgSchedueInfoPack(const GetOrgSchedueInfo_Upload_Pack& getOrgSchedueInfoUpPack,
 		GetOrgSchedueInfo_Download_Pack& getOrgSchedueInfoDownPack);
@@ -116,6 +115,13 @@ public:
 	CADORecordset* UpLoadGetLinePointTimePack(const GetLinePointTime_Upload_Pack& getLinePointTimeUpPack);
 
 	CADORecordset* UpLoadGetOrgSchWorkerPack(const GetOrgSchWorker_Upload_Pack& getOrgSchWorkerUpPack);
+
+	CADORecordset* UploadWorkerPollQureyPack(const WorkerPoll_Upload_Pack& workerPollUpPack);
+
+	bool UpLoadUrgencyMissionDeletePack(const UrgencyMissionDelete_Upload_Pack& urgencyMissionDeleteUpPack,
+		UrgencyMissionDelete_Download_Pack& urgencyMissionDeleteDownPack);
+
+	CADORecordset* UploadWorkerPollPack(const WorkerPoll_Upload_Pack& workerPollUpPack);
 
 private:
 	string GetCurrentTimeByFormat();

@@ -98,7 +98,7 @@ bool CAccessBaseData::UploadLoginPack(const Login_UpLoad_Pack& loginUpPack,
 		int nErrorCode = 1;
 		memset(m_strBuffer, 0x00, INPUTSQLBUFFERS);
 
-		sprintf_s(m_strBuffer, INPUTSQLBUFFERS, "select * from t_user where User_State = 1 and User_Name = '%s' and User_Pawd = '%s'",
+		sprintf_s(m_strBuffer, INPUTSQLBUFFERS, "select * from t_user where User_State = 1 and User_Oper = '%s' and User_Pawd = '%s'",
 			loginUpPack.gDataBodyPack.strName.c_str(),
 			loginUpPack.gDataBodyPack.strPassword.c_str());
 
@@ -1668,55 +1668,38 @@ bool CAccessBaseData::UpLoadGetPicDataPack(const GetPicData_Upload_Pack& getPicD
 	return false;
 }
 
-bool CAccessBaseData::UpLoadGetOrgSchedueListPack(const GetOrgSchedueList_Upload_Pack& getOrgSchedueListUpPack,
-	GetOrgSchedueList_Download_Pack& getOrgSchedueListDownPack)
+CADORecordset* CAccessBaseData::UpLoadGetOrgSchedueListPack(const GetOrgSchedueList_Upload_Pack& getOrgSchedueListUpPack)
 {
 	if(m_pDatabase)
 	{
-		/*int nErrorCode = 1;
+		int nErrorCode = 1;
+		CADORecordset adoRecordset;
 
 		if(!m_pDatabase->IsOpen())
 		{
 			if(!m_pDatabase->Open())
 			{
-				nErrorCode = 1;
-				goto ErrorDeal;
+				return NULL;
 			}
 		}
 
+		CADORecordset *padoRecordset = new CADORecordset();;
 		CADOCommand adoCommand(m_pDatabase);
+
 		CADOParameter orgidPar(adOpenDynamic, sizeof(int), adParamInput, _T("@orgid"));
 		CADOParameter yearPar(adOpenDynamic, sizeof(int), adParamInput, _T("@year"));
 		CADOParameter monthPar(adOpenDynamic, sizeof(int), adParamInput, _T("@month"));
-		
-		try
+
+		adoCommand.AddParameter(&orgidPar);
+		adoCommand.AddParameter(&yearPar);
+		adoCommand.AddParameter(&monthPar);
+
+		if(padoRecordset->Execute(&adoCommand))
 		{
-			adoCommand.AddParameter(&orgidPar);
-			adoCommand.AddParameter(&yearPar);
-			adoCommand.AddParameter(&monthPar);
-
-			if(adoCommand.Execute())
-			{
-				getOrgSchedueListDownPack.gDataBodyPack.adoCommand.GetCommand()->Parameters->GetItem(_T("r"))->Value;
-				adoCommand.GetCommand()->Parameters->GetItem(_T("r2"))->Value;
-				adoCommand.GetCommand()->Parameters->GetItem(_T("r3"))->Value;
-
-				
-			}
+			return padoRecordset;
 		}
-		catch (...)
-		{
-
-		}
-
-
-
-
-ErrorDeal:
-*/
-
 	}
-	return false;
+	return NULL;
 }
 
 bool CAccessBaseData::UpLoadGetOrgSchedueInfoPack(const GetOrgSchedueInfo_Upload_Pack& getOrgSchedueInfoUpPack,
@@ -1938,6 +1921,96 @@ CADORecordset* CAccessBaseData::UpLoadGetOrgSchWorkerPack(const GetOrgSchWorker_
 		memset(m_strBuffer, 0x00, INPUTSQLBUFFERS);
 		sprintf_s(m_strBuffer, INPUTSQLBUFFERS, "select * from v_user where User_Org = %d order by Pp_sx asc",
 			getOrgSchWorkerUpPack.gDataBodyPack.nOrgID);
+
+		if(!m_pDatabase->IsOpen())
+		{
+			if(!m_pDatabase->Open())
+			{
+				return NULL;
+			}
+		}
+
+		CADORecordset* pRecordset = new CADORecordset(m_pDatabase);
+		if(pRecordset->Open(m_strBuffer))
+		{
+			return pRecordset;
+		}
+	}
+	return NULL;
+}
+
+CADORecordset* CAccessBaseData::UploadWorkerPollQureyPack(const WorkerPoll_Upload_Pack& workerPollUpPack)
+{
+	if(m_pDatabase)
+	{
+		memset(m_strBuffer, 0x00, INPUTSQLBUFFERS);
+		sprintf_s(m_strBuffer, INPUTSQLBUFFERS, "Select G_j,G_w,G_time from T_GPS where datediff(d,,G_time,time) = 0",
+			workerPollUpPack.gDataBodyPack.strOper.c_str(),
+			workerPollUpPack.gDataBodyPack.strDate.c_str());
+
+		if(!m_pDatabase->IsOpen())
+		{
+			if(!m_pDatabase->Open())
+			{
+				return NULL;
+			}
+		}
+
+		CADORecordset* pRecordset = new CADORecordset(m_pDatabase);
+		if(pRecordset->Open(m_strBuffer))
+		{
+			return pRecordset;
+		}
+	}
+	return NULL;
+}
+
+bool CAccessBaseData::UpLoadUrgencyMissionDeletePack(const UrgencyMissionDelete_Upload_Pack& urgencyMissionDeleteUpPack,
+	UrgencyMissionDelete_Download_Pack& urgencyMissionDeleteDownPack)
+{
+	if(m_pDatabase)
+	{
+		int nErrorCode = 1;
+
+		memset(m_strBuffer, 0x00, INPUTSQLBUFFERS);
+		sprintf_s(m_strBuffer, INPUTSQLBUFFERS, "Delete from t_jjry where jj_id = %d",
+			urgencyMissionDeleteUpPack.gDataBodyPack.nOrgID);
+
+		if(!m_pDatabase->IsOpen())
+		{
+			if(!m_pDatabase->Open())
+			{
+				nErrorCode = 1;
+				goto ErrorDeal;
+			}
+		}
+
+		if(!m_pDatabase->Execute(m_strBuffer))
+		{
+			nErrorCode = 1;
+			goto ErrorDeal;
+		}
+		nErrorCode = 0;
+
+ErrorDeal:
+		urgencyMissionDeleteDownPack.nBeginIdentify = urgencyMissionDeleteUpPack.nBeginIdentify;
+		urgencyMissionDeleteDownPack.nMsgNumber = urgencyMissionDeleteUpPack.nMsgNumber;
+		urgencyMissionDeleteDownPack.gDataBodyPack.nResult = nErrorCode;
+
+		urgencyMissionDeleteDownPack.nBodyLength = 4;
+		return true;
+	}
+	return false;
+}
+
+CADORecordset* CAccessBaseData::UploadWorkerPollPack(const WorkerPoll_Upload_Pack& workerPollUpPack)
+{
+	if(m_pDatabase)
+	{
+		memset(m_strBuffer, 0x00, INPUTSQLBUFFERS);
+		sprintf_s(m_strBuffer, INPUTSQLBUFFERS, "Select R_pointid,r_pxdate,R_arrTime,R_realtime,R_pid,P_state from T_realPb where R_Userid ='%s' and r_pxdate = '%s'",
+			workerPollUpPack.gDataBodyPack.strOper.c_str(),
+			workerPollUpPack.gDataBodyPack.strDate.c_str());
 
 		if(!m_pDatabase->IsOpen())
 		{

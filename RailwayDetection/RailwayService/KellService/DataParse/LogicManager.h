@@ -180,8 +180,10 @@ private:
 		CGobalConfig* pGobalConfig);
 
 	int  DealGetSchedueListPack(DWORD dNumberOfBytes, 
-		char  * pBuffer, 
-		CADODatabase* pDatabase);
+		LPOverKeyPire pKeyOverPire, 
+		CADODatabase* pDatabase,
+		void* pWorkThread,
+		void* pFunDealSendData);
 
 	int  DealGetSchedueInfoPack(DWORD dNumberOfBytes, 
 		char  * pBuffer, 
@@ -207,6 +209,21 @@ private:
 		void* pWorkThread,
 		void* pFunDealSendData);
 
+	int  DealWorkerPollQueryPack(DWORD dNumberOfBytes, 
+		LPOverKeyPire pKeyOverPire, 
+		CADODatabase* pDatabase,
+		void* pWorkThread,
+		void* pFunDealSendData);
+
+	int  DealUrgencyMissionDeletePack(DWORD dNumberOfBytes, 
+		char  * pBuffer, 
+		CADODatabase* pDatabase);
+
+	int  DealWorkerPollPack(DWORD dNumberOfBytes, 
+		LPOverKeyPire pKeyOverPire, 
+		CADODatabase* pDatabase,
+		void* pWorkThread,
+		void* pFunDealSendData);
 private:
 	void FillPicStoreStruct(GPSPIC_Pack& gpsPicUpLoadPack, string strTel);
 	bool BuildPicDir(string strDir);
@@ -328,5 +345,14 @@ private:
 
 	GetOrgSchWorker_Upload_Pack			m_getOrgSchWorkerUpPack;
 	GetOrgSchWorker_Download_Pack		m_getOrgSchWorkerDownPack;
+	
+	WorkerPollQuery_Upload_Pack			m_workerPollQueryUpPack;
+	WorkerPollQuery_Download_Pack		m_workerPollQueryDownPack;
+
+	UrgencyMissionDelete_Upload_Pack	m_urgencyMissionDeleteUpPack;
+	UrgencyMissionDelete_Download_Pack	m_urgencyMissionDeleteDownPack;
+
+	WorkerPoll_Upload_Pack				m_workerPollUpPack;
+	WorkerPoll_Download_Pack			m_workerPollDownPack;
 };
 

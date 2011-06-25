@@ -1494,8 +1494,10 @@ void CDataPackParse::FillGetOrgSchedueListFailPack(GetOrgSchedueList_Download_Pa
 {
 	getOrgSchedueListDownLoadPack.nBeginIdentify = PACK_IDENTIFY;
 	getOrgSchedueListDownLoadPack.nMsgNumber = GETORGSCHEDUELIST_PACK;
-	getOrgSchedueListDownLoadPack.nBodyLength = 72;
+	getOrgSchedueListDownLoadPack.nBodyLength = 84;
 
+	getOrgSchedueListDownLoadPack.gDataBodyPack.nTotlePacket = 0;
+	getOrgSchedueListDownLoadPack.gDataBodyPack.nCurrentPacket = 0;
 	getOrgSchedueListDownLoadPack.gDataBodyPack.strUserID = "";
 	getOrgSchedueListDownLoadPack.gDataBodyPack.strDates = "";
 	getOrgSchedueListDownLoadPack.gDataBodyPack.strXJ = "";
@@ -1688,6 +1690,110 @@ void CDataPackParse::FillGetOrgSchWorkerFailPack(GetOrgSchWorker_Download_Pack& 
 	getOrgSchWorkerDownLoadPack.gDataBodyPack.nPda1 = 0;
 	getOrgSchWorkerDownLoadPack.gDataBodyPack.nPda2 = 0;
 	getOrgSchWorkerDownLoadPack.gDataBodyPack.nWorkerState = 0;
+}
+
+bool CDataPackParse::PackWorkerPollQueryUpPack(const char* pDataBuffer, WorkerPollQuery_Upload_Pack& workerPollQureyUpLoadPack)
+{
+	if(ParseDataPackShell(pDataBuffer, workerPollQureyUpLoadPack))
+	{
+		if(WORKERPOLLQUERY_PACK == workerPollQureyUpLoadPack.nMsgNumber)
+		{
+			if(ParseWorkerPollQueryPackData(pDataBuffer + 7, workerPollQureyUpLoadPack))
+				return true;
+		}
+	}
+	return false;
+}
+bool CDataPackParse::PackWorkerPollQueryDownBuild(char* pDataBuffer, WorkerPollQuery_Download_Pack& workerPollQureyDownLoadPack)
+{
+	memset(pDataBuffer, 0x00, BUFFER_SIZE_TO_CLIENT);
+	if(BuildDataPackShell(pDataBuffer, workerPollQureyDownLoadPack, WORKERPOLLQUERY_PACK))
+	{
+		if(BuildWorkerPollQueryPackData(pDataBuffer + 7, workerPollQureyDownLoadPack))
+			return true;
+	}
+	return false;
+}
+void CDataPackParse::FillWorkerPollQueryFailPack(WorkerPollQuery_Download_Pack& workerPollQureyDownLoadPack)
+{
+	workerPollQureyDownLoadPack.nBeginIdentify = PACK_IDENTIFY;
+	workerPollQureyDownLoadPack.nMsgNumber = WORKERPOLLQUERY_PACK;
+	workerPollQureyDownLoadPack.nBodyLength = 36;
+
+	workerPollQureyDownLoadPack.gDataBodyPack.nTotlePacket = 0;
+	workerPollQureyDownLoadPack.gDataBodyPack.nCurrentPacket = 0;
+	workerPollQureyDownLoadPack.gDataBodyPack.fJUD = 0;
+	workerPollQureyDownLoadPack.gDataBodyPack.fWDU = 0;
+	workerPollQureyDownLoadPack.gDataBodyPack.strTime = "";
+}
+
+bool CDataPackParse::PackUrgencyMissionDeleteUpPack(const char* pDataBuffer, UrgencyMissionDelete_Upload_Pack& urgencyMissionDeleteUpLoadPack)
+{
+	if(ParseDataPackShell(pDataBuffer, urgencyMissionDeleteUpLoadPack))
+	{
+		if(URGENCYMISSIONDELETE_PACK == urgencyMissionDeleteUpLoadPack.nMsgNumber)
+		{
+			if(ParseUrgencyMissionDeletePackData(pDataBuffer + 7, urgencyMissionDeleteUpLoadPack))
+				return true;
+		}
+	}
+	return false;
+}
+bool CDataPackParse::PackUrgencyMissionDeleteDownBuild(char* pDataBuffer, UrgencyMissionDelete_Download_Pack& urgencyMissionDeleteDownLoadPack)
+{
+	memset(pDataBuffer, 0x00, BUFFER_SIZE_TO_CLIENT);
+	if(BuildDataPackShell(pDataBuffer, urgencyMissionDeleteDownLoadPack, URGENCYMISSIONDELETE_PACK))
+	{
+		if(BuildUrgencyMissionDeletePackData(pDataBuffer + 7, urgencyMissionDeleteDownLoadPack))
+			return true;
+	}
+	return false;
+}
+void CDataPackParse::FillUrgencyMissionDeleteFailPack(UrgencyMissionDelete_Download_Pack& urgencyMissionDeleteDownLoadPack)
+{
+	urgencyMissionDeleteDownLoadPack.nBeginIdentify = PACK_IDENTIFY;
+	urgencyMissionDeleteDownLoadPack.nMsgNumber = URGENCYMISSIONDELETE_PACK;
+	urgencyMissionDeleteDownLoadPack.nBodyLength = 4;
+
+	urgencyMissionDeleteDownLoadPack.gDataBodyPack.nResult = 1;
+}
+
+bool CDataPackParse::PackWorkerPollUpPack(const char* pDataBuffer, WorkerPoll_Upload_Pack& workerPollUpLoadPack)
+{
+	if(ParseDataPackShell(pDataBuffer, workerPollUpLoadPack))
+	{
+		if(WORKERPOLL_PACK == workerPollUpLoadPack.nMsgNumber)
+		{
+			if(ParseWorkerPollPackData(pDataBuffer + 7, workerPollUpLoadPack))
+				return true;
+		}
+	}
+	return false;
+}
+bool CDataPackParse::PackWorkerPollDownBuild(char* pDataBuffer, WorkerPoll_Download_Pack& workerPollDownLoadPack)
+{
+	memset(pDataBuffer, 0x00, BUFFER_SIZE_TO_CLIENT);
+	if(BuildDataPackShell(pDataBuffer, workerPollDownLoadPack, WORKERPOLL_PACK))
+	{
+		if(BuildWorkerPollPackData(pDataBuffer + 7, workerPollDownLoadPack))
+			return true;
+	}
+	return false;
+}
+void CDataPackParse::FillWorkerPollFailPack(WorkerPoll_Download_Pack& workerPollDownLoadPack)
+{
+	workerPollDownLoadPack.nBeginIdentify = PACK_IDENTIFY;
+	workerPollDownLoadPack.nMsgNumber = WORKERPOLL_PACK;
+	workerPollDownLoadPack.nBodyLength = 96;
+
+	workerPollDownLoadPack.gDataBodyPack.nTotlePacket = 0;
+	workerPollDownLoadPack.gDataBodyPack.nCurrentPacket = 0;
+	workerPollDownLoadPack.gDataBodyPack.nPointID = 0;
+	workerPollDownLoadPack.gDataBodyPack.strArrtime = "";
+	workerPollDownLoadPack.gDataBodyPack.strDate = "";
+	workerPollDownLoadPack.gDataBodyPack.strPID = "";
+	workerPollDownLoadPack.gDataBodyPack.strRealTime = "";
+	workerPollDownLoadPack.gDataBodyPack.nPointState = 0;
 }
 
 int CDataPackParse::ParseGPSPackHttpShell(const char* pDataBuffer, char* outBuffer, 
@@ -2862,13 +2968,17 @@ bool CDataPackParse::BuildGetOrgSchedueListPackData(char* pDataBuffer, const Get
 	ASSERT(pDataBuffer);
 	if(pDataBuffer)
 	{
-		memcpy(pDataBuffer, getOrgShcedueListDownLoadPack.gDataBodyPack.strUserID.c_str(), getOrgShcedueListDownLoadPack.gDataBodyPack.strUserID.length());
-		memcpy(pDataBuffer + 20, getOrgShcedueListDownLoadPack.gDataBodyPack.strDates.c_str(), getOrgShcedueListDownLoadPack.gDataBodyPack.strDates.length());
-		memcpy(pDataBuffer + 40, getOrgShcedueListDownLoadPack.gDataBodyPack.strXJ.c_str(), getOrgShcedueListDownLoadPack.gDataBodyPack.strXJ.length());
+		*((unsigned int*)(pDataBuffer)) = getOrgShcedueListDownLoadPack.gDataBodyPack.nTotlePacket;
+		*((unsigned int*)(pDataBuffer + 4)) = getOrgShcedueListDownLoadPack.gDataBodyPack.nCurrentPacket;
 
-		*((unsigned int*)(pDataBuffer + 60)) = getOrgShcedueListDownLoadPack.gDataBodyPack.nSGetPoint;
-		*((unsigned int*)(pDataBuffer + 64)) = getOrgShcedueListDownLoadPack.gDataBodyPack.nCPoint;
-		*((unsigned int*)(pDataBuffer + 68)) = getOrgShcedueListDownLoadPack.gDataBodyPack.nLPoint;
+		memcpy(pDataBuffer + 8, getOrgShcedueListDownLoadPack.gDataBodyPack.strUserID.c_str(), getOrgShcedueListDownLoadPack.gDataBodyPack.strUserID.length());
+		memcpy(pDataBuffer + 28, getOrgShcedueListDownLoadPack.gDataBodyPack.strDates.c_str(), getOrgShcedueListDownLoadPack.gDataBodyPack.strDates.length());
+		memcpy(pDataBuffer + 48, getOrgShcedueListDownLoadPack.gDataBodyPack.strXJ.c_str(), getOrgShcedueListDownLoadPack.gDataBodyPack.strXJ.length());
+
+		*((unsigned int*)(pDataBuffer + 68)) = getOrgShcedueListDownLoadPack.gDataBodyPack.nSTotlePoint;
+		*((unsigned int*)(pDataBuffer + 72)) = getOrgShcedueListDownLoadPack.gDataBodyPack.nSGetPoint;
+		*((unsigned int*)(pDataBuffer + 76)) = getOrgShcedueListDownLoadPack.gDataBodyPack.nCPoint;
+		*((unsigned int*)(pDataBuffer + 80)) = getOrgShcedueListDownLoadPack.gDataBodyPack.nLPoint;
 
 		return true;
 	}
@@ -3015,6 +3125,103 @@ bool CDataPackParse::BuildGetOrgSchWorkerPackData(char* pDataBuffer, const GetOr
 		*((unsigned int*)(pDataBuffer + 76)) = getOrgSchWorkerDownLoadPack.gDataBodyPack.nPda1;
 		*((unsigned int*)(pDataBuffer + 80)) = getOrgSchWorkerDownLoadPack.gDataBodyPack.nPda2;
 		*((unsigned int*)(pDataBuffer + 84)) = getOrgSchWorkerDownLoadPack.gDataBodyPack.nWorkerState;
+
+		return true;
+	}
+	return false;
+}
+
+bool CDataPackParse::ParseWorkerPollQueryPackData(const char* pDataBuffer, WorkerPollQuery_Upload_Pack& workerPollQueryUpLoadPack)
+{
+	ASSERT(pDataBuffer);
+	if(pDataBuffer)
+	{
+		memset(m_tempBuffer1, 0x00, TEMP_BUFFER_SIZE);
+		memset(m_tempBuffer2, 0x00, TEMP_BUFFER_SIZE);
+
+		memcpy(m_tempBuffer1, pDataBuffer, 20);
+		memcpy(m_tempBuffer2, pDataBuffer + 20, 20);
+
+		workerPollQueryUpLoadPack.gDataBodyPack.strOper = m_tempBuffer1;
+		workerPollQueryUpLoadPack.gDataBodyPack.strTime = m_tempBuffer2;
+
+		return true;
+	}
+	return false;
+}
+
+bool CDataPackParse::BuildWorkerPollQueryPackData(char* pDataBuffer, const WorkerPollQuery_Download_Pack& workerPollQueryDownLoadPack)
+{
+	ASSERT(pDataBuffer);
+	if(pDataBuffer)
+	{
+		*((unsigned int*)(pDataBuffer)) = workerPollQueryDownLoadPack.gDataBodyPack.nTotlePacket;
+		*((unsigned int*)(pDataBuffer + 4)) = workerPollQueryDownLoadPack.gDataBodyPack.nCurrentPacket;
+		*((float*)(pDataBuffer + 8)) = workerPollQueryDownLoadPack.gDataBodyPack.fJUD;
+		*((float*)(pDataBuffer + 12)) = workerPollQueryDownLoadPack.gDataBodyPack.fWDU;
+		memcpy(pDataBuffer + 16, workerPollQueryDownLoadPack.gDataBodyPack.strTime.c_str(), 
+			workerPollQueryDownLoadPack.gDataBodyPack.strTime.length());
+
+		return true;
+	}
+	return false;
+}
+
+bool CDataPackParse::ParseUrgencyMissionDeletePackData(const char* pDataBuffer, UrgencyMissionDelete_Upload_Pack& urgencyMissionDeleteUpLoadPack)
+{
+	ASSERT(pDataBuffer);
+	if(pDataBuffer)
+	{
+		urgencyMissionDeleteUpLoadPack.gDataBodyPack.nOrgID = *((unsigned int*)(pDataBuffer));
+		return true;
+	}
+	return false;
+}
+
+bool CDataPackParse::BuildUrgencyMissionDeletePackData(char* pDataBuffer, const UrgencyMissionDelete_Download_Pack& urgencyMissionDeleteDownLoadPack)
+{
+	ASSERT(pDataBuffer);
+	if(pDataBuffer)
+	{
+		*((unsigned int*)(pDataBuffer)) = urgencyMissionDeleteDownLoadPack.gDataBodyPack.nResult;
+
+		return true;
+	}
+	return false;
+}
+
+bool CDataPackParse::ParseWorkerPollPackData(const char* pDataBuffer, WorkerPoll_Upload_Pack& workerPollUpLoadPack)
+{
+	ASSERT(pDataBuffer);
+	if(pDataBuffer)
+	{
+		memset(m_tempBuffer1, 0x00, TEMP_BUFFER_SIZE);
+		memset(m_tempBuffer2, 0x00, TEMP_BUFFER_SIZE);
+
+		memcpy(m_tempBuffer1, pDataBuffer, 20);
+		memcpy(m_tempBuffer2, pDataBuffer + 20, 20);
+
+		workerPollUpLoadPack.gDataBodyPack.strOper = m_tempBuffer1;
+		workerPollUpLoadPack.gDataBodyPack.strDate = m_tempBuffer2;
+
+		return true;
+	}
+	return false;
+}
+
+bool CDataPackParse::BuildWorkerPollPackData(char* pDataBuffer, const WorkerPoll_Download_Pack& workerPollDownLoadPack)
+{
+	ASSERT(pDataBuffer);
+	if(pDataBuffer)
+	{
+		*((unsigned int*)(pDataBuffer)) = workerPollDownLoadPack.gDataBodyPack.nTotlePacket;
+		*((unsigned int*)(pDataBuffer + 4)) = workerPollDownLoadPack.gDataBodyPack.nCurrentPacket;
+		*((unsigned int*)(pDataBuffer + 8)) = workerPollDownLoadPack.gDataBodyPack.nPointID;
+		memcpy(pDataBuffer + 12, workerPollDownLoadPack.gDataBodyPack.strDate.c_str(), workerPollDownLoadPack.gDataBodyPack.strDate.length());
+		memcpy(pDataBuffer + 32, workerPollDownLoadPack.gDataBodyPack.strArrtime.c_str(), workerPollDownLoadPack.gDataBodyPack.strArrtime.length());
+		memcpy(pDataBuffer + 52, workerPollDownLoadPack.gDataBodyPack.strRealTime.c_str(), workerPollDownLoadPack.gDataBodyPack.strRealTime.length());
+		memcpy(pDataBuffer + 72, workerPollDownLoadPack.gDataBodyPack.strPID.c_str(), workerPollDownLoadPack.gDataBodyPack.strPID.length());
+		*((unsigned int*)(pDataBuffer + 92)) = workerPollDownLoadPack.gDataBodyPack.nPointState;
 
 		return true;
 	}
