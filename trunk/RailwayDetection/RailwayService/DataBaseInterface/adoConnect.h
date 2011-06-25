@@ -1,15 +1,3 @@
-//
-//  MODULE: Ado2.h
-//
-//	AUTHOR: Carlos Antollini 
-//
-//  mailto: cantollini@hotmail.com
-//
-//	Date: 07/02/2003
-//
-//	Version 2.10
-// 
-
 #if !defined(AFX_ADO2_H_INCLUDED_)
 #define AFX_ADO2_H_INCLUDED_
 
@@ -25,8 +13,11 @@
 #pragma warning (disable: 4996)
 // CG : In order to use this code against a different version of ADO, the appropriate
 // ADO library needs to be used in the #import statement
-#import "C:\Program Files\Common Files\System\ADO\msado15.dll" rename("EOF", "EndOfFile")
-#import "C:\Program Files\Common Files\System\ado\MSJRO.DLL" no_namespace
+
+#import "C:\Program Files (x86)\Common Files\System\ADO\msado15.dll" rename("EOF", "EndOfFile")
+#import "C:\Program Files (x86)\Common Files\System\ado\MSJRO.DLL" no_namespace
+
+
 
 using namespace ADODB;
 
@@ -35,9 +26,17 @@ using namespace ADODB;
 
 #include "icrsint.h"
 
+#ifdef DATABASEINTERFACE_EXPORTS
+#define DATABASEINTERFACE_API __declspec(dllexport)
+#else
+#define DATABASEINTERFACE_API __declspec(dllimport)
+#endif
+
+
+
 class CADOCommand;
 
-struct CADOFieldInfo
+struct DATABASEINTERFACE_API CADOFieldInfo
 {
 	char m_strName[30]; 
 	short m_nType;
@@ -61,7 +60,7 @@ CString DblToStr(double dblVal, int ndigits = 20);
 CString DblToStr(float fltVal);
 
 
-class CJetEngine
+class DATABASEINTERFACE_API CJetEngine
 {
 public:
 
@@ -79,7 +78,7 @@ public:
 };
 
 
-class CADODatabase
+class DATABASEINTERFACE_API CADODatabase
 {
 public:
 	enum cadoConnectModeEnum
@@ -118,35 +117,35 @@ public:
 		::CoUninitialize();
 	}
 	
-	BOOL Open(LPCTSTR lpstrConnection = _T(""), LPCTSTR lpstrUserID = _T(""), LPCTSTR lpstrPassword = _T(""));
+	BOOL Open(LPCTSTR lpstrConnection = (""), LPCTSTR lpstrUserID = (""), LPCTSTR lpstrPassword = (""));
 	_ConnectionPtr GetActiveConnection() 
-		{return m_pConnection;};
+	{return m_pConnection;};
 	BOOL Execute(LPCTSTR lpstrExec);
 	int GetRecordsAffected()
-		{return m_nRecordsAffected;};
+	{return m_nRecordsAffected;};
 	DWORD GetRecordCount(_RecordsetPtr m_pRs);
 	long BeginTransaction() 
-		{return m_pConnection->BeginTrans();};
+	{return m_pConnection->BeginTrans();};
 	long CommitTransaction() 
-		{return m_pConnection->CommitTrans();};
+	{return m_pConnection->CommitTrans();};
 	long RollbackTransaction() 
-		{return m_pConnection->RollbackTrans();};
+	{return m_pConnection->RollbackTrans();};
 	BOOL IsOpen();
 	void Close();
 	void SetConnectionMode(cadoConnectModeEnum nMode)
-		{m_pConnection->PutMode((enum ConnectModeEnum)nMode);};
+	{m_pConnection->PutMode((enum ConnectModeEnum)nMode);};
 	void SetConnectionString(LPCTSTR lpstrConnection)
-		{m_strConnection = lpstrConnection;};
+	{m_strConnection = lpstrConnection;};
 	CString GetConnectionString()
-		{return m_strConnection;};
+	{return m_strConnection;};
 	CString GetLastErrorString() 
-		{return m_strLastError;};
+	{return m_strLastError;};
 	DWORD GetLastError()
-		{return m_dwLastError;};
+	{return m_dwLastError;};
 	CString GetErrorDescription() 
-		{return m_strErrorDescription;};
+	{return m_strErrorDescription;};
 	void SetConnectionTimeout(long nConnectionTimeout = 30)
-		{m_nConnectionTimeout = nConnectionTimeout;};
+	{m_nConnectionTimeout = nConnectionTimeout;};
 
 protected:
 	void dump_com_error(_com_error &e);
@@ -163,7 +162,7 @@ protected:
 	long m_nConnectionTimeout;
 };
 
-class CADORecordset
+class DATABASEINTERFACE_API CADORecordset
 {
 public:
 	BOOL Clone(CADORecordset& pRs);
@@ -458,7 +457,7 @@ protected:
 		
 };
 
-class CADOParameter
+class DATABASEINTERFACE_API CADOParameter
 {
 public:
 
@@ -517,7 +516,7 @@ protected:
 	DWORD m_dwLastError;
 };
 
-class CADOCommand
+class DATABASEINTERFACE_API CADOCommand
 {
 public:
 	enum cadoCommandType
@@ -572,7 +571,7 @@ protected:
 	DWORD m_dwLastError;
 };
 
-class CADOException : public CException
+class DATABASEINTERFACE_API CADOException : public CException
 {
 public:
 

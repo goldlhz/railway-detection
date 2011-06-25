@@ -14,7 +14,7 @@ int APIENTRY _tWinMain(
 {
 	CIOCPManager iocpmanager;
 
-	iocpmanager.InitManagerPar(hInstance, lpCmdLine);
+	iocpmanager.InitSysParam(hInstance, lpCmdLine);
 	iocpmanager.RunService();
 
 	return 0;
