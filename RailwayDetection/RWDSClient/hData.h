@@ -363,6 +363,6 @@ typedef lPicList::iterator iterPic;
 #define NoData                          0x01
 #define ErrSocket                       -1
 #define ErrListCount                    -2
-#define WaitListDataTime                0x02
+#define WaitListDataTime                0x03
 #define ResultIsOk                      0x01
 #endif

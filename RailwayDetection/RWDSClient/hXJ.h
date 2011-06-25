@@ -160,11 +160,12 @@ typedef struct
 {
 	unsigned  int iTotle;//一共多少包
 	unsigned  int iHasRecv;//已经发送报数
+	unsigned int iPoint;
 	float jdu;
 	float wdu;
 	float gls; //公里数
-	int  iState;
-	int lineid;
+	unsigned int  iState;
+	unsigned int lineid;
 }OrgLineResult;
 typedef list <OrgLineResult> lOrgLine;
 typedef lOrgLine::iterator iterOrgLine;

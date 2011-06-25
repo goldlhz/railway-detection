@@ -29,6 +29,7 @@ public:
 	void OnChangeVisualStyle();
 	void SetRWDSClientView(CRWDSClientView* aRWDSClientView);
     void GetOrgData(OrganizationInfo* aOrg);
+	void DeleteAllOrgData(OrganizationInfo* aOrg);
 // Ьиад
 protected:
 
@@ -60,7 +61,7 @@ protected:
 	afx_msg void OnTvnItemexpandingFileView(NMHDR *pNMHDR, LRESULT *pResult);
 
 	DECLARE_MESSAGE_MAP()
-
+	
 
 };
 

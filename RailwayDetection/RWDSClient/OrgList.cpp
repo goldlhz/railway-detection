@@ -223,6 +223,11 @@ void COrgList::OnBnClickedBtnAddorg()
     {
         parentOrg = (OrganizationInfo*)m_ComboOrgParent.GetItemData(comboIndex);
     }
+	if(parentOrg->iOrgLevel == 4)
+	{
+		AfxMessageBox(_T("该机构不能添加"));
+		return;
+	}
     int iOrgID = _ttoi(orgID);
     BOOL foundID = FALSE;
     for(size_t i=0; i<m_CRWDSClientView->m_Org.size(); i++)
@@ -249,6 +254,7 @@ void COrgList::OnBnClickedBtnAddorg()
         newOrg->iOrgName = orgName;
         newOrg->iParentOrg = parentOrg;
         newOrg->iParentID = parentOrg->iOrgID;
+		newOrg->iOrgLevel = parentOrg->iOrgLevel+1;
         parentOrg->iChildID.push_back(newOrg->iOrgID);
         parentOrg->iChildOrg.push_back(newOrg);
         newOrg->iBoundaryRail = (RailLine)m_ComboBoundaryLine.GetCurSel();
@@ -325,3 +331,4 @@ void COrgList::OnBnClickedBtnDeleteorg()
         m_TreeOrg.DeleteItem(curItem);
     }
 }
+

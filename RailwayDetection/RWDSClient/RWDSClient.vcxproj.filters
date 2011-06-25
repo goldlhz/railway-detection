@@ -207,6 +207,12 @@
     <ClInclude Include="Report.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="MessageInfo.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="VoiceList.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RWDSClient.cpp">
@@ -294,6 +300,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Report.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MessageInfo.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="VoiceList.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

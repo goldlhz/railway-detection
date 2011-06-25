@@ -138,6 +138,7 @@ public:
     afx_msg void OnUpdateSetDevice(CCmdUI *pCmdUI);
     afx_msg void OnReviewPicture();
 
+	afx_msg void OnReviewVoice();
 };
 extern CRWDSClientView* gClientView;
 

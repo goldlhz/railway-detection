@@ -142,6 +142,7 @@
     <ClInclude Include="Login.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="MAPX.H" />
+    <ClInclude Include="MessageInfo.h" />
     <ClInclude Include="ModifyPassword.h" />
     <ClInclude Include="OrgList.h" />
     <ClInclude Include="OrgTree.h" />
@@ -162,6 +163,7 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TCPTransmit.h" />
     <ClInclude Include="ViewTree.h" />
+    <ClInclude Include="VoiceList.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cData.cpp" />
@@ -175,6 +177,7 @@
     <ClCompile Include="Login.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="MAPX.CPP" />
+    <ClCompile Include="MessageInfo.cpp" />
     <ClCompile Include="ModifyPassword.cpp" />
     <ClCompile Include="OrgList.cpp" />
     <ClCompile Include="OrgTree.cpp" />
@@ -196,6 +199,7 @@
     </ClCompile>
     <ClCompile Include="TCPTransmit.cpp" />
     <ClCompile Include="ViewTree.cpp" />
+    <ClCompile Include="VoiceList.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="RWDSClient.rc" />
