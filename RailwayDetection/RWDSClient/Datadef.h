@@ -159,6 +159,7 @@ typedef struct _Staff
        // iID = 0;
         iOrgID = 0;
         iLoginPermission = FALSE;
+        iTakeDevice = NULL;
     }
     CString iID;
     int iOrgID;
@@ -170,7 +171,7 @@ typedef struct _Staff
     //Permission iPermission;
 	int Pda1;
 	int Pda2;//设备id号
-	int PowerId;
+	int iPermissionGroup;
 }StaffInfo;
 
 typedef struct _Calendar  //排班表
@@ -213,6 +214,8 @@ typedef struct _OrgObj	//机构
         iOrgAddress = _T("");
         iParentOrg = NULL;
         iDataSet = FALSE;
+        iBoundaryStartKM = 0;
+        iBoundaryEndKM = 0;
         iCalendar = new CalendarSchedule;
     }
 	int iOrgID;
