@@ -51,7 +51,7 @@ public:
 	//获取机构月度报表
 	int GetOrgMonthPx(getorgpx const sValue,lOrgMonth *llist);
 	//获取图片
-	bool getPic(const Getrealpic sValue);
+	int getPic(const Getrealpic sValue);
 	//点设置
 	int setPoint(const PointMang sValue);
 	//获取机构下属线
@@ -64,7 +64,7 @@ private:
 	CTCPClient *cs;
 	void CreateConn();
 	void CloseConn();
-	void WriteBug(const char const *buf,const int iLength) const;
+	void WriteBug(const char *buf,const int iLength) const;
 	void readBug(char  *buf, int* iLength) ;
 	int iSocketState;
 

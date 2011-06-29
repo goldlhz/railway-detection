@@ -238,7 +238,7 @@ void COrgTree::InsertListSelectedData()
     StaffInfo* staff = (StaffInfo*)m_ListOrgData.GetItemData(select);
     StaffInfo* addedStaff = NULL;
     BOOL flagInsert = TRUE;
-    for (size_t i=0; i<m_ListSelectedData.GetItemCount(); i++)
+    for (int i=0; i<m_ListSelectedData.GetItemCount(); i++)
     {
         addedStaff = (StaffInfo*)m_ListSelectedData.GetItemData(i);
         if (staff == addedStaff)
@@ -275,7 +275,7 @@ void COrgTree::OnBnClickedBtnOk()
 {
     // TODO: 在此添加控件通知处理程序代码
     m_EmergencyTask->iAppointStaff.clear();
-    for (size_t i=0; i<m_ListSelectedData.GetItemCount(); i++)
+    for (int i=0; i<m_ListSelectedData.GetItemCount(); i++)
     {
         m_EmergencyTask->iAppointStaff.push_back((StaffInfo*)m_ListSelectedData.GetItemData(i));
     }

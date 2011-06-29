@@ -128,7 +128,7 @@ BOOL COrgList::OnInitDialog()
     m_ComboOrgParent.AddString(_T("нч"));
     m_ComboOrgParent.SetItemData(0, NULL);
     OrgListVisitForAddComboOrgParent(m_CRWDSClientView->m_Org[0]);
-    for(size_t i=0; i<RailLineNameCount; i++)
+    for(int i=0; i<RailLineNameCount; i++)
     {
         m_ComboBoundaryLine.AddString(RailLineName[i]);
     }
@@ -162,9 +162,9 @@ void COrgList::OnTvnSelchangedTreeOrglist(NMHDR *pNMHDR, LRESULT *pResult)
     m_ComboOrgParent.SetCurSel(curOrg->iParentID);
     m_ComboBoundaryLine.SetCurSel(curOrg->iBoundaryRail);
     //CString str;
-    str.Format(_T("%f"), curOrg->iBoundaryStartKM);
+    str.Format(_T("%d"), curOrg->iBoundaryStartKM);
     GetDlgItem(IDC_EDIT_BOUNDARYSTARTKM)->SetWindowText(str);
-    str.Format(_T("%f"), curOrg->iBoundaryEndKM);
+    str.Format(_T("%d"), curOrg->iBoundaryEndKM);
     GetDlgItem(IDC_EDIT_BOUNDARYENDKM)->SetWindowText(str);
     *pResult = 0;
 }
@@ -260,9 +260,9 @@ void COrgList::OnBnClickedBtnAddorg()
         newOrg->iBoundaryRail = (RailLine)m_ComboBoundaryLine.GetCurSel();
         CString str;
         GetDlgItem(IDC_EDIT_BOUNDARYSTARTKM)->GetWindowText(str);
-        newOrg->iBoundaryStartKM = _ttof(str);
+        newOrg->iBoundaryStartKM = _ttoi(str);
         GetDlgItem(IDC_EDIT_BOUNDARYENDKM)->GetWindowText(str);
-        newOrg->iBoundaryEndKM = _ttof(str);
+        newOrg->iBoundaryEndKM = _ttoi(str);
         AddOrgToTreeOrg(newOrg, parentOrg);
         
         str.Format(_T("%d"), newOrg->iOrgID);
@@ -309,9 +309,9 @@ void COrgList::OnBnClickedBtnModifyorg()
         m_SeletedOrg->iBoundaryRail = (RailLine)m_ComboBoundaryLine.GetCurSel();
         CString str;
         GetDlgItem(IDC_EDIT_BOUNDARYSTARTKM)->GetWindowText(str);
-        m_SeletedOrg->iBoundaryStartKM = _ttof(str);
+        m_SeletedOrg->iBoundaryStartKM = _ttoi(str);
         GetDlgItem(IDC_EDIT_BOUNDARYENDKM)->GetWindowText(str);
-        m_SeletedOrg->iBoundaryEndKM = _ttof(str);
+        m_SeletedOrg->iBoundaryEndKM = _ttoi(str);
     }
 }
 

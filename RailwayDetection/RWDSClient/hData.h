@@ -10,11 +10,11 @@ struct Pack_Shell_Type
 };// 数据区		依赖消息的不同数据内容
 
 
-typedef struct BaseStruct
+typedef struct 
 {
 	unsigned char  nMsgNumber;	
 	unsigned int   nBodyLength;
-};
+}BaseStruct;
 
 typedef struct
 {

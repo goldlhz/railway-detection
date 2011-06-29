@@ -249,7 +249,8 @@ void CSchedule::OnBnClickedBtnModifytime()
 	//CTime t1(m_SelectedSchedule->iULineKmTime[select]);
 	CString strHour;
 	CString strMin;
-	struct tm* schTime = localtime(&m_SelectedLine->iLineKmTime[select]);
+	struct tm* schTime = NULL;
+    localtime_s(schTime, &m_SelectedLine->iLineKmTime[select]);
 	GetDlgItem(IDC_EDIT_HOUR)->GetWindowText(strHour);
 	schTime->tm_hour = _ttoi(strHour);
 	GetDlgItem(IDC_EDIT_MINUTE)->GetWindowText(strMin);
