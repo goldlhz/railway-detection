@@ -158,11 +158,13 @@ void CEmergencyTask::OnLvnItemchangedEmergencylist(NMHDR *pNMHDR, LRESULT *pResu
     CString strBeginMin;
     CString strEndHour;
     CString strEndMin;
-    struct tm* beginTime = localtime(&task->iBeginTime);
+    struct tm* beginTime = NULL;
+    localtime_s(beginTime, &task->iBeginTime);
     strBeginHour.Format(_T("%02d"), beginTime->tm_hour);
     strBeginMin.Format(_T("%02d"), beginTime->tm_min);
 
-    struct tm* endTime = localtime(&task->iEndTime);
+    struct tm* endTime = NULL;
+    localtime_s(endTime, &task->iEndTime);
     strEndHour.Format(_T("%02d"), endTime->tm_hour);
     strEndMin.Format(_T("%02d"), endTime->tm_min);
 
@@ -281,12 +283,14 @@ void CEmergencyTask::OnBnClickedBtnEmergencymodify()
     GetDlgItem(IDC_EDIT_ENDHOUR)->GetWindowText(strEndHour);
     GetDlgItem(IDC_EDIT_ENDMINUTE)->GetWindowText(strEndMin);
 
-    struct tm* beginTime = localtime(&task->iBeginTime);
+    struct tm* beginTime = NULL;
+    localtime_s(beginTime, &task->iBeginTime);
     beginTime->tm_hour = _ttoi(strBeginHour);
     beginTime->tm_min = _ttoi(strBeginMin);
     task->iBeginTime = mktime(beginTime);
 
-    struct tm* endTime = localtime(&task->iEndTime);
+    struct tm* endTime = NULL;
+    localtime_s(endTime, &task->iEndTime);
     endTime->tm_hour = _ttoi(strEndHour);
     endTime->tm_min = _ttoi(strEndMin);
     task->iEndTime = mktime(endTime);

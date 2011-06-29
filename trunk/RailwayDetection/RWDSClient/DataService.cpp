@@ -8,11 +8,11 @@
 int VerifyLogin( CString& aLoginAccount, CString& aLoginPassword, int* orgID, Permission *pPower)
 {
     ///////////////////////////////////////////////////
-    //*orgID = 1;
-    //pPower->iBasical = 1;
-    //pPower->iOperate = 1;
-    //pPower->iReportForm = 1;
-    //return KErrNone;
+    *orgID = 1;
+    pPower->iBasical = 1;
+    pPower->iOperate = 1;
+    pPower->iReportForm = 1;
+    return KErrNone;
     ///////////////////////////////////////////////////
     cData *cd = new cData();
 	char  *UserName = (LPSTR)(LPCTSTR)aLoginAccount; 
@@ -37,36 +37,36 @@ int VerifyLogin( CString& aLoginAccount, CString& aLoginPassword, int* orgID, Pe
 int GetOrgTree(const int& OrgId, vector<OrganizationInfo*>* a_OrgTree)
 {
     ///////////////////////////////////////////////////
-    //OrganizationInfo* org = new OrganizationInfo;
-    //org->iOrgName = _T("Admin");
-    //org->iParentOrg = NULL;
-    //org->iParentID = 0;
-    //org->iOrgID = 1;
-    //org->iBoundaryRail = Chengdu_Kunming;
-    //org->iChildID.push_back(2);
-    //org->iChildID.push_back(3);
-    //a_OrgTree->push_back(org);
+    OrganizationInfo* org = new OrganizationInfo;
+    org->iOrgName = _T("Admin");
+    org->iParentOrg = NULL;
+    org->iParentID = 0;
+    org->iOrgID = 1;
+    org->iBoundaryRail = Chengdu_Kunming;
+    org->iChildID.push_back(2);
+    org->iChildID.push_back(3);
+    a_OrgTree->push_back(org);
 
-    //org = new OrganizationInfo;
-    //org->iOrgName = _T("Child1");
-    //org->iParentOrg = (*a_OrgTree)[0];
-    //org->iParentID = org->iParentOrg->iOrgID;
-    //(*a_OrgTree)[0]->iChildOrg.push_back(org);
-    //org->iOrgID = 2;
-    //org->iBoundaryRail = Chengdu_Chongqing;
-    //org->iChildID.push_back(4);
-    //a_OrgTree->push_back(org);
+    org = new OrganizationInfo;
+    org->iOrgName = _T("Child1");
+    org->iParentOrg = (*a_OrgTree)[0];
+    org->iParentID = org->iParentOrg->iOrgID;
+    (*a_OrgTree)[0]->iChildOrg.push_back(org);
+    org->iOrgID = 2;
+    org->iBoundaryRail = Chengdu_Chongqing;
+    org->iChildID.push_back(4);
+    a_OrgTree->push_back(org);
 
-    //org = new OrganizationInfo;
-    //org->iOrgName = _T("Child2");
-    //org->iParentOrg = (*a_OrgTree)[0];
-    //org->iParentID = org->iParentOrg->iOrgID;
-    //(*a_OrgTree)[0]->iChildOrg.push_back(org);
-    //org->iBoundaryRail = Baoji_Chengdu;
-    //org->iOrgID = 3;
-    //org->iChildID.push_back(5);
-    //a_OrgTree->push_back(org);
-    //return KErrNone;
+    org = new OrganizationInfo;
+    org->iOrgName = _T("Child2");
+    org->iParentOrg = (*a_OrgTree)[0];
+    org->iParentID = org->iParentOrg->iOrgID;
+    (*a_OrgTree)[0]->iChildOrg.push_back(org);
+    org->iBoundaryRail = Baoji_Chengdu;
+    org->iOrgID = 3;
+    org->iChildID.push_back(5);
+    a_OrgTree->push_back(org);
+    return KErrNone;
     ///////////////////////////////////////////////////
 	
 	cData *cd = new cData();
@@ -478,7 +478,7 @@ int SetOrgLine( int aOrgID, int aCmd, const LineInfo* aLine )
 				for(int i = 0;i < iPointSize ;i++)
 				{//
 					int iPoint = aLine->iLineKmLonLat[i]->iPointId;
-					long sec = aLine->iLineKmTime[i];
+					time_t sec = aLine->iLineKmTime[i];
 					int iHour,iMin;
 					CTime t(sec);
 					iHour = t.GetHour();
@@ -946,28 +946,28 @@ int SavePictureToDirect( int aOrgID, const PictureInfo* aPicture, CString aToDir
     return KErrNone;
 }
 
-long Time2Strings1(CString sec)
+time_t Time2Strings1(CString sec)
 {
 	int iHour,iMonth;
-	sscanf((const char*)sec.GetBuffer(),"%d:%d",&iHour,&iMonth);
+	sscanf_s((const char*)sec.GetBuffer(),"%d:%d",&iHour,&iMonth);
 	CTime time(2010,1,1,iHour,iMonth,0); 
 	time_t time2=time.GetTime();
 	sec.ReleaseBuffer();
 	return time2;
 }
-long Time2Strings2(CString sec)
+time_t Time2Strings2(CString sec)
 {
 	if(sec == "")
 		return 0;
 	int i1,i2,i3;
-	sscanf((const char*)sec.GetBuffer(),"%d-%d-%d",&i1,&i2,&i3);
+	sscanf_s((const char*)sec.GetBuffer(),"%d-%d-%d",&i1,&i2,&i3);
 	CTime time(i1,i2,i3,0,0,0); 
 	time_t time2=time.GetTime();
 	sec.ReleaseBuffer();
 	return time2;
 }
 
-CString Time2Strings(long sec)
+CString Time2Strings(time_t sec)
 {
 	if(sec==0){
 		return _T("");

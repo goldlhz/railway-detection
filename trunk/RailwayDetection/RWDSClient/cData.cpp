@@ -49,7 +49,7 @@ int cData::UserLog(char * UserName,char *UserPwd,int *Orgid,int *p1,int *p2,int 
 	{
 		return -1;
 	}
-	LoginRerquestResult ls;
+	//LoginRerquestResult ls;
 	memset(cTempBuf,0,sizeof(cTempBuf));
 	int it = 11 + sizeof(LoginRerquestResult);
 	Sleep(10);
@@ -1136,7 +1136,7 @@ int cData::GetOrgMonthPx(getorgpx const sValue,lOrgMonth *llist)
 	return 1;
 }
 
-bool cData::getPic(const Getrealpic sValue)
+int cData::getPic(const Getrealpic sValue)
 {
 	char pDataBuffer[11 + sizeof(Getrealpic)];
 	memset(pDataBuffer,0,sizeof(pDataBuffer));
@@ -1175,7 +1175,7 @@ bool cData::getPic(const Getrealpic sValue)
 			iTotleCount = lr.totlePacket;
 		}
 	}
-	return true;
+	return 0;
 }
 
 int cData::setPoint(const PointMang sValue)

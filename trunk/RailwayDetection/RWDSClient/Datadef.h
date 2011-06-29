@@ -227,8 +227,8 @@ typedef struct _OrgObj	//机构
 	vector<int> iChildID;
 	vector<struct _OrgObj*> iChildOrg;//直接下级机构
     RailLine iBoundaryRail;
-    double iBoundaryStartKM;
-    double iBoundaryEndKM;
+    unsigned int iBoundaryStartKM;
+    unsigned int iBoundaryEndKM;
     vector<MapPoint*> iMapPoint;
     vector<StaffInfo*> iStaff;//该机构的人员
 	vector<DeviceInfo*> iDevice;//该机构拥有的设备
