@@ -175,18 +175,20 @@ bool CWorkThread::InitWorkThread(
 		return false;
 	m_pGobalConfig = pGobalConfig;
 
-	string strConnection = FormatConnectString(pGobalConfig);
+	string strConnection;
+
+	m_pAdoDatabase->SetConnectionTimeout(5);
+	strConnection= FormatConnectString(pGobalConfig);
+
 	if(m_pAdoDatabase->Open(strConnection.c_str()))
 	{
 		// 只有到所有值都确定为有效时才设置成初始化成功
 		m_bIsInitWorkThread = true;
-		WriteLogInfo(LOG_INFO, _T("CWorkThread::InitWorkThread(), 连接数据库成功"));
+		WriteLogInfo(LOG_DEBUG, _T("CWorkThread::InitWorkThread(), 连接数据库成功"));
 
 		return true;
 	}
-
 	WriteLogInfo(LOG_INFO, _T("CWorkThread::InitWorkThread(), 连接数据库失败"));
-
 	return false;
 }
 
