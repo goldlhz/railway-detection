@@ -11,7 +11,7 @@ public:
 	void InitSysParam(HINSTANCE hInstance, LPTSTR lpCmdLine);					// 传递系统的参数
 	void RunService();															// 运行后不会返回	
 	void PostCloseMSG();														// 投递一个消息以关闭正在运行的服务
-
+	void StopService();
 private:
 	bool InitGlbEnvironment(HINSTANCE hInstance);
 	void UnInitGlbEnvironment();

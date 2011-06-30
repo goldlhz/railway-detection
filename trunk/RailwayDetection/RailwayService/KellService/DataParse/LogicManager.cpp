@@ -2022,7 +2022,9 @@ int  CLogicManager::DealWorkerPollPack(DWORD dNumberOfBytes,
 void CLogicManager::FillPicStoreStruct(GPSPIC_Pack& gpsPicUpLoadPack, string strTel)
 {
 	gpsPicUpLoadPack.strPicName = CCommonFunction::GetCurrentTimeByFormat() + ".jpg";
-	gpsPicUpLoadPack.strTime = gpsPicUpLoadPack.strPicName.substr(0, 8);
+	gpsPicUpLoadPack.strTime = gpsPicUpLoadPack.strPicName.substr(0, 4) + "-" + 
+		gpsPicUpLoadPack.strPicName.substr(4, 2) + "-" +
+		gpsPicUpLoadPack.strPicName.substr(6, 2);
 	gpsPicUpLoadPack.strTel = strTel;
 	gpsPicUpLoadPack.nType = 2;
 }

@@ -2839,7 +2839,7 @@ bool CDataPackParse::ParseGetPicListPackData(const char* pDataBuffer, GetPicList
 		memcpy(m_tempBuffer1, pDataBuffer + 4, 20);
 		memcpy(m_tempBuffer2, pDataBuffer + 24, 20);
 		getPicListUpLoadPack.gDataBodyPack.strSTime = m_tempBuffer1;
-		getPicListUpLoadPack.gDataBodyPack.strSTime = m_tempBuffer2;
+		getPicListUpLoadPack.gDataBodyPack.strETime = m_tempBuffer2;
 
 		return true;
 	}

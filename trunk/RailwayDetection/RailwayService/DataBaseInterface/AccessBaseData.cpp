@@ -1554,10 +1554,10 @@ CADORecordset* CAccessBaseData::UpLoadGetPicListPack(const GetPicList_Upload_Pac
 	if(m_pDatabase)
 	{
 		memset(m_strBuffer, 0x00, INPUTSQLBUFFERS);
-		sprintf_s(m_strBuffer, INPUTSQLBUFFERS, "select * from t_pic where dtime =< %d and dtime >= %d and tel in (select Device_Pid from t_device where Device_Org = %d)",
-			getPicListUpPack.gDataBodyPack.strSTime.c_str(),
+		sprintf_s(m_strBuffer, INPUTSQLBUFFERS, "select * from t_pic where tel in (select Device_Pid from t_device where Device_Org = %d) and datediff(d,dtime,'%s') > 0 and datediff(d,'%s',dtime) >= 0",
+			getPicListUpPack.gDataBodyPack.nOrgID,
 			getPicListUpPack.gDataBodyPack.strETime.c_str(),
-			getPicListUpPack.gDataBodyPack.nOrgID);
+			getPicListUpPack.gDataBodyPack.strSTime.c_str());
 
 		if(!m_pDatabase->IsOpen())
 		{

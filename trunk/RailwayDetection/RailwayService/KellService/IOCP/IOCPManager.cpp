@@ -62,6 +62,19 @@ void CIOCPManager::PostCloseMSG()
 	}
 }
 
+void CIOCPManager::StopService()
+{
+	HANDLE hWaitEvent = NULL;
+
+	hWaitEvent = CreateEvent(NULL, TRUE, FALSE, m_strGlbEvent.c_str());
+	if(NULL != hWaitEvent)
+	{
+		if(ERROR_ALREADY_EXISTS == GetLastError())
+		{
+			SetEvent(hWaitEvent);
+		}
+	}
+}
 bool CIOCPManager::InitGlbEnvironment(HINSTANCE hInstance)
 {
 	InitLogPluginManager(_T("KellService"));

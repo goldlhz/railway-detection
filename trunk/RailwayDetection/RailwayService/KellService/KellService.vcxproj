@@ -75,7 +75,7 @@ copy ..\ConfigFileLib\loger.ini ..\Bin\BinD\LogPlugin\loger.ini</Command>
       <Optimization>Disabled</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\include;..\DataBaseInterface;.\DataParse;.\Common;.\iocp\;..\LogPluginManager\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
