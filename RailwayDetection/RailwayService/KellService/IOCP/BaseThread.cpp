@@ -118,7 +118,7 @@ unsigned int WINAPI CBaseThread::Execute(PVOID pArguments)
 
 		CloseHandle(pThread->m_hThread);
 		pThread->m_hThread = NULL;
-		ASSERT(NULL);
+
 		return nExitCode;
 	}
 
