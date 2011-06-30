@@ -30,17 +30,19 @@ bool CListenThread::InitListener(CGobalConfig * pGobalConfig)
 		if(!CreateIOCPHandle(m_pGobalConfig))
 		{
 			// 创建IOCP架构所要用的句柄出错
+			DoWriteLogInfo(LOG_INFO, _T("CSocketListenThread::InitListenThread(), CreateIOCPHandle()调用失败"));
 			return false;
 		}
-		DoWriteLogInfo(LOG_INFO, _T("CSocketListenThread::InitListenThread(), CreateIOCPHandle()调用成功"));
+		DoWriteLogInfo(LOG_DEBUG, _T("CSocketListenThread::InitListenThread(), CreateIOCPHandle()调用成功"));
 
 		if(!CreateListenSocket(nListenPort))
 		{
 			// 监听套接字创建失败
+			DoWriteLogInfo(LOG_INFO, _T("CSocketListenThread::InitListenThread(), CreateListenSocket()调用失败"));
 			CloseIOCPHandle();
 			return false;
 		}
-		DoWriteLogInfo(LOG_INFO, _T("CSocketListenThread::InitListenThread(), CreateListenSocket()调用成功"));
+		DoWriteLogInfo(LOG_DEBUG, _T("CSocketListenThread::InitListenThread(), CreateListenSocket()调用成功"));
 
 		if(!m_MemoryPool.InitMemoryPool(m_pGobalConfig))
 		{
@@ -51,7 +53,7 @@ bool CListenThread::InitListener(CGobalConfig * pGobalConfig)
 
 			return false;
 		}
-		DoWriteLogInfo(LOG_INFO, _T("CSocketListenThread::InitListenThread(), 初始化内存池成功"));
+		DoWriteLogInfo(LOG_DEBUG, _T("CSocketListenThread::InitListenThread(), 初始化内存池成功"));
 
 		if(!m_SocketPool.InitSocketPool(m_pGobalConfig))
 		{
@@ -62,7 +64,7 @@ bool CListenThread::InitListener(CGobalConfig * pGobalConfig)
 
 			return false;
 		}
-		DoWriteLogInfo(LOG_INFO, _T("CSocketListenThread::InitListenThread(), 初始化套接字池成功"));
+		DoWriteLogInfo(LOG_DEBUG, _T("CSocketListenThread::InitListenThread(), 初始化套接字池成功"));
 
 		if(SOCKET_ERROR == WSAEventSelect(m_sListenSocket.GetSocket(), m_hJudgeEvent[0], FD_ACCEPT))
 		{
@@ -74,7 +76,7 @@ bool CListenThread::InitListener(CGobalConfig * pGobalConfig)
 
 			return false;
 		}
-		DoWriteLogInfo(LOG_INFO, _T("CSocketListenThread::InitListenThreadInstance(), 注册FD_ACCEPT事件成功"));
+		DoWriteLogInfo(LOG_DEBUG, _T("CSocketListenThread::InitListenThreadInstance(), 注册FD_ACCEPT事件成功"));
 
 
 		HANDLE hHandle = CreateIoCompletionPort((HANDLE)m_sListenSocket.GetSocket(), m_hCompletionPort, (ULONG_PTR)NULL, NULL);
@@ -88,14 +90,15 @@ bool CListenThread::InitListener(CGobalConfig * pGobalConfig)
 
 			return false;
 		}
-		DoWriteLogInfo(LOG_INFO, _T("CSocketListenThread::InitListenThreadInstance(), 绑定监听套接字到完成端口时成功"));
+		DoWriteLogInfo(LOG_DEBUG, _T("CSocketListenThread::InitListenThreadInstance(), 绑定监听套接字到完成端口时成功"));
 
 		if(CreateWorkThreadPool())
 		{
-			DoWriteLogInfo(LOG_INFO, _T("CSocketListenThread::InitListenThreadInstance(), 初始化监听线程完成"));
+			DoWriteLogInfo(LOG_DEBUG, _T("CSocketListenThread::InitListenThreadInstance(), 初始化监听线程完成"));
 			return true;
 		}
 
+		DoWriteLogInfo(LOG_INFO, _T("CSocketListenThread::InitListenThreadInstance(), CreateWorkThreadPool调用失败"));
 		CloseListenSocket();
 		CloseIOCPHandle();
 		return false;
@@ -252,7 +255,7 @@ bool CListenThread::CreateListenSocket(int nPort)
 {
 	if(nPort < 1024 || nPort > 65535)
 	{
-		DoWriteLogInfo(LOG_DEBUG, _T("CSocketListenThread::CreateListenSocket(), 配置文件中设置的服务器监听端口不在合法范围内"));
+		DoWriteLogInfo(LOG_INFO, _T("CSocketListenThread::CreateListenSocket(), 配置文件中设置的服务器监听端口不在合法范围内"));
 		return false;
 	}
 
@@ -263,7 +266,6 @@ bool CListenThread::CreateListenSocket(int nPort)
 	}
 
 	DoWriteLogInfo(LOG_INFO, _T("CSocketListenThread::CreateListenSocket(), 创建服务器套接字失败"));
-
 	return false;
 }
 

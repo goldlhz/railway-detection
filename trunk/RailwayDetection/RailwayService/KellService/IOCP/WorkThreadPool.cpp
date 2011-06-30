@@ -72,12 +72,7 @@ bool CWorkThreadPool::CreateWorkThreads(
 		{
 			if(pThread->BeginThread(false))
 			{
-				if(pThread->InitWorkThread(hCompletionPort, 
-					hRevcNotify, 
-					pBaseSocket, 
-					pSocketPool, 
-					pMemoryPool, 
-					pGobalConfig))
+				if(pThread->InitWorkThread(hCompletionPort, hRevcNotify, pBaseSocket, pSocketPool, pMemoryPool, pGobalConfig))
 				{
 					if(-1 != pThread->ResumeThread())
 					{
@@ -87,9 +82,7 @@ bool CWorkThreadPool::CreateWorkThreads(
 				}
 
 				delete pThread;
-
 				CloseWorkThreads();
-
 				return false;
 			}
 		}
