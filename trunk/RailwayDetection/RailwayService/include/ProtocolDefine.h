@@ -644,6 +644,8 @@ struct GetOrgSchedueList_Upload_Type
 
 struct GetOrgSchedueList_Download_Type
 {
+	unsigned  int nTotlePacket;
+	unsigned  int nCurrentPacket;
 	string		strUserID;
 	string		strDates;
 	string		strXJ;
@@ -746,6 +748,57 @@ struct GetOrgSchWorker_Download_Type
 };
 typedef Pack_Shell_Type<GetOrgSchWorker_Upload_Type> GetOrgSchWorker_Upload_Pack;
 typedef Pack_Shell_Type<GetOrgSchWorker_Download_Type> GetOrgSchWorker_Download_Pack;
+
+// 人员巡检查询msgnum=0x30
+struct WorkerPollQuery_Upload_Type
+{
+	string strOper;
+	string strTime;
+};
+struct WorkerPollQuery_Download_Type
+{
+	unsigned  int nTotlePacket;
+	unsigned  int nCurrentPacket;
+	float fJUD;
+	float fWDU;
+	string strTime;
+};
+typedef Pack_Shell_Type<WorkerPollQuery_Upload_Type> WorkerPollQuery_Upload_Pack;
+typedef Pack_Shell_Type<WorkerPollQuery_Download_Type> WorkerPollQuery_Download_Pack;
+
+
+// 紧急任务人员删除msgnum=0x31
+struct UrgencyMissionDelete_Upload_Type
+{
+	unsigned  int nOrgID;
+};
+struct UrgencyMissionDelete_Download_Type
+{
+	unsigned  int nResult;
+};
+typedef Pack_Shell_Type<UrgencyMissionDelete_Upload_Type> UrgencyMissionDelete_Upload_Pack;
+typedef Pack_Shell_Type<UrgencyMissionDelete_Download_Type> UrgencyMissionDelete_Download_Pack;
+
+// 人员巡检msgnum=0x32
+struct WorkerPoll_Upload_Type
+{
+	string strOper;
+	string strDate;
+};
+struct WorkerPoll_Download_Type
+{
+	unsigned  int nTotlePacket;
+	unsigned  int nCurrentPacket;
+	unsigned  int nPointID;
+	string    strDate;
+	string    strArrtime;
+	string    strRealTime;
+	string    strPID;;
+	unsigned  int nPointState;
+};
+typedef Pack_Shell_Type<WorkerPoll_Upload_Type> WorkerPoll_Upload_Pack;
+typedef Pack_Shell_Type<WorkerPoll_Download_Type> WorkerPoll_Download_Pack;
+
 //////////////////////////////////////////////////////////////////////////
 ///
 /// 数据包类型宏定义
@@ -790,3 +843,6 @@ typedef Pack_Shell_Type<GetOrgSchWorker_Download_Type> GetOrgSchWorker_Download_
 #define GETORGLINE_PACK					0X2D
 #define	GETLINEPOINTTIME_PACK			0X2E
 #define GETORGSCHWORKER_PACK			0X2F
+#define WORKERPOLLQUERY_PACK			0X30
+#define	URGENCYMISSIONDELETE_PACK		0X31
+#define WORKERPOLL_PACK					0X32

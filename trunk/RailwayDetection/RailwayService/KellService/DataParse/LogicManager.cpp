@@ -335,7 +335,7 @@ int  CLogicManager::DealGPSPack(DWORD dNumberOfBytes,
 						GPSPIC_Pack gpsPicUpLoadPack;
 
 						FillPicStoreStruct(gpsPicUpLoadPack, strTel);
-						strPicName = pGobalConfig->GetPicFilePath() + "\\" + gpsPicUpLoadPack.strTime;
+						strPicName = pGobalConfig->GetPicFilePath() + "\\" + gpsPicUpLoadPack.strPicName.substr(0, 8);//gpsPicUpLoadPack.strTime;
 
 						if(BuildPicDir(strPicName))
 						{
@@ -1329,7 +1329,7 @@ int  CLogicManager::DealGetPicListPack(DWORD dNumberOfBytes,
 						strTemp.LockBuffer();
 
 						pRecordset->GetFieldValue("dtime", strTemp);
-						m_getPicListDownPack.gDataBodyPack.strName = strTemp;
+						m_getPicListDownPack.gDataBodyPack.strTime = strTemp;
 						strTemp.LockBuffer();
 
 						pRecordset->GetFieldValue("itype", nTemp);
@@ -1522,7 +1522,7 @@ int  CLogicManager::DealGetPicDataPack(DWORD dNumberOfBytes,
 				FILE * fPic = NULL;
 				string strPicnName;
 
-				strPicnName = pGobalConfig->GetPicFilePath() + "\\" + gpsPicPack.strTime + "\\" + gpsPicPack.strPicName;
+				strPicnName = pGobalConfig->GetPicFilePath() + "\\" + gpsPicPack.strPicName.substr(0, 8) + "\\" + gpsPicPack.strPicName;
 				fPic = fopen(strPicnName.c_str(), "rb");
 				if(fPic)
 				{
@@ -2024,7 +2024,10 @@ void CLogicManager::FillPicStoreStruct(GPSPIC_Pack& gpsPicUpLoadPack, string str
 	gpsPicUpLoadPack.strPicName = CCommonFunction::GetCurrentTimeByFormat() + ".jpg";
 	gpsPicUpLoadPack.strTime = gpsPicUpLoadPack.strPicName.substr(0, 4) + "-" + 
 		gpsPicUpLoadPack.strPicName.substr(4, 2) + "-" +
-		gpsPicUpLoadPack.strPicName.substr(6, 2);
+		gpsPicUpLoadPack.strPicName.substr(6, 2) + " " +
+		gpsPicUpLoadPack.strPicName.substr(8, 2) + ":" +
+		gpsPicUpLoadPack.strPicName.substr(10, 2) +":" +
+		gpsPicUpLoadPack.strPicName.substr(12, 2);
 	gpsPicUpLoadPack.strTel = strTel;
 	gpsPicUpLoadPack.nType = 2;
 }
