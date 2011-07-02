@@ -6,7 +6,7 @@
 
 
 const int port = 9527 ;
-const char* destIp = "192.168.1.101\0";
+const char* destIp = "124.161.252.200\0";
 cData::cData(void)
 {
 	cs = new CTCPClient();
@@ -1049,7 +1049,7 @@ int cData::GetOrgPic(GetPic const sValue,lPicList *llist)
 	memset(pDataBuffer,0,sizeof(pDataBuffer));
 	BaseStruct bs;
 	bs.nBodyLength = sizeof(GetPic);
-	bs.nMsgNumber = GETORGPOINT_PACK;
+	bs.nMsgNumber = GETPICLIST_PACK;
 	BuildDataPackShell(pDataBuffer, &bs);
 	memcpy(pDataBuffer+7,&sValue,sizeof(GetPic));
 
@@ -1063,8 +1063,8 @@ int cData::GetOrgPic(GetPic const sValue,lPicList *llist)
 	llist->clear();
 	while(1)
 	{
+		
 		Sleep(WaitListDataTime);
-
 		int it = 11 + sizeof(picResult);
 		char cTempBuf[11 + sizeof(picResult)];
 		memset(cTempBuf,0,it);
@@ -1076,10 +1076,19 @@ int cData::GetOrgPic(GetPic const sValue,lPicList *llist)
 			break;
 		}
 		memset(&lr,0,sizeof(lr));
-		if(DepressPacket(lr,GETORGPOINT_PACK,cTempBuf))
+		if(DepressPacket(lr,GETPICLIST_PACK,cTempBuf))
 		{
 			llist->push_back(lr);
 			iTotleCount = lr.totlePacket ;
+			if(lr.CurrentPacket == lr.totlePacket)
+			{
+				break;
+			}
+		}
+		else
+		{
+			return 0;
+			break;
 		}
 	}
 	if(llist->size() != iTotleCount)
@@ -1344,6 +1353,130 @@ int cData::rGetOPb(const rOrgPB sValue,lUser *lPoint)
 		return -2;
 	}
 	return 1;
+}
+
+///////////////////////////////////////////////////
+int cData::PGPSDayData(const UserGps value,lOrgLineResult *lPoint)
+{
+	char pDataBuffer[11 + sizeof(UserGps)];
+	memset(pDataBuffer,0,sizeof(pDataBuffer));
+	BaseStruct bs;
+	bs.nBodyLength = sizeof(UserGps);
+	bs.nMsgNumber = GETGPSDATE_PACKET;
+	BuildDataPackShell(pDataBuffer, &bs);
+	memcpy(pDataBuffer+7,&value,sizeof(UserGps));
+
+	int iResult = cs->Write(pDataBuffer,11 + sizeof(UserGps));
+	if(iResult < iSocketState)
+	{
+		return -1;
+	}
+	int iTotleCount = 0;
+	lPoint->clear();
+	while(1)
+	{
+
+		OrgLineResults lr;
+		int it = 11 + sizeof(OrgLineResults);
+		char cTempBuf[11 + sizeof(OrgLineResults)];
+		memset(cTempBuf,0,it);
+		Sleep(2);
+		iResult = cs->Read(cTempBuf,it);
+
+		if(iResult < 1)
+		{
+			break;
+		}
+		memset(&lr,0,sizeof(lr));
+		if(DepressPacket(lr,GETGPSDATE_PACKET,cTempBuf))
+		{
+			lPoint->push_back(lr);
+			iTotleCount = lr.totlePacket ;
+		}
+	}
+	if(lPoint->size() != iTotleCount)
+	{
+		return -2;
+	}
+	return 1;
+}
+
+int cData::GetXjRymx(const ryxj1result value,lryxj1result *lPoint)
+{
+	char pDataBuffer[11 + sizeof(ryxj1result)];
+	memset(pDataBuffer,0,sizeof(pDataBuffer));
+	BaseStruct bs;
+	bs.nBodyLength = sizeof(ryxj1result);
+	bs.nMsgNumber = XJMX_PACKET;
+	BuildDataPackShell(pDataBuffer, &bs);
+	memcpy(pDataBuffer+7,&value,sizeof(ryxj1result));
+
+	int iResult = cs->Write(pDataBuffer,11 + sizeof(ryxj1result));
+	if(iResult < iSocketState)
+	{
+		return -1;
+	}
+	int iTotleCount = 0;
+	lPoint->clear();
+	while(1)
+	{
+
+		OrgLineResults lr;
+		int it = 11 + sizeof(OrgLineResults);
+		char cTempBuf[11 + sizeof(OrgLineResults)];
+		memset(cTempBuf,0,it);
+		Sleep(2);
+		iResult = cs->Read(cTempBuf,it);
+
+		if(iResult < 1)
+		{
+			break;
+		}
+		memset(&lr,0,sizeof(lr));
+		if(DepressPacket(lr,XJMX_PACKET,cTempBuf))
+		{
+			lPoint->push_back(lr);
+			iTotleCount = lr.totlePacket ;
+		}
+	}
+	if(lPoint->size() != iTotleCount)
+	{
+		return -2;
+	}
+	return 1;
+}
+
+//删除全部 解决任务下面的人员
+int cData::GetXjRymx(const jjDel value)
+{
+	char pDataBuffer[11 + sizeof(jjDel)];
+	memset(pDataBuffer,0,sizeof(pDataBuffer));
+	BaseStruct bs;
+	bs.nBodyLength = sizeof(jjDel);
+	bs.nMsgNumber = DELALLJJRY_PACKET;
+	BuildDataPackShell(pDataBuffer, &bs);
+	memcpy(pDataBuffer+7,(char *)&value,sizeof(jjDel));
+
+	int iResult = cs->Write(pDataBuffer,11 + sizeof(jjDel));
+	if(iResult < iSocketState)
+	{
+		return -1;
+	}
+
+	BaseResult lr;
+	int it = 11 + sizeof(BaseResult);
+	char cTempBuf[11 + sizeof(BaseResult)];
+	memset(cTempBuf,0,it);
+	memset(&lr,0,sizeof(lr));
+	iResult = cs->Read(cTempBuf,it);
+
+	if(iResult < 0)
+	{
+		return -1;
+	}
+	DepressPacket(lr,DELALLJJRY_PACKET	,cTempBuf);
+
+	return lr.result;
 }
 ////////////////////////////////////////////////////
 template<typename T>

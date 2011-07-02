@@ -312,7 +312,68 @@ typedef struct
 }picResult;
 typedef list <picResult> lPicList;
 typedef lPicList::iterator iterPic;
+//图像获取
+typedef struct
+{
+	char pname[30];
+}Getrealpic;
 
+typedef struct
+{
+	unsigned  int totlePacket;
+	unsigned  int CurrentPacket;
+	unsigned  int Pagesize;
+	char param [1024*3];
+}realpiclist;
+//获取某天巡检
+typedef struct
+{
+	char oper[20];
+	char time[20];
+}UserGps;
+typedef struct
+{
+	unsigned  int totlePacket;
+	unsigned  int CurrentPacket;
+	float jdu;
+	float wdu;
+	char time[20];
+}OrgLineResults;
+typedef list <OrgLineResults> lOrgLineResult;
+typedef lOrgLineResult::iterator IterOrgLineResult;
+
+/////////////////////////////
+//人员巡检
+typedef struct
+{
+	char oper[20];
+	char date[20];
+}ryxj1;
+
+typedef struct
+{
+unsigned  int totlePacket;
+unsigned  int CurrentPacket;
+unsigned  int Pointid;
+char date[20];
+char sArrtime[20];
+char realTime[20];
+char pid[20];
+unsigned  int pointstate;
+}ryxj1result;
+typedef list<ryxj1result> lryxj1result;
+typedef lryxj1result::iterator Iterryxj1result;
+
+////紧急任务人员删除
+typedef struct
+{
+	unsigned  int iOrgid;
+}jjDel;
+
+typedef struct
+{
+	unsigned  int iresult;
+}jDleRersult;
 
 //////////////////////
 //////////////////////////////////////////////////////////////////////////
@@ -358,6 +419,9 @@ typedef lPicList::iterator iterPic;
 #define GETORGLINE                      0x2d
 #define GETLINETIME                     0x2e
 #define GETORGPBSTAFF                   0x2f
+#define GETGPSDATE_PACKET               0x30
+#define DELALLJJRY_PACKET               0x31
+#define XJMX_PACKET                     0x32
 
 #define NoSocket                        0x00
 #define NoData                          0x01

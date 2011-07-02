@@ -407,14 +407,6 @@ int GetOrgLine(int aOrgID, const vector<MapPoint*>& aPointList, vector<LineInfo*
 				}
 				
 			}
-			//line->iLineKmLonLat.push_back(aPointList[0]);
-			//line->iLineKmTime.push_back(100);
-			//line->iLineKmLonLat.push_back(aPointList[1]);
-			//line->iLineKmTime.push_back(100);
-			//line->iLineKmLonLat.push_back(aPointList[2]);
-			//line->iLineKmTime.push_back(100);
-			//line->iLineKmLonLat.push_back(aPointList[3]);
-			//line->iLineKmTime.push_back(100);
 			aLineList->push_back(line);
 			//delete line;
 		}
@@ -426,12 +418,7 @@ int GetOrgLine(int aOrgID, const vector<MapPoint*>& aPointList, vector<LineInfo*
 
 int SetOrgLine( int aOrgID, int aCmd, const LineInfo* aLine )
 {
-    ///////////////////////////////////////////////////
-    //return KErrNone;
-    ///////////////////////////////////////////////////
-//#define CMD_LINE_ADD 0x33
-//#define CMD_LINE_MODIFY 0x34
-//#define CMD_LINE_DELETE 0x35
+
 	cData *cd = new cData();
 	MangLine Ml;
 	int iResult = 0;
@@ -523,34 +510,7 @@ int SetOrgLine( int aOrgID, int aCmd, const LineInfo* aLine )
 
 int GetOrgStaff(int aOrgID, vector<StaffInfo*>* aStaffList)
 {
-    ///////////////////////////////////////////////////
-    //StaffInfo* staff = new StaffInfo;
-    //staff->iID = _T("1");
-    //staff->iOrgID = aOrgID;
-    //staff->iPassword = _T("111");
-    //staff->iLoginPermission = TRUE;
-    //staff->iName = _T("张三");
-    //staff->iPermissionGroup = 0;
-    //aStaffList->push_back(staff);
 
-    //staff = new StaffInfo;
-    //staff->iID = _T("2");;
-    //staff->iOrgID = aOrgID;
-    //staff->iPassword = _T("");
-    //staff->iLoginPermission = FALSE;
-    //staff->iName = _T("李四");
-    //staff->iPermissionGroup = 1;
-    //aStaffList->push_back(staff);
-
-    //staff = new StaffInfo;
-    //staff->iID = _T("3");;
-    //staff->iOrgID = aOrgID;
-    //staff->iName = _T("王五");
-    //staff->iPassword = _T("");
-    //staff->iLoginPermission = FALSE;
-    //staff->iPermissionGroup = 2;
-    //aStaffList->push_back(staff);
-    //return KErrNone;
     ///////////////////////////////////////////////////
 	cData *cd = new cData();
 	lUser lPoint;
@@ -913,32 +873,39 @@ int GetPictureInfo( int aOrgID, time_t aStartDate, time_t aEndDate, vector<Pictu
     ///////////////////////////////////////////////////
     //return KErrNone;
     ///////////////////////////////////////////////////
-	CString sStart = Time2Strings(aStartDate);
-	CString eTimes = Time2Strings(aEndDate);
+	CString sStart = _T("2011-1-1");//Time2Strings(aStartDate);
+	CString eTimes = _T("2011-11-1");//Time2Strings(aEndDate);
 	GetPic pc;
 	memset(&pc,0,sizeof(GetPic));
 	pc.Orgid = aOrgID;
 
-	char *pTemp = (LPSTR)(LPCTSTR)sStart;
-	memcpy(&pc.stime,pTemp,sizeof(pTemp));
+	CString cTEMP = sStart;
+	char *p1 = (char*)cTEMP.GetBuffer(cTEMP.GetLength());
+	memcpy(&pc.stime,p1,cTEMP.GetLength());
+	cTEMP.ReleaseBuffer();
 
-	pTemp = (LPSTR)(LPCTSTR)eTimes;
-	memcpy(&pc.etime,pTemp,sizeof(pTemp));
-	//int GetOrgPic(GetPic const sValue,lPicList *llist);
-	lPicList *llist = NULL;
+	CString cTEMP1 = eTimes;
+	char *p2 = (char*)cTEMP1.GetBuffer(cTEMP1.GetLength());
+	memcpy(&pc.etime,p2,cTEMP1.GetLength());
+	cTEMP1.ReleaseBuffer();
+
+	lPicList llist ;
 	cData *cd = new cData();
-	cd->GetOrgPic(pc,llist);
-	for(iterPic iter = llist->begin();iter != llist->end() ;iter++)
+	if(cd->GetOrgPic(pc,&llist) != 1)
+	{
+		return 1;
+	}
+	for(iterPic iter = llist.begin();iter != llist.end() ;iter++)
 	{
 		PictureInfo *pInfo = new PictureInfo;
-		memset(pInfo,0,sizeof(PictureInfo));
+		//memset(pInfo,0,sizeof(PictureInfo));
 		pInfo->iErrorType = iter->itype ;
 		//pInfo.iPicID = iter->
 		pInfo->iPicName = iter->name;
 		pInfo->iShootingTime = iter->time;
 		aPictureList->push_back(pInfo);
 	}
-	return 1;
+	return 0;
 }
 
 int SavePictureToDirect( int aOrgID, const PictureInfo* aPicture, CString aToDirect )
@@ -996,28 +963,11 @@ CString Time2Strings(time_t sec)
 	if((year2>=0)&&(year2<=9)){
 		strYear = _T("0") + strYear;
 	}
-	//strMonth.Format("%d",month);
+
 	strMonth.Format(_T("%d"),month);
-	//if((month>=0)&&(month<=9)){
-	//	strMonth = "0" + strMonth;
-	//}
-	//strDay.Format("%d",day);
+
 	strDay.Format(_T("%d"),day);
-	//if((day>=0)&&(day<=9)){
-	//	strDay = "0"+strDay;
-	//}
-	//strHour.Format("%d",hour);
-	//if((hour>=0)&&(hour<=9)){
-	//	strHour = "0"+strHour;
-	//}
-	//strMinute.Format("%d",minute);
-	//if((minute>=0)&&(minute<=9)){
-	//	strMinute = "0"+strMinute;
-	//}
-	//strSecond.Format("%d",second);
-	//if((second>=0)&&(second<=9)){
-	//	strSecond = "0"+strSecond;
-	//}
+
 
 	CString result = strYear+"-"+strMonth+"-"+strDay;
 

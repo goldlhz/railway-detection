@@ -205,20 +205,20 @@ typedef struct
 }getorgpxlistresult;
 typedef list <getorgpxlistresult> lOrgMonth;
 typedef lOrgMonth::iterator iterOrgMonth;
-//图片信息获取
-typedef struct
-{
-	char pname[30];
-}Getrealpic;
-
-typedef struct
-{
-
-	unsigned  int totlePacket;
-	unsigned  int CurrentPacket;
-	unsigned  int Pagesize;
-	char param [1024*3];
-}realpiclist;
+////图片信息获取
+//typedef struct
+//{
+//	char pname[30];
+//}Getrealpic;
+//
+//typedef struct
+//{
+//
+//	unsigned  int totlePacket;
+//	unsigned  int CurrentPacket;
+//	unsigned  int Pagesize;
+//	char param [1024*3];
+//}realpiclist;
 ///点设置
 typedef struct
 {

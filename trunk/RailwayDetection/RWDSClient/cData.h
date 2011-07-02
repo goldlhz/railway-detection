@@ -60,6 +60,12 @@ public:
 	int rGetLineTime(const rLinePointTime sValue,lrLinePointTimeResult *llist);
 	//获取排版人员
 	int rGetOPb(const rOrgPB sValue,lUser *lPoint);
+	//获取人员的某天巡检坐标
+	int PGPSDayData(const UserGps value,lOrgLineResult *lPoint);
+	//人员寻件人员明细
+	int GetXjRymx(const ryxj1result value,lryxj1result *lPoint);
+	//删除全部 解决任务下面的人员
+	int GetXjRymx(const jjDel value);
 private:
 	CTCPClient *cs;
 	void CreateConn();
