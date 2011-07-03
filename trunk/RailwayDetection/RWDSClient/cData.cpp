@@ -6,7 +6,7 @@
 
 
 const int port = 9527 ;
-const char* destIp = "124.161.252.200\0";
+const char* destIp = "192.168.0.192\0";
 cData::cData(void)
 {
 	cs = new CTCPClient();
@@ -49,7 +49,7 @@ int cData::UserLog(char * UserName,char *UserPwd,int *Orgid,int *p1,int *p2,int 
 	{
 		return -1;
 	}
-	//LoginRerquestResult ls;
+	LoginRerquestResult ls;
 	memset(cTempBuf,0,sizeof(cTempBuf));
 	int it = 11 + sizeof(LoginRerquestResult);
 	Sleep(10);
@@ -1145,8 +1145,9 @@ int cData::GetOrgMonthPx(getorgpx const sValue,lOrgMonth *llist)
 	return 1;
 }
 
-int cData::getPic(const Getrealpic sValue)
+bool cData::getPic(const Getrealpic sValue,CString aToDirect)
 {
+	string picBuf;
 	char pDataBuffer[11 + sizeof(Getrealpic)];
 	memset(pDataBuffer,0,sizeof(pDataBuffer));
 	BaseStruct bs;
@@ -1162,11 +1163,14 @@ int cData::getPic(const Getrealpic sValue)
 	}
 	realpiclist lr;
 	int iTotleCount = 0;
-
+    picBuf = "";
+	char p[1024*100*3];
+	memset(p,0,1024*100*3);
+	int i =0;
 	while(1)
 	{
-		Sleep(WaitListDataTime);
-
+		Sleep(5);
+		string sTemp;
 		int it = 11 + sizeof(realpiclist);
 		char cTempBuf[11 + sizeof(realpiclist)];
 		memset(cTempBuf,0,it);
@@ -1180,11 +1184,31 @@ int cData::getPic(const Getrealpic sValue)
 		memset(&lr,0,sizeof(lr));
 		if(DepressPacket(lr,GETpic_PACK,cTempBuf))
 		{
-			//llist->push_back(lr);
+			memcpy(p+(i *1024),lr.param,1024);
+			i++;
+			
+			
 			iTotleCount = lr.totlePacket;
+			if(lr.CurrentPacket == lr.totlePacket)
+			{
+
+                
+                if(!PathFileExists(aToDirect))
+                {
+                    CFile logFile;
+                    logFile.Open(aToDirect, CFile::modeCreate | CFile::modeWrite);
+                    logFile.Write(p,lr.Pagesize);
+                }
+
+				break;
+			}
+		}else
+		{
+			return false;
 		}
 	}
-	return 0;
+	//sTemp = p;
+	return true;
 }
 
 int cData::setPoint(const PointMang sValue)
@@ -1401,17 +1425,17 @@ int cData::PGPSDayData(const UserGps value,lOrgLineResult *lPoint)
 	return 1;
 }
 
-int cData::GetXjRymx(const ryxj1result value,lryxj1result *lPoint)
+int cData::GetXjRymx(const ryxj1 value,lryxj1result *lPoint)
 {
-	char pDataBuffer[11 + sizeof(ryxj1result)];
+	char pDataBuffer[11 + sizeof(ryxj1)];
 	memset(pDataBuffer,0,sizeof(pDataBuffer));
 	BaseStruct bs;
-	bs.nBodyLength = sizeof(ryxj1result);
+	bs.nBodyLength = sizeof(ryxj1);
 	bs.nMsgNumber = XJMX_PACKET;
 	BuildDataPackShell(pDataBuffer, &bs);
-	memcpy(pDataBuffer+7,&value,sizeof(ryxj1result));
+	memcpy(pDataBuffer+7,&value,sizeof(ryxj1));
 
-	int iResult = cs->Write(pDataBuffer,11 + sizeof(ryxj1result));
+	int iResult = cs->Write(pDataBuffer,11 + sizeof(ryxj1));
 	if(iResult < iSocketState)
 	{
 		return -1;
@@ -1421,9 +1445,9 @@ int cData::GetXjRymx(const ryxj1result value,lryxj1result *lPoint)
 	while(1)
 	{
 
-		OrgLineResults lr;
-		int it = 11 + sizeof(OrgLineResults);
-		char cTempBuf[11 + sizeof(OrgLineResults)];
+		ryxj1result lr;
+		int it = 11 + sizeof(ryxj1result);
+		char cTempBuf[11 + sizeof(ryxj1result)];
 		memset(cTempBuf,0,it);
 		Sleep(2);
 		iResult = cs->Read(cTempBuf,it);
@@ -1435,7 +1459,7 @@ int cData::GetXjRymx(const ryxj1result value,lryxj1result *lPoint)
 		memset(&lr,0,sizeof(lr));
 		if(DepressPacket(lr,XJMX_PACKET,cTempBuf))
 		{
-			//lPoint->push_back(lr);
+			lPoint->push_back(lr);
 			iTotleCount = lr.totlePacket ;
 		}
 	}

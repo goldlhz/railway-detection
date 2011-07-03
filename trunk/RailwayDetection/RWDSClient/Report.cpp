@@ -52,11 +52,13 @@ BOOL CReport::OnInitDialog()
     CRect clientRect;
     m_ListCtrl.GetClientRect(&clientRect);
     //m_ListCtrl.InsertColumn(0, _T("员工号"), LVCFMT_LEFT, clientRect.Width()/4);
-    m_ListCtrl.InsertColumn(0, _T("日期"), LVCFMT_LEFT, clientRect.Width()/5);
-    m_ListCtrl.InsertColumn(1, _T("姓名"), LVCFMT_LEFT, clientRect.Width()/5);
-    m_ListCtrl.InsertColumn(2, _T("计划记录"), LVCFMT_LEFT, clientRect.Width()/5);
-    m_ListCtrl.InsertColumn(3, _T("实际记录"), LVCFMT_LEFT, clientRect.Width()/5);
-    m_ListCtrl.InsertColumn(4, _T("异常次数"), LVCFMT_LEFT, clientRect.Width()/5);
+    m_ListCtrl.InsertColumn(0, _T("日期"), LVCFMT_LEFT, clientRect.Width()/7);
+    m_ListCtrl.InsertColumn(1, _T("星期"), LVCFMT_LEFT, clientRect.Width()/7);
+    m_ListCtrl.InsertColumn(2, _T("姓名"), LVCFMT_LEFT, clientRect.Width()/7);
+    m_ListCtrl.InsertColumn(3, _T("计划记录"), LVCFMT_LEFT, clientRect.Width()/7);
+    m_ListCtrl.InsertColumn(4, _T("实际记录"), LVCFMT_LEFT, clientRect.Width()/7);
+    m_ListCtrl.InsertColumn(5, _T("异常次数"), LVCFMT_LEFT, clientRect.Width()/7);
+    m_ListCtrl.InsertColumn(6, _T("异常次数"), LVCFMT_LEFT, clientRect.Width()/7);
 
     m_ComboReportMonth.AddString(_T("1月"));
     m_ComboReportMonth.AddString(_T("2月"));
@@ -86,7 +88,7 @@ void CReport::OnBnClickedBtnSearchreport()
     }
     DeleteReportListElement(&m_RWDSClientView->m_CurrentOrg->iReportInfo);
 
-    int err = GetReportInfoList(m_RWDSClientView->m_CurrentOrg->iOrgID, month, &m_RWDSClientView->m_CurrentOrg->iReportInfo);
+    int err = GetReportInfoList(m_RWDSClientView->m_CurrentOrg->iOrgID, 2011, month, &m_RWDSClientView->m_CurrentOrg->iReportInfo);
     if (err == KErrNone)
     {
         m_ListCtrl.DeleteAllItems();
