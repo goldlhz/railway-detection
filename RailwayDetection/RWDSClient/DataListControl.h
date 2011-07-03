@@ -12,12 +12,12 @@
     CFile logFile;\
     if(!PathFileExists(_T("log.txt")))\
     {\
-    logFile.Open(_T("log.txt"), CFile::modeCreate | CFile::modeWrite);\
+        logFile.Open(_T("log.txt"), CFile::modeCreate | CFile::modeWrite);\
     }\
     else\
     {\
-    logFile.Open(_T("log.txt"), CFile::modeWrite);\
-    logFile.SeekToEnd();\
+        logFile.Open(_T("log.txt"), CFile::modeWrite);\
+        logFile.SeekToEnd();\
     }\
     logFile.Write(a, strlen(a));\
     logFile.Write(_T("\r\n"), 2);\

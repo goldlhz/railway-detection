@@ -51,7 +51,7 @@ public:
 	//获取机构月度报表
 	int GetOrgMonthPx(getorgpx const sValue,lOrgMonth *llist);
 	//获取图片
-	int getPic(const Getrealpic sValue);
+	bool getPic(const Getrealpic sValue,CString aToDirect);
 	//点设置
 	int setPoint(const PointMang sValue);
 	//获取机构下属线
@@ -63,14 +63,14 @@ public:
 	//获取人员的某天巡检坐标
 	int PGPSDayData(const UserGps value,lOrgLineResult *lPoint);
 	//人员寻件人员明细
-	int GetXjRymx(const ryxj1result value,lryxj1result *lPoint);
+	int GetXjRymx(const ryxj1 value,lryxj1result *lPoint);
 	//删除全部 解决任务下面的人员
 	int GetXjRymx(const jjDel value);
 private:
 	CTCPClient *cs;
 	void CreateConn();
 	void CloseConn();
-	void WriteBug(const char *buf,const int iLength) const;
+	void WriteBug(const char const *buf,const int iLength) const;
 	void readBug(char  *buf, int* iLength) ;
 	int iSocketState;
 

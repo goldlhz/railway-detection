@@ -4,15 +4,18 @@
 #include "CmdDefine.h"
 #include "cData.h"
 
+#define TESTCODE
 
 int VerifyLogin( CString& aLoginAccount, CString& aLoginPassword, int* orgID, Permission *pPower)
 {
     ///////////////////////////////////////////////////
+#ifdef TESTCODE
     *orgID = 1;
     pPower->iBasical = 1;
     pPower->iOperate = 1;
     pPower->iReportForm = 1;
     return KErrNone;
+#endif
     ///////////////////////////////////////////////////
     cData *cd = new cData();
 	char  *UserName = (LPSTR)(LPCTSTR)aLoginAccount; 
@@ -37,6 +40,7 @@ int VerifyLogin( CString& aLoginAccount, CString& aLoginPassword, int* orgID, Pe
 int GetOrgTree(const int& OrgId, vector<OrganizationInfo*>* a_OrgTree)
 {
     ///////////////////////////////////////////////////
+    #ifdef TESTCODE
     OrganizationInfo* org = new OrganizationInfo;
     org->iOrgName = _T("Admin");
     org->iParentOrg = NULL;
@@ -67,6 +71,7 @@ int GetOrgTree(const int& OrgId, vector<OrganizationInfo*>* a_OrgTree)
     org->iChildID.push_back(5);
     a_OrgTree->push_back(org);
     return KErrNone;
+#endif
     ///////////////////////////////////////////////////
 	
 	cData *cd = new cData();
@@ -210,6 +215,7 @@ int SetOrganization(int aCmd, const OrganizationInfo* aOrganization )
 int GetOrgPoint(int aOrgID, vector<MapPoint*>* aPointList)
 {
     ///////////////////////////////////////////////////
+    #ifdef TESTCODE
     MapPoint *pt = new MapPoint;
     pt->iRailLine = Chengdu_Chongqing; 
     pt->iKM = 251;
@@ -242,6 +248,7 @@ int GetOrgPoint(int aOrgID, vector<MapPoint*>* aPointList)
     pt->iDirect = KUpLine;
     aPointList->push_back(pt);
     return KErrNone;
+#endif
     ///////////////////////////////////////////////////
 
 	cData *cd = new cData();
@@ -277,7 +284,9 @@ int GetOrgPoint(int aOrgID, vector<MapPoint*>* aPointList)
 int SetOrgPoint( int aOrgID, int aCmd, const MapPoint* aPoint )
 {
     ///////////////////////////////////////////////////
+#ifdef TESTCODE
     return KErrNone;
+#endif
     ///////////////////////////////////////////////////
     cData *cd = new cData();
 	int iResult = 0;
@@ -328,6 +337,7 @@ int SetOrgPoint( int aOrgID, int aCmd, const MapPoint* aPoint )
 int GetOrgLine(int aOrgID, const vector<MapPoint*>& aPointList, vector<LineInfo*>* aLineList)
 {
     ///////////////////////////////////////////////////
+#ifdef TESTCODE
     LineInfo *line = new LineInfo;
     line->iLineID = 1;
     line->iLineName = _T("成局1段");
@@ -354,6 +364,7 @@ int GetOrgLine(int aOrgID, const vector<MapPoint*>& aPointList, vector<LineInfo*
     line->iLineKmTime.push_back(0);
     aLineList->push_back(line);
     return KErrNone;
+#endif
     ///////////////////////////////////////////////////
     aLineList->clear();
 	lallOrgLine llist ;
@@ -419,7 +430,9 @@ int GetOrgLine(int aOrgID, const vector<MapPoint*>& aPointList, vector<LineInfo*
 int SetOrgLine( int aOrgID, int aCmd, const LineInfo* aLine )
 {
     ///////////////////////////////////////////////////
+#ifdef TESTCODE
     return KErrNone;
+#endif
     ///////////////////////////////////////////////////
 //#define CMD_LINE_ADD 0x33
 //#define CMD_LINE_MODIFY 0x34
@@ -516,6 +529,7 @@ int SetOrgLine( int aOrgID, int aCmd, const LineInfo* aLine )
 int GetOrgStaff(int aOrgID, vector<StaffInfo*>* aStaffList)
 {
     ///////////////////////////////////////////////////
+#ifdef TESTCODE
     StaffInfo* staff = new StaffInfo;
     staff->iID = _T("1");
     staff->iOrgID = aOrgID;
@@ -543,6 +557,7 @@ int GetOrgStaff(int aOrgID, vector<StaffInfo*>* aStaffList)
     staff->iPermissionGroup = 2;
     aStaffList->push_back(staff);
     return KErrNone;
+#endif
     ///////////////////////////////////////////////////
 	cData *cd = new cData();
 	lUser lPoint;
@@ -570,7 +585,9 @@ int GetOrgStaff(int aOrgID, vector<StaffInfo*>* aStaffList)
 int SetOrgStaff( int aOrgID, int aCmd, const StaffInfo* aStaff )
 {
     ///////////////////////////////////////////////////
+#ifdef TESTCODE
     return KErrNone;
+#endif
     ///////////////////////////////////////////////////
    // aStaff->
 	/*
@@ -675,11 +692,13 @@ int SetOrgStaff( int aOrgID, int aCmd, const StaffInfo* aStaff )
 int GetCalendarSchedule(int aOrgID, const vector<StaffInfo*>* ListStaff, CalendarSchedule* aSchedule)
 {
     ///////////////////////////////////////////////////
+#ifdef TESTCODE
     aSchedule->iCaledarID = 1;
     aSchedule->iOrgID = aOrgID;
     aSchedule->iStartDay = 1288915200;
     aSchedule->iPeriods = 3;
 	return KErrNone;
+#endif
     ///////////////////////////////////////////////////
 	cData *cd = new cData();
 	OrgPxInfo oInfo ;
@@ -727,7 +746,9 @@ int GetCalendarSchedule(int aOrgID, const vector<StaffInfo*>* ListStaff, Calenda
 int SetCalendarSchedule(int aOrgID, const CalendarSchedule* aSchedule/*, const <StaffInfo*>*ListStaff*/)
 {
     ///////////////////////////////////////////////////
+#ifdef TESTCODE
 	 return KErrNone;
+#endif
     ///////////////////////////////////////////////////
 	cData *cd = new cData();
 	pb *p = new pb();
@@ -780,10 +801,17 @@ int SetEmergencyTask( int aOrgID, int aCmd, const EmergencyTaskInfo* aEmergencyT
 	return KErrNone;
 }
 
+int GetEmergencyCount( int aTaskID, vector<EmergencyCount*>* aEmergencyStaff )
+{
+    return KErrNone;
+}
+
 int GetOrgDevice( int aOrgID, vector<DeviceInfo*>* aDeviceList )
 {
     ///////////////////////////////////////////////////
+#ifdef TESTCODE
     return KErrNone;
+#endif
     ///////////////////////////////////////////////////
 	cData *cd = new cData();
 	//if(cd->iSocketState < 0)
@@ -817,7 +845,9 @@ int GetOrgDevice( int aOrgID, vector<DeviceInfo*>* aDeviceList )
 int SetOrgDevice( int aOrgID, int aCmd, const DeviceInfo* aDeviceList )
 {
     ///////////////////////////////////////////////////
+#ifdef TESTCODE
     return KErrNone;
+#endif
     ///////////////////////////////////////////////////
 //#define CMD_DEVICE_ADD 0x40
 //#define CMD_DEVICE_MODIFY 0x41
@@ -879,34 +909,61 @@ int SetOrgDevice( int aOrgID, int aCmd, const DeviceInfo* aDeviceList )
 	
 }
 
-int GetStaffCurrentTrack(time_t aDate, RecordStaff* aStaff)
+//int GetStaffCurrentTrack(time_t aDate, RecordStaff* aStaff)
+//{
+//    //Get the data by aStaff->iStaff->iID
+//
+//    aStaff->iRecordLon.push_back(104.064631);
+//    aStaff->iRecordLat.push_back(30.698965);
+//
+//    aStaff->iRecordLon.push_back(104.075630);
+//    aStaff->iRecordLat.push_back(30.699584);
+//
+//    aStaff->iRecordLon.push_back(104.086426);
+//    aStaff->iRecordLat.push_back(30.699584);
+//
+//    return KErrNone;
+//}
+
+
+int GetOrgMonthPx(GetOrgPxEx const sValue,vector<getorgpxlistresultEx*> *Value)
 {
-    //Get the data by aStaff->iStaff->iID
+	cData *cd = new cData();
+//int cData::GetOrgMonthPx(getorgpx const sValue,lOrgMonth *llist)
+//{
+	getorgpx sValues;
+	lOrgMonth llist;
 
-    aStaff->iRecordLon.push_back(104.064631);
-    aStaff->iRecordLat.push_back(30.698965);
-
-    aStaff->iRecordLon.push_back(104.075630);
-    aStaff->iRecordLat.push_back(30.699584);
-
-    aStaff->iRecordLon.push_back(104.086426);
-    aStaff->iRecordLat.push_back(30.699584);
-
-    return KErrNone;
-}
-
-int GetStaffScheduleTrack(int aStaffID, time_t aDate, vector<double>* aRecordLon, vector<double>* aRecordLat )
-{
-    return KErrNone;
+	sValues.months = sValue.months;
+	sValues.orgid = sValue.orgid;
+	sValues.yesrs = sValue.yesrs;
+	if(cd->GetOrgMonthPx(sValues,&llist) == 1)
+	{
+		for (iterOrgMonth iter = llist.begin() ; iter != llist.end();iter++)
+		{
+            getorgpxlistresultEx *ex = new getorgpxlistresultEx();
+            ex->dates = iter->dates;
+            ex->xj = iter->xj;
+            ex->sGetPoint = iter->sGetPoint;
+            ex->sTotlePoint =  iter->sTotlePoint;
+            ex->cPoint =  iter->cPoint;
+            ex->lPoint =  iter->lPoint;
+            ex->userid =  iter->userid;
+            Value->push_back(ex);
+		}
+	}
+	return 0;
 }
 
 int GetPictureInfo( int aOrgID, time_t aStartDate, time_t aEndDate, vector<PictureInfo*>* aPictureList )
 {
     ///////////////////////////////////////////////////
+#ifdef TESTCODE
     return KErrNone;
+#endif
     ///////////////////////////////////////////////////
-	CString sStart = _T("2011-1-1");//Time2Strings(aStartDate);
-	CString eTimes = _T("2011-11-1");//Time2Strings(aEndDate);
+	CString sStart = Time2Strings(aStartDate);//_T("2011-1-1");//
+	CString eTimes = Time2Strings(aEndDate);//_T("2011-11-1");//
 	GetPic pc;
 	memset(&pc,0,sizeof(GetPic));
 	pc.Orgid = aOrgID;
@@ -935,20 +992,75 @@ int GetPictureInfo( int aOrgID, time_t aStartDate, time_t aEndDate, vector<Pictu
 		//pInfo.iPicID = iter->
 		pInfo->iPicName = iter->name;
 		pInfo->iShootingTime = iter->time;
+		pInfo->iErrorType =	iter->itype;
 		aPictureList->push_back(pInfo);
 	}
 	return 0;
 }
 
+int GetOrgXl()
+{
+	//int cData::GetXjRymx(const ryxj1 value,lryxj1result *lPoint)
+	ryxj1 user;
+	memset(&user,0,sizeof(UserGps));
+	strcpy(user.oper,"1234");
+	strcpy(user.date,"2011-1-1");
+	cData *cd = new cData();
+	lryxj1result lPoint;
+	cd->GetXjRymx(user,&lPoint);
+	return 1;
+}
+//
+int GetOrgMonthxl()
+{
+	//int PGPSDayData(const UserGps value,lOrgLineResult *lPoint);
+	UserGps user;
+	memset(&user,0,sizeof(UserGps));
+	strcpy(user.oper,"jiaoxc");
+	strcpy(user.time,"2011-6-26");
+	cData *cd = new cData();
+	lOrgLineResult lPoint;
+	cd->PGPSDayData(user,&lPoint);;
+	return 1;
+}
+
 int SavePictureToDirect( int aOrgID, const PictureInfo* aPicture, CString aToDirect )
 {
+    //bool cData::getPic(const Getrealpic sValue,CString aToDirect)
+    Getrealpic cs;
+
+    memset(&cs,0,sizeof(Getrealpic));
+ //   strcpy(cs.pname,"20110702170018677.jpg");
+    
+    CString cTEMP1 = aPicture->iPicName;
+    char *p2 = (char*)cTEMP1.GetBuffer(cTEMP1.GetLength());
+    memcpy(&cs.pname,p2,cTEMP1.GetLength());
+    cTEMP1.ReleaseBuffer();
+
+cData *cd = new cData();
+
+
+cd->getPic((const Getrealpic)cs,aToDirect);
+return KErrNone;
+
+}
+
+int GetStaffScheduleTrack(CString aStaffID, time_t aDate, RecordStaff* aRecord )
+{//流水
+    aRecord->iStaffID = aStaffID;
+    //aRecord->
     return KErrNone;
 }
 
+int GetReportDetail(CString aStaffID, CString aTime, ReportDetail* aReportList)
+{//明细
+    return KErrNone;
+}
 
-int GetReportInfoList( int aOrgID, int aMonth, vector<ReportInfo*>* aReportList )
-{
+int GetReportInfoList( int aOrgID, int aYear, int aMonth, vector<ReportInfo*>* aReportList )
+{//月报表
     /////////////////////////////////////////////////////
+#ifdef TESTCODE
     ReportInfo* report = new ReportInfo;
     report->iOrgID = aOrgID;
     report->iStaffName = _T("Admin");
@@ -968,8 +1080,9 @@ int GetReportInfoList( int aOrgID, int aMonth, vector<ReportInfo*>* aReportList 
     aReportList->push_back(report);
 
     return KErrNone;
+#endif
     /////////////////////////////////////////////////////
-
+    return KErrNone;
 }
 
 time_t Time2Strings1(CString sec)

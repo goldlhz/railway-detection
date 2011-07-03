@@ -31,22 +31,35 @@ int SetCalendarSchedule(int aOrgID, const CalendarSchedule* aSchedule);
 //获取/设置紧急任务
 int GetEmergencyTask(int aOrgID, vector<EmergencyTaskInfo*>* aEmergency);
 int SetEmergencyTask(int aOrgID, int aCmd, const EmergencyTaskInfo* aEmergencyTask);
+
+//统计紧急任务
+int GetEmergencyCount(int aTaskID, vector<EmergencyCount*>* aEmergencyStaff);
+
 //获取紧急任务人员列表
 //获取/设置设备
 int GetOrgDevice(int aOrgID, vector<DeviceInfo*>* aDeviceList);
 int SetOrgDevice(int aOrgID, int aCmd, const DeviceInfo* aDeviceList);
 
-//获取员工巡查记录
-int GetStaffCurrentTrack(time_t aDate, RecordStaff* aStaff);
+////获取员工巡查记录
+//int GetStaffCurrentTrack(time_t aDate, RecordStaff* aStaff);
 
-//获取员工预设巡查路线
-int GetStaffScheduleTrack(int aStaffID, time_t aDate, vector<double>* aRecordLon, vector<double>* aRecordLat);
+
 //获取图片信息
 int GetPictureInfo(int aOrgID, time_t aStartDate, time_t aEndDate, vector<PictureInfo*>* aPictureList);
 int SavePictureToDirect(int aOrgID, const PictureInfo* aPicture, CString aToDirect);
 
+//获取员工巡查流水
+int GetStaffScheduleTrack(CString aStaffID, time_t aDate, RecordStaff* aRecord );
 //获取机构月报表
-int GetReportInfoList(int aOrgID, int aMonth, vector<ReportInfo*>* aReportList);
+int GetReportInfoList(int aOrgID, int aYear, int aMonth, vector<ReportInfo*>* aReportList);
+//获取日明细
+int GetReportDetail(CString aStaffID, CString aTime, ReportDetail* aReportList);
+
+
+int GetOrgMonthPx(GetOrgPxEx const sValue,vector<getorgpxlistresultEx*> *Value);
+int GetOrgMonthxl();
+int Getryxjmx();
+int GetOrgXl();
 
 CString Time2Strings(time_t sec);
 time_t Time2Strings1(CString sec);

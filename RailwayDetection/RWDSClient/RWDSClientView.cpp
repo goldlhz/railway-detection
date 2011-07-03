@@ -862,15 +862,15 @@ void CRWDSClientView::OnReviewRecordstaff()
             m_StaffRecord = new RecordStaff;
         }
         int recordSelect = rstaff.GetSelect();
-        m_StaffRecord->iStaff = m_CurrentOrg->iStaff[recordSelect];
+       // m_StaffRecord->iStaff = m_CurrentOrg->iStaff[recordSelect];
 
         //获取员工巡查记录
-        GetStaffCurrentTrack(rstaff.GetPickDateTime(), m_StaffRecord);
-        vector<double> recordLon;
-        vector<double> recordLat;
-        GetStaffScheduleTrack(_ttoi(m_StaffRecord->iStaff->iID), rstaff.GetPickDateTime(), 
-            &recordLon, &recordLat);
-
+        //GetStaffCurrentTrack(rstaff.GetPickDateTime(), m_StaffRecord);
+        //vector<double> recordLon;
+        //vector<double> recordLat;
+        //GetStaffScheduleTrack(_ttoi(m_CurrentOrg->iStaff[recordSelect]->iID), rstaff.GetPickDateTime(), 
+        //    &recordLon, &recordLat);
+        //GetStaffScheduleTrack()
         MapxCleanAllFeature(m_SymbolLayer);
         MapxCleanAllFeature(m_TrackLayer);
 
@@ -906,9 +906,9 @@ void CRWDSClientView::OnReviewRecordstaff()
         m_MapX.SetCenterY(centerY);
         m_MapX.SetZoom(m_InitZoom/256);
         CMainFrame* mainFrame = (CMainFrame *)GetParentFrame();
-        CString str;
-        str = m_StaffRecord->iStaff->iName + _T("巡查记录");
-        mainFrame->m_wndStatusBar.SetPaneText(mainFrame->m_wndStatusBar.CommandToIndex(ID_RECORD), str);
+        //CString str;
+        //str = m_StaffRecord->iStaff->iName + _T("巡查记录");
+        //mainFrame->m_wndStatusBar.SetPaneText(mainFrame->m_wndStatusBar.CommandToIndex(ID_RECORD), str);
     }
 }
 

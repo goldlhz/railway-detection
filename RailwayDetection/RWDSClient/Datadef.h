@@ -83,6 +83,11 @@ enum PictureErrorType
     KUnkownType = 0
 };
 
+enum PointState
+{
+    KPointNormal = 0
+};
+
 typedef struct _Single
 {
     _Single()
@@ -201,8 +206,43 @@ typedef struct _Emergency
     time_t iEndTime;//终点处时间
     EmergencyStatus iStatus;//0正常，1结束
     CString iEmergencyRemark;
+    vector<int> iStaffOrgID;
+    vector<CString> iStaffID;
+    vector<CString> iStaffName;
     vector<StaffInfo*> iAppointStaff;
 }EmergencyTaskInfo;
+
+typedef struct _EmergencyCount//紧急任务的统计信息
+{
+    int iTaskID;//
+    int iStaffOrgID;
+    CString iStaffID;
+    CString iStaffName;
+    unsigned int iTotalTime;
+    double iTotalKM;
+}EmergencyCount;
+
+typedef struct _RecordStaff//员工所巡查流水
+{
+    _RecordStaff()
+    {
+        //iStaff = NULL;
+    }
+    //StaffInfo* iStaff;
+    //vector<double>
+    CString iStaffID;
+    vector<double> iRecordLon;
+    vector<double> iRecordLat;
+    vector<CString> iArrivedTime;
+}RecordStaff;
+
+typedef struct _ReportDetail//日明细
+{
+    CString iDay;
+    vector<CString> iPlanArrivedTime;
+    vector<CString> iActualArrivedTime;
+    vector<PointState> iState;
+}ReportDetail;
 
 typedef struct _ReportInfo//机构月报表
 {
@@ -212,6 +252,7 @@ typedef struct _ReportInfo//机构月报表
     int iPlanArrived;//计划到达数
     int iActualArrived;//实际到达数
     int iAbnormal;//异常数
+    int iUnArrived;//未到达
 }ReportInfo;
 
 typedef struct _OrgObj	//机构
@@ -253,22 +294,34 @@ typedef struct _OrgObj	//机构
 }OrganizationInfo;
 
 
-typedef struct _RecordStaff//员工所巡查记录
-{
-    _RecordStaff()
-    {
-    iStaff = NULL;
-    }
-    StaffInfo* iStaff;
-    vector<double> iRecordLon;
-    vector<double> iRecordLat;
-}RecordStaff;
+
 
 typedef struct _PictureInfo//图片信息
 {
-	int iPicID;
+	unsigned int iPicID;
 	CString iPicName;
 	CString iShootingTime;
-	int iErrorType;
+	unsigned int iErrorType;
 }PictureInfo;
 
+
+///机构月报表
+typedef struct
+{
+	unsigned  int orgid;
+	unsigned  int yesrs;
+	unsigned  int months;
+}GetOrgPxEx;
+
+typedef struct
+{
+	CString userid;
+	CString dates;
+	CString xj;
+	unsigned  int sTotlePoint;//总点数
+	unsigned  int sGetPoint;//到达点数 正常
+	unsigned  int cPoint;//未正常到达点
+	unsigned  int lPoint;//没有达到点
+}getorgpxlistresultEx;
+//typedef vector <getorgpxlistresult> lOrgMonth;
+//typedef lOrgMonth::iterator iterOrgMonth;

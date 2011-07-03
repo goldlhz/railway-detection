@@ -10,11 +10,11 @@ struct Pack_Shell_Type
 };// 数据区		依赖消息的不同数据内容
 
 
-typedef struct 
+typedef struct BaseStruct
 {
 	unsigned char  nMsgNumber;	
 	unsigned int   nBodyLength;
-}BaseStruct;
+};
 
 typedef struct
 {
@@ -307,7 +307,7 @@ typedef struct
 	unsigned  int CurrentPacket;
 	char  name[30];
 	char time[20];
-	int itype;
+	unsigned int itype;
 	char tel[20];
 }picResult;
 typedef list <picResult> lPicList;
@@ -323,7 +323,7 @@ typedef struct
 	unsigned  int totlePacket;
 	unsigned  int CurrentPacket;
 	unsigned  int Pagesize;
-	char param [1024*3];
+	char param [1024];
 }realpiclist;
 //获取某天巡检
 typedef struct
@@ -427,6 +427,6 @@ typedef struct
 #define NoData                          0x01
 #define ErrSocket                       -1
 #define ErrListCount                    -2
-#define WaitListDataTime                0x03
+#define WaitListDataTime                0x02
 #define ResultIsOk                      0x01
 #endif
