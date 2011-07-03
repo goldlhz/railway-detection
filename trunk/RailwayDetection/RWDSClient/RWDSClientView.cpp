@@ -27,6 +27,9 @@
 #include "PitureReview.h"
 #include "ErrorDefine.h"
 #include "VoiceList.h"
+#include "Report.h"
+#include "DataListControl.h"
+#include "PermissionGroup.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -82,6 +85,8 @@ BEGIN_MESSAGE_MAP(CRWDSClientView, CView)
     ON_UPDATE_COMMAND_UI(ID_SET_DEVICE, &CRWDSClientView::OnUpdateSetDevice)
     ON_COMMAND(ID_REVIEW_PICTURE, &CRWDSClientView::OnReviewPicture)
 	ON_COMMAND(ID_REVIEW_VOICE, &CRWDSClientView::OnReviewVoice)
+    ON_COMMAND(ID_REPORT_MONTH, &CRWDSClientView::OnReportMonth)
+    ON_COMMAND(ID_SET_PERMISSIONGROUP, &CRWDSClientView::OnSetPermissiongroup)
 END_MESSAGE_MAP()
 
 BEGIN_EVENTSINK_MAP(CRWDSClientView, CView)
@@ -108,6 +113,8 @@ CRWDSClientView::CRWDSClientView()
     //m_Calendar->iScheduleLine = &m_Line;
     m_MapLoaded = TRUE;
     m_CurrentOrg = NULL;
+    m_ReportForm = NULL;
+    m_OpenReportForm = FALSE;
 }
 
 CRWDSClientView::~CRWDSClientView()
@@ -203,8 +210,11 @@ CRWDSClientDoc* CRWDSClientView::GetDocument() const // 非调试版本是内联的
 
 int CRWDSClientView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
+    PRINTTRACE(_T("123"));
 	if (CView::OnCreate(lpCreateStruct) == -1)
 		return -1;
+
+    PRINTTRACE(_T("456"));
 	gClientView = this;
 	// TODO:  在此添加您专用的创建代码
 	CString strLic = _T("uQnZi2sFw22L0-MRa8pYX-2E6P1077-3N6M0499-5C038223-10884-12802-36882-8029");
@@ -214,6 +224,7 @@ int CRWDSClientView::OnCreate(LPCREATESTRUCT lpCreateStruct)
         m_MapLoaded = FALSE;
 		//return -1;
 	}
+    PRINTTRACE(_T("789"));
 	::SysFreeString(bstrLic); 
 	//if(!m_MapX.Create(NULL, WS_VISIBLE, CRect(0,0,100,100), this, IDC_MAP))
 	//{
@@ -221,6 +232,7 @@ int CRWDSClientView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	//}
     if (m_MapLoaded)
     {
+        PRINTTRACE(_T("111111"));
 	    try 
         {	
             //CString curDir;
@@ -289,17 +301,19 @@ int CRWDSClientView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	    }
 	    catch (COleDispatchException *e) 
 	    {
+            PRINTTRACE(_T("aaaa"));
 		    e->ReportError();
 		    e->Delete();
 	    } 
 	    catch (COleException *e)
 	    {
+            PRINTTRACE(_T("bbbbbbb"));
 		    e->ReportError();
 		    e->Delete();
 	    }
         m_MapX.SetRedrawInterval(2000);
     }
-	
+	PRINTTRACE(_T("ccccccccc"));
 	m_FileView = &((CMainFrame *)AfxGetApp()->m_pMainWnd)->GetFileView();
 	//m_FileView->SetRWDSClientView(this);
 	//m_FileView->FillFileView();
@@ -1138,7 +1152,12 @@ void CRWDSClientView::OnResetOrg()
     // TODO: 在此添加命令处理程序代码
     CMainFrame* pMain=static_cast<CMainFrame*>(AfxGetApp()->m_pMainWnd);
     pMain->m_wndFileView.TreeVisitForDeleteItemData(pMain->m_wndFileView.m_wndFileView.GetRootItem());
+    //清空树形结构
     pMain->m_wndFileView.CleanFileView();
+    //重新获取机构
+    //m_Org.clear();
+    DeleteOrgListElement(&m_Org);
+    GetOrgTree(theApp.m_LoginOrgID, &m_Org);
     pMain->m_wndFileView.FillFileView();
     m_CurrentOrg = NULL;
 }
@@ -1160,4 +1179,42 @@ void CRWDSClientView::OnReviewVoice()
 	// TODO: 在此添加命令处理程序代码
 	CVoiceList voice;
 	voice.DoModal();
+}
+
+
+void CRWDSClientView::OnReportMonth()
+{
+    // TODO: 在此添加命令处理程序代码
+    if (!m_CurrentOrg)
+    {
+        return;
+    }
+    if (!m_OpenReportForm)
+    {
+        m_ReportForm = new CReport(this);
+        m_ReportForm->Create(IDD_REVIEWREPORT);
+        m_ReportForm->ShowWindow(SW_SHOW); 
+        m_OpenReportForm = TRUE;
+    }
+}
+
+void CRWDSClientView::DestroyReportForm()
+{
+    if (m_OpenReportForm)
+    {
+        m_OpenReportForm = FALSE;
+        delete m_ReportForm;
+    }
+}
+
+
+void CRWDSClientView::OnSetPermissiongroup()
+{
+    // TODO: 在此添加命令处理程序代码
+    if (!m_CurrentOrg)
+    {
+        return;
+    }
+    CPermissionGroup pGroup(this);
+    pGroup.DoModal();
 }

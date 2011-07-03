@@ -28,6 +28,7 @@ class CRWDSClientView : public CView
     friend class COrgList;
     friend class CDeviceList;
     friend class CPitureReview;
+    friend class CReport;
 protected: // 仅从序列化创建
 	CRWDSClientView();
 	DECLARE_DYNCREATE(CRWDSClientView)
@@ -68,6 +69,7 @@ public:
 	void MapxDrawLine(double aMapLon1, double aMapLat1, double aMapLon2, double aMapLat2, ColorConstants aColor = miColorBlue);
 	void MapxSetText(double aMapLon, double aMapLat, CString aText);
 	void MapxCleanAllFeature(CString aLayerName);
+    void DestroyReportForm();
 protected:
     Permission m_CurrentPermission;
 	bool m_SymbolMove;
@@ -83,6 +85,8 @@ protected:
 	CPoint  m_RightClkPoint;
 
 	vector<OrganizationInfo*> m_Org;
+    CReport* m_ReportForm;//月报表
+    BOOL m_OpenReportForm;//打开月报表界面
 
     RecordStaff* m_StaffRecord;//查看人员巡查记录
 	CFileView* m_FileView;
@@ -139,6 +143,8 @@ public:
     afx_msg void OnReviewPicture();
 
 	afx_msg void OnReviewVoice();
+    afx_msg void OnReportMonth();
+    afx_msg void OnSetPermissiongroup();
 };
 extern CRWDSClientView* gClientView;
 

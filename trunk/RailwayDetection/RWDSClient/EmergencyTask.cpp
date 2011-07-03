@@ -158,15 +158,15 @@ void CEmergencyTask::OnLvnItemchangedEmergencylist(NMHDR *pNMHDR, LRESULT *pResu
     CString strBeginMin;
     CString strEndHour;
     CString strEndMin;
-    struct tm* beginTime = NULL;
-    localtime_s(beginTime, &task->iBeginTime);
-    strBeginHour.Format(_T("%02d"), beginTime->tm_hour);
-    strBeginMin.Format(_T("%02d"), beginTime->tm_min);
+    struct tm beginTime;
+    localtime_s(&beginTime, &task->iBeginTime);
+    strBeginHour.Format(_T("%02d"), beginTime.tm_hour);
+    strBeginMin.Format(_T("%02d"), beginTime.tm_min);
 
-    struct tm* endTime = NULL;
-    localtime_s(endTime, &task->iEndTime);
-    strEndHour.Format(_T("%02d"), endTime->tm_hour);
-    strEndMin.Format(_T("%02d"), endTime->tm_min);
+    struct tm endTime;
+    localtime_s(&endTime, &task->iEndTime);
+    strEndHour.Format(_T("%02d"), endTime.tm_hour);
+    strEndMin.Format(_T("%02d"), endTime.tm_min);
 
     GetDlgItem(IDC_EDIT_STARTHOUR)->SetWindowText(strBeginHour);
     GetDlgItem(IDC_EDIT_STARTMINUTE)->SetWindowText(strBeginMin);
@@ -187,7 +187,6 @@ void CEmergencyTask::OnLvnItemchangedEmergencylist(NMHDR *pNMHDR, LRESULT *pResu
             m_Combo_EndKM.SetCurSel(i);
         }
     }
-
     *pResult = 0;
 }
 
@@ -283,17 +282,17 @@ void CEmergencyTask::OnBnClickedBtnEmergencymodify()
     GetDlgItem(IDC_EDIT_ENDHOUR)->GetWindowText(strEndHour);
     GetDlgItem(IDC_EDIT_ENDMINUTE)->GetWindowText(strEndMin);
 
-    struct tm* beginTime = NULL;
-    localtime_s(beginTime, &task->iBeginTime);
-    beginTime->tm_hour = _ttoi(strBeginHour);
-    beginTime->tm_min = _ttoi(strBeginMin);
-    task->iBeginTime = mktime(beginTime);
+    struct tm beginTime;
+    localtime_s(&beginTime, &task->iBeginTime);
+    beginTime.tm_hour = _ttoi(strBeginHour);
+    beginTime.tm_min = _ttoi(strBeginMin);
+    task->iBeginTime = mktime(&beginTime);
 
-    struct tm* endTime = NULL;
-    localtime_s(endTime, &task->iEndTime);
-    endTime->tm_hour = _ttoi(strEndHour);
-    endTime->tm_min = _ttoi(strEndMin);
-    task->iEndTime = mktime(endTime);
+    struct tm endTime;
+    localtime_s(&endTime, &task->iEndTime);
+    endTime.tm_hour = _ttoi(strEndHour);
+    endTime.tm_min = _ttoi(strEndMin);
+    task->iEndTime = mktime(&endTime);
 
     SetEmergencyTask(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_EMERGENCY_MODIFY, task);
     AfxMessageBox(_T("ÐÞ¸Ä³É¹¦"), MB_OK);

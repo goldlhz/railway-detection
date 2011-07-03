@@ -131,6 +131,7 @@
     <ClInclude Include="ClassView.h" />
     <ClInclude Include="CmdDefine.h" />
     <ClInclude Include="Datadef.h" />
+    <ClInclude Include="DataListControl.h" />
     <ClInclude Include="DataService.h" />
     <ClInclude Include="DeviceList.h" />
     <ClInclude Include="EmergencyTask.h" />
@@ -147,6 +148,7 @@
     <ClInclude Include="OrgList.h" />
     <ClInclude Include="OrgTree.h" />
     <ClInclude Include="OutputWnd.h" />
+    <ClInclude Include="PermissionGroup.h" />
     <ClInclude Include="PitureReview.h" />
     <ClInclude Include="PointList.h" />
     <ClInclude Include="PropertiesWnd.h" />
@@ -169,6 +171,7 @@
     <ClCompile Include="cData.cpp" />
     <ClCompile Include="ClassView.cpp" />
     <ClCompile Include="Datadef.cpp" />
+    <ClCompile Include="DataListControl.cpp" />
     <ClCompile Include="DataService.cpp" />
     <ClCompile Include="DeviceList.cpp" />
     <ClCompile Include="EmergencyTask.cpp" />
@@ -182,6 +185,7 @@
     <ClCompile Include="OrgList.cpp" />
     <ClCompile Include="OrgTree.cpp" />
     <ClCompile Include="OutputWnd.cpp" />
+    <ClCompile Include="PermissionGroup.cpp" />
     <ClCompile Include="PitureReview.cpp" />
     <ClCompile Include="PointList.cpp" />
     <ClCompile Include="PropertiesWnd.cpp" />

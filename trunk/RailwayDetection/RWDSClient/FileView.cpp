@@ -6,6 +6,7 @@
 #include "RWDSClient.h"
 #include "DataService.h"
 #include "MessageInfo.h"
+#include "DataListControl.h"
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -124,7 +125,8 @@ void CFileView::TreeVisitForDeleteItemData(HTREEITEM aItem)
             item = m_wndFileView.GetNextItem(item, TVGN_NEXT);
         }
 		//刷新机构后需要重新加载
-		curOrg->iDataSet = FALSE;
+        curOrg->iDataSet = FALSE;
+        delete curOrg;
     }
 }
 
@@ -257,63 +259,70 @@ void CFileView::OnChangeVisualStyle()
 	m_wndFileView.SetImageList(&m_FileViewImages, TVSIL_NORMAL);
 }
 
-void CFileView::OnNMClickFileView(NMHDR *pNMHDR, LRESULT *pResult)
-{
-    // TODO: 在此添加控件通知处理程序代码
-    HTREEITEM curItem = reinterpret_cast<LPNMTREEVIEW>(pNMHDR)->itemNew.hItem;
-    HTREEITEM curItem1 = reinterpret_cast<LPNMTREEVIEW>(pNMHDR)->itemOld.hItem;
-    if (!m_wndFileView.ItemHasChildren(curItem))
-    {
-        return;
-    }
-    HTREEITEM childItem = m_wndFileView.GetChildItem(curItem);
-    if (!childItem)
-    {
-        return;
-    }
-    OrganizationInfo* curOrg = (OrganizationInfo*) m_wndFileView.GetItemData(curItem);
-
-    m_RWDSClientView->m_CurrentOrg = curOrg;
-
-    if (!curOrg->iDataSet)
-    {//从未获取该机构的数据
-        GetOrgData(curOrg);
-        curOrg->iDataSet = TRUE;
-    }
-    *pResult = 0;
-}
-
 
 void CFileView::GetOrgData(OrganizationInfo* aOrg)
 {
-	CMessageInfo* messageBox = new CMessageInfo(this);
-	messageBox->Create(IDD_FLASHWND);
-	messageBox->CenterWindow();
-	messageBox->ShowWindow(SW_NORMAL);
-	Sleep(10);
+    CMessageInfo* messageBox = new CMessageInfo(this);
+    messageBox->Create(IDD_FLASHWND);
+    messageBox->CenterWindow();
+    messageBox->ShowWindow(SW_NORMAL);
+    Sleep(10);
     GetOrgPoint(aOrg->iOrgID, &aOrg->iMapPoint);
     GetOrgLine(aOrg->iOrgID, aOrg->iMapPoint, &aOrg->iLine);
     GetOrgStaff(aOrg->iOrgID, &aOrg->iStaff);
     GetOrgDevice(aOrg->iOrgID, &aOrg->iDevice);
     GetCalendarSchedule(aOrg->iOrgID, &aOrg->iStaff, aOrg->iCalendar);
-	messageBox->DestroyWindow();
-	delete messageBox;
+    messageBox->DestroyWindow();
+    delete messageBox;
 }
 
 void CFileView::DeleteAllOrgData(OrganizationInfo* aOrg)
 {
-	aOrg->iChildID.clear();
-	aOrg->iChildOrg.clear();
-	aOrg->iMapPoint.clear();
-	aOrg->iStaff.clear();
-	aOrg->iDevice.clear();
-	aOrg->iLine.clear();
-	aOrg->iCalendar->iScheduleStaff.clear();
-	aOrg->iEmergency.clear();
-	//for (size_t i=0; i<aOrg->iLine.size(); i++)
-	//{
-	//	aOrg->iLine[i];
-	//}
+    aOrg->iChildID.clear();
+    aOrg->iCalendar->iScheduleStaff.clear();
+    DeleteOrgListElement(&aOrg->iChildOrg);
+    DeletePointListElement(&aOrg->iMapPoint);
+    DeleteStaffListElement(&aOrg->iStaff);
+    DeleteDeviceListElement(&aOrg->iDevice);
+    DeleteLineListElement(&aOrg->iLine);
+    DeleteEmergencyListElement(&aOrg->iEmergency);
+    DeleteReportListElement(&aOrg->iReportInfo);
+}
+
+void CFileView::OnNMClickFileView(NMHDR *pNMHDR, LRESULT *pResult)
+{
+    // TODO: 在此添加控件通知处理程序代码
+
+    CPoint pt;
+    GetCursorPos(&pt);
+    m_wndFileView.ScreenToClient(&pt);
+    UINT uFlag = 0;
+    HTREEITEM curItem = m_wndFileView.HitTest(pt, &uFlag);
+    if(curItem)
+    {
+        if(TVHT_ONITEM & uFlag)
+        {//点击项
+            OrganizationInfo* curOrg = (OrganizationInfo*) m_wndFileView.GetItemData(curItem);
+
+            m_RWDSClientView->m_CurrentOrg = curOrg;
+            m_RWDSClientView->DestroyReportForm();
+
+            if (!curOrg->iDataSet)
+            {//从未获取该机构的数据
+                GetOrgData(curOrg);
+                curOrg->iDataSet = TRUE;
+            }
+        }
+        //else if(TVHT_ONITEMBUTTON & uFlag)
+        //{//点击+号
+        //    //CString strText = m_wndFileView.GetItemText(curItem);
+        //    //AfxMessageBox(strText);
+        //    return;
+        //}
+    } 
+
+
+    *pResult = 0;
 }
 
 void CFileView::OnNMDblclkFileView(NMHDR *pNMHDR, LRESULT *pResult)
@@ -366,6 +375,7 @@ void CFileView::OnTvnItemexpandingFileView(NMHDR *pNMHDR, LRESULT *pResult)
         HTREEITEM childItem = m_wndFileView.GetChildItem(curItem);
         OrganizationInfo* curOrg = (OrganizationInfo*) m_wndFileView.GetItemData(curItem);
         m_RWDSClientView->m_CurrentOrg = curOrg;
+        m_RWDSClientView->DestroyReportForm();
         if (m_wndFileView.GetItemText(childItem).Compare(_T("")) == 0)
         {//从未展开过最后一层机构
             if (!curOrg->iDataSet)
@@ -397,6 +407,7 @@ void CFileView::OnTvnItemexpandedFileView(NMHDR *pNMHDR, LRESULT *pResult)
 		}
 		OrganizationInfo* curOrg = (OrganizationInfo*) m_wndFileView.GetItemData(curItem);
 		m_RWDSClientView->m_CurrentOrg = curOrg;
+        m_RWDSClientView->DestroyReportForm();
 		HTREEITEM tmpChild;
 		if(curOrg->iChildOrg.size() > 0)
 		{//加载子项
