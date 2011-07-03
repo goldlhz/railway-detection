@@ -1522,12 +1522,14 @@ int  CLogicManager::DealGetPicDataPack(DWORD dNumberOfBytes,
 				FILE * fPic = NULL;
 				string strPicnName;
 
+				//strPicnName = pGobalConfig->GetPicFilePath() + "\\" + m_getPicDataUpPack.gDataBodyPack.strPicName.substr(0, 8) + "\\" + m_getPicDataUpPack.gDataBodyPack.strPicName;
+
 				strPicnName = pGobalConfig->GetPicFilePath() + "\\" + gpsPicPack.strPicName.substr(0, 8) + "\\" + gpsPicPack.strPicName;
 				fPic = fopen(strPicnName.c_str(), "rb");
 				if(fPic)
 				{
-#define READBUFFERLENGTH		1024*3
 					long lFileLength;
+					const int nBufferLength = 1024;
 
 					fseek(fPic, 0, SEEK_END);
 					lFileLength = ftell(fPic);
@@ -1539,10 +1541,10 @@ int  CLogicManager::DealGetPicDataPack(DWORD dNumberOfBytes,
 						int nReadCount;
 						int nTemp;
 
-						if((lFileLength % READBUFFERLENGTH) == 0)
-							nTotalPack = lFileLength / READBUFFERLENGTH;
+						if((lFileLength % nBufferLength) == 0)
+							nTotalPack = lFileLength / (nBufferLength);
 						else
-							nTotalPack = lFileLength / READBUFFERLENGTH + 1;
+							nTotalPack = lFileLength / (nBufferLength) + 1;
 
 						fseek(fPic, 0, SEEK_SET);
 						for (nCurrentPack = 1; nCurrentPack <= nTotalPack ; ++nCurrentPack )
@@ -1551,12 +1553,12 @@ int  CLogicManager::DealGetPicDataPack(DWORD dNumberOfBytes,
 							m_getPicDataDownPack.gDataBodyPack.nCurrentPacket = nCurrentPack;
 							m_getPicDataDownPack.gDataBodyPack.nPagesize = lFileLength;
 
-							memset(m_getPicDataDownPack.gDataBodyPack.picBuffer, 0x00, READBUFFERLENGTH);
+							memset(m_getPicDataDownPack.gDataBodyPack.picBuffer, 0x00, nBufferLength);
 
-							nReadCount = fread(m_getPicDataDownPack.gDataBodyPack.picBuffer, READBUFFERLENGTH, READBUFFERLENGTH, fPic);
+							nReadCount = fread(m_getPicDataDownPack.gDataBodyPack.picBuffer, 1, nBufferLength, fPic);
 							if(nReadCount > 0)
 							{
-								m_getPicDataDownPack.nBodyLength = READBUFFERLENGTH + 12;
+								m_getPicDataDownPack.nBodyLength = nBufferLength + 12;
 								m_DataPackPares.PackGetPicDataDownBuild(pBuffer, m_getPicDataDownPack);
 								pKeyOverPire->pireOverLappedex.wsaWSABUF.len = m_getPicDataDownPack.nBodyLength + 11;
 
@@ -1621,24 +1623,24 @@ int  CLogicManager::DealGetSchedueListPack(DWORD dNumberOfBytes,
 						m_getOrgSchedueListDownPack.gDataBodyPack.strUserID = strTemp;
 						strTemp.LockBuffer();
 
-						pRecordset->GetFieldValue("r1", strTemp);
+						pRecordset->GetFieldValue("r2", strTemp);
 						m_getOrgSchedueListDownPack.gDataBodyPack.strDates = strTemp;
 						strTemp.LockBuffer();
 
-						pRecordset->GetFieldValue("r2", strTemp);
+						pRecordset->GetFieldValue("r3", strTemp);
 						m_getOrgSchedueListDownPack.gDataBodyPack.strXJ = strTemp;
 						strTemp.LockBuffer();
 
-						pRecordset->GetFieldValue("r3", nTemp);
+						pRecordset->GetFieldValue("r4", nTemp);
 						m_getOrgSchedueListDownPack.gDataBodyPack.nSTotlePoint = nTemp;
 
-						pRecordset->GetFieldValue("r4", nTemp);
+						pRecordset->GetFieldValue("r5", nTemp);
 						m_getOrgSchedueListDownPack.gDataBodyPack.nSGetPoint = nTemp;
 
-						pRecordset->GetFieldValue("r5", nTemp);
+						pRecordset->GetFieldValue("r6", nTemp);
 						m_getOrgSchedueListDownPack.gDataBodyPack.nCPoint = nTemp;
 
-						pRecordset->GetFieldValue("r6", nTemp);
+						pRecordset->GetFieldValue("r7", nTemp);
 						m_getOrgSchedueListDownPack.gDataBodyPack.nLPoint = nTemp;
 
 						m_getOrgSchedueListDownPack.nBodyLength = 84;
@@ -1922,6 +1924,60 @@ int  CLogicManager::DealWorkerPollQueryPack(DWORD dNumberOfBytes,
 	void* pWorkThread,
 	void* pFunDealSendData)
 {
+	FPDealSendData DealSendData = (FPDealSendData)pFunDealSendData;
+
+	char * pBuffer = pKeyOverPire->pireOverLappedex.wsaBuffer;
+
+	if(m_DataPackPares.PackWorkerPollQueryUpPack(pBuffer, m_workerPollQueryUpPack))
+	{
+		if(m_AccessBaseData.InitAccesser(pDatabase))
+		{
+			auto_ptr<CADORecordset> pRecordset(m_AccessBaseData.UploadWorkerPollQureyPack(m_workerPollQueryUpPack));
+			if(pRecordset.get())
+			{
+				DWORD nHadSendRecord;
+				DWORD nTitleRecord = pRecordset->GetRecordCount();
+
+				if(nTitleRecord > 0)
+				{
+					CString strTemp;
+					int     nTemp;
+					double  dTemp;
+
+					pRecordset->MoveFirst();
+					for (nHadSendRecord = 1; !pRecordset->IsEOF(); ++nHadSendRecord, pRecordset->MoveNext())
+					{
+						m_workerPollQueryDownPack.gDataBodyPack.nTotlePacket = nTitleRecord;
+						m_workerPollQueryDownPack.gDataBodyPack.nCurrentPacket = nHadSendRecord;
+
+						pRecordset->GetFieldValue(_T("G_j"), dTemp);
+						m_workerPollQueryDownPack.gDataBodyPack.fJUD = (float)dTemp;
+
+						pRecordset->GetFieldValue(_T("G_w"), dTemp);
+						m_workerPollQueryDownPack.gDataBodyPack.fWDU = (float)dTemp;
+
+						pRecordset->GetFieldValue(_T("G_time"), strTemp);
+						m_workerPollQueryDownPack.gDataBodyPack.strTime = strTemp.GetBuffer();
+						strTemp.LockBuffer();
+						
+						m_workerPollQueryDownPack.nBodyLength = 36;
+						m_DataPackPares.PackWorkerPollQueryDownBuild(pBuffer, m_workerPollQueryDownPack);
+						pKeyOverPire->pireOverLappedex.wsaWSABUF.len = m_workerPollQueryDownPack.nBodyLength + 11;
+
+						nTemp = DealSendData(pKeyOverPire, pWorkThread);
+						if(0 != nTemp)
+							return -2;
+					}
+					return 0;
+				}
+			}
+		}
+	}
+	m_DataPackPares.FillWorkerPollQueryFailPack(m_workerPollQueryDownPack);
+	m_DataPackPares.PackWorkerPollQueryDownBuild(pBuffer, m_workerPollQueryDownPack);
+	pKeyOverPire->pireOverLappedex.wsaWSABUF.len = m_workerPollQueryDownPack.nBodyLength + 11;
+
+	DealSendData(pKeyOverPire, pWorkThread);
 	return 0;
 }
 

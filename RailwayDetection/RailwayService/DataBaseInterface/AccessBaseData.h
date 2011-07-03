@@ -116,7 +116,7 @@ public:
 
 	CADORecordset* UpLoadGetOrgSchWorkerPack(const GetOrgSchWorker_Upload_Pack& getOrgSchWorkerUpPack);
 
-	CADORecordset* UploadWorkerPollQureyPack(const WorkerPoll_Upload_Pack& workerPollUpPack);
+	CADORecordset* UploadWorkerPollQureyPack(const WorkerPollQuery_Upload_Pack& workerPollQuerUpPack);
 
 	bool UpLoadUrgencyMissionDeletePack(const UrgencyMissionDelete_Upload_Pack& urgencyMissionDeleteUpPack,
 		UrgencyMissionDelete_Download_Pack& urgencyMissionDeleteDownPack);

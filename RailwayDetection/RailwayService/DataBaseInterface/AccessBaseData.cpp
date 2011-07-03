@@ -1673,8 +1673,6 @@ CADORecordset* CAccessBaseData::UpLoadGetOrgSchedueListPack(const GetOrgSchedueL
 	if(m_pDatabase)
 	{
 		int nErrorCode = 1;
-		CADORecordset adoRecordset;
-
 		if(!m_pDatabase->IsOpen())
 		{
 			if(!m_pDatabase->Open())
@@ -1682,13 +1680,17 @@ CADORecordset* CAccessBaseData::UpLoadGetOrgSchedueListPack(const GetOrgSchedueL
 				return NULL;
 			}
 		}
-
-		CADORecordset *padoRecordset = new CADORecordset();;
-		CADOCommand adoCommand(m_pDatabase);
+		
+ 		CADORecordset *padoRecordset = new CADORecordset(m_pDatabase);;
+		CADOCommand adoCommand(m_pDatabase, _T("dbo.tj"));
 
 		CADOParameter orgidPar(adOpenDynamic, sizeof(int), adParamInput, _T("@orgid"));
 		CADOParameter yearPar(adOpenDynamic, sizeof(int), adParamInput, _T("@year"));
 		CADOParameter monthPar(adOpenDynamic, sizeof(int), adParamInput, _T("@month"));
+
+		orgidPar.SetValue((long)getOrgSchedueListUpPack.gDataBodyPack.nOrgID);
+		yearPar.SetValue((long)getOrgSchedueListUpPack.gDataBodyPack.nYears);
+		monthPar.SetValue((long)getOrgSchedueListUpPack.gDataBodyPack.nMonths);
 
 		adoCommand.AddParameter(&orgidPar);
 		adoCommand.AddParameter(&yearPar);
@@ -1939,14 +1941,14 @@ CADORecordset* CAccessBaseData::UpLoadGetOrgSchWorkerPack(const GetOrgSchWorker_
 	return NULL;
 }
 
-CADORecordset* CAccessBaseData::UploadWorkerPollQureyPack(const WorkerPoll_Upload_Pack& workerPollUpPack)
+CADORecordset* CAccessBaseData::UploadWorkerPollQureyPack(const WorkerPollQuery_Upload_Pack& workerPollQuerUpPack)
 {
 	if(m_pDatabase)
 	{
 		memset(m_strBuffer, 0x00, INPUTSQLBUFFERS);
-		sprintf_s(m_strBuffer, INPUTSQLBUFFERS, "Select G_j,G_w,G_time from T_GPS where datediff(d,,G_time,time) = 0",
-			workerPollUpPack.gDataBodyPack.strOper.c_str(),
-			workerPollUpPack.gDataBodyPack.strDate.c_str());
+		sprintf_s(m_strBuffer, INPUTSQLBUFFERS, "SELECT * FROM T_GPS WHERE datediff(d,G_TIME,'%s')=0 and dbo.cherkPda('%s',g_tel)=1",
+			workerPollQuerUpPack.gDataBodyPack.strTime.c_str(),
+			workerPollQuerUpPack.gDataBodyPack.strOper.c_str());
 
 		if(!m_pDatabase->IsOpen())
 		{

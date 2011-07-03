@@ -65,7 +65,7 @@ bool CWorkThreadPool::CreateWorkThreads(
 	CWorkThread * pThread;
 	int nServerThreadSize = CCommonFunction::GetKernalCount() * 2 + 2;
 
-	for (int nIndex = 0; nIndex < nServerThreadSize; ++nIndex)
+	for (int nIndex = 0; nIndex < 1; ++nIndex)
 	{
 		pThread = new CWorkThread();
 		if(pThread)
