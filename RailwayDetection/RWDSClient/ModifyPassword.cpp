@@ -48,13 +48,14 @@ void CModifyPassword::OnBnClickedOk()
         AfxMessageBox(_T("新密码不一致，请重新输入"));
         return;
     }
-    GetDlgItem(IDC_EDIT_ORIGINALPASSWORD)->GetWindowText(originalPassword);
-    if (originalPassword != m_Password)
-    {
-        AfxMessageBox(_T("原密码不正确，请重新输入"));
-        return;
-    }
+    //GetDlgItem(IDC_EDIT_ORIGINALPASSWORD)->GetWindowText(originalPassword);
+    //if (originalPassword != m_Password)
+    //{
+    //    AfxMessageBox(_T("原密码不正确，请重新输入"));
+    //    return;
+    //}
     m_Password = newPassword;
+    AfxMessageBox(_T("修改成功"));
     CDialogEx::OnOK();
 }
 

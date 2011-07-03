@@ -213,6 +213,12 @@
     <ClInclude Include="VoiceList.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="PermissionGroup.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="DataListControl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RWDSClient.cpp">
@@ -306,6 +312,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="VoiceList.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="PermissionGroup.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="DataListControl.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

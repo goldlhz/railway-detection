@@ -1435,7 +1435,7 @@ int cData::GetXjRymx(const ryxj1result value,lryxj1result *lPoint)
 		memset(&lr,0,sizeof(lr));
 		if(DepressPacket(lr,XJMX_PACKET,cTempBuf))
 		{
-			lPoint->push_back(lr);
+			//lPoint->push_back(lr);
 			iTotleCount = lr.totlePacket ;
 		}
 	}

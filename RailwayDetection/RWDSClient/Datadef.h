@@ -204,6 +204,16 @@ typedef struct _Emergency
     vector<StaffInfo*> iAppointStaff;
 }EmergencyTaskInfo;
 
+typedef struct _ReportInfo//机构月报表
+{
+    int iOrgID;
+    CString iStaffName;
+    time_t iReportDay;
+    int iPlanArrived;//计划到达数
+    int iActualArrived;//实际到达数
+    int iAbnormal;//异常数
+}ReportInfo;
+
 typedef struct _OrgObj	//机构
 {
     inline _OrgObj()
@@ -218,6 +228,7 @@ typedef struct _OrgObj	//机构
         iBoundaryEndKM = 0;
         iCalendar = new CalendarSchedule;
     }
+    //机构基本信息
 	int iOrgID;
     int iOrgLevel;
 	CString iOrgName;
@@ -229,13 +240,16 @@ typedef struct _OrgObj	//机构
     RailLine iBoundaryRail;
     unsigned int iBoundaryStartKM;
     unsigned int iBoundaryEndKM;
+    BOOL iDataSet;//机构基本信息是否已经获取
+
+    //机构附属信息
     vector<MapPoint*> iMapPoint;
     vector<StaffInfo*> iStaff;//该机构的人员
 	vector<DeviceInfo*> iDevice;//该机构拥有的设备
 	vector<LineInfo*> iLine;//该机构配置的路线，若不为最后一级，则为NULL
     CalendarSchedule* iCalendar;//该机构的排班表
     vector<EmergencyTaskInfo*> iEmergency;
-    BOOL iDataSet;
+    vector<ReportInfo*> iReportInfo;
 }OrganizationInfo;
 
 
@@ -257,5 +271,4 @@ typedef struct _PictureInfo//图片信息
 	CString iShootingTime;
 	int iErrorType;
 }PictureInfo;
-
 

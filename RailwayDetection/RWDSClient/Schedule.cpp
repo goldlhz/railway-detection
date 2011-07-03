@@ -249,16 +249,16 @@ void CSchedule::OnBnClickedBtnModifytime()
 	//CTime t1(m_SelectedSchedule->iULineKmTime[select]);
 	CString strHour;
 	CString strMin;
-	struct tm* schTime = NULL;
-    localtime_s(schTime, &m_SelectedLine->iLineKmTime[select]);
+	struct tm schTime;
+    localtime_s(&schTime, &m_SelectedLine->iLineKmTime[select]);
 	GetDlgItem(IDC_EDIT_HOUR)->GetWindowText(strHour);
-	schTime->tm_hour = _ttoi(strHour);
+	schTime.tm_hour = _ttoi(strHour);
 	GetDlgItem(IDC_EDIT_MINUTE)->GetWindowText(strMin);
-	schTime->tm_min = _ttoi(strMin);
-	m_SelectedLine->iLineKmTime[select] = mktime(schTime);
+	schTime.tm_min = _ttoi(strMin);
+	m_SelectedLine->iLineKmTime[select] = mktime(&schTime);
 	AfxMessageBox(_T("ÐÞ¸Ä³É¹¦"));
 	CString str;
-	str.Format(_T("%02d:%02d"), schTime->tm_hour, schTime->tm_min);
+	str.Format(_T("%02d:%02d"), schTime.tm_hour, schTime.tm_min);
 	m_ListArriveTime.SetItemText(select, 1, str);
 	
 	POSITION posCtrl;

@@ -67,6 +67,7 @@ void CPitureReview::OnBnClickedBtnDownloadpicture()
     time_t start = pictureTimeStart.GetTime();
     time_t end = pictureTimeEnd.GetTime();
     GetPictureInfo(m_CRWDSClientView->m_CurrentOrg->iOrgID, start, end, &m_PictureList);
+    m_ListCtrl.DeleteAllItems();
     PictureInfo* picture;
     //在ctrllist上显示
     for (size_t i=0; i<m_PictureList.size(); i++)
@@ -97,10 +98,10 @@ void CPitureReview::ShowPictureInWindows(PictureInfo* aPicture)
     CString picturePath;
     picturePath = GetModulePath() + _T("\\pic\\");
     CString pictureDirect = picturePath + aPicture->iPicName;
-    BOOL fileExist = PathFileExists(picturePath);
+    BOOL fileExist = PathFileExists(pictureDirect);
     if(!fileExist)
     {//文件不存在，下载文件
-        int retValue = SavePictureToDirect(m_CRWDSClientView->m_CurrentOrg->iOrgID, aPicture, picturePath);
+        int retValue = SavePictureToDirect(m_CRWDSClientView->m_CurrentOrg->iOrgID, aPicture, pictureDirect);
         if (retValue == 0)
         {
             fileExist = TRUE;

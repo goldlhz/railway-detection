@@ -210,38 +210,38 @@ int SetOrganization(int aCmd, const OrganizationInfo* aOrganization )
 int GetOrgPoint(int aOrgID, vector<MapPoint*>* aPointList)
 {
     ///////////////////////////////////////////////////
-    //MapPoint *pt = new MapPoint;
-    //pt->iRailLine = Chengdu_Chongqing; 
-    //pt->iKM = 251;
-    //pt->iLon = 104.064531;
-    //pt->iLat = 30.699965;
-    //pt->iDirect = KUpLine;
-    //aPointList->push_back(pt);
+    MapPoint *pt = new MapPoint;
+    pt->iRailLine = Chengdu_Chongqing; 
+    pt->iKM = 251;
+    pt->iLon = 104.064531;
+    pt->iLat = 30.699965;
+    pt->iDirect = KUpLine;
+    aPointList->push_back(pt);
 
-    //pt = new MapPoint;
-    //pt->iRailLine = Chengdu_Chongqing; 
-    //pt->iKM = 252;
-    //pt->iLon = 104.075530;
-    //pt->iLat = 30.699484;
-    //pt->iDirect = KUpLine;
-    //aPointList->push_back(pt);
+    pt = new MapPoint;
+    pt->iRailLine = Chengdu_Chongqing; 
+    pt->iKM = 252;
+    pt->iLon = 104.075530;
+    pt->iLat = 30.699484;
+    pt->iDirect = KUpLine;
+    aPointList->push_back(pt);
 
-    //pt = new MapPoint;
-    //pt->iRailLine = Chengdu_Chongqing; 
-    //pt->iKM = 253;
-    //pt->iLon = 104.086526;
-    //pt->iLat = 30.699484;
-    //pt->iDirect = KUpLine;
-    //aPointList->push_back(pt);
+    pt = new MapPoint;
+    pt->iRailLine = Chengdu_Chongqing; 
+    pt->iKM = 253;
+    pt->iLon = 104.086526;
+    pt->iLat = 30.699484;
+    pt->iDirect = KUpLine;
+    aPointList->push_back(pt);
 
-    //pt = new MapPoint;
-    //pt->iRailLine = Chengdu_Chongqing; 
-    //pt->iKM = 254;
-    //pt->iLon = 104.097521;
-    //pt->iLat = 30.699484;
-    //pt->iDirect = KUpLine;
-    //aPointList->push_back(pt);
-    //return KErrNone;
+    pt = new MapPoint;
+    pt->iRailLine = Chengdu_Chongqing; 
+    pt->iKM = 254;
+    pt->iLon = 104.097521;
+    pt->iLat = 30.699484;
+    pt->iDirect = KUpLine;
+    aPointList->push_back(pt);
+    return KErrNone;
     ///////////////////////////////////////////////////
 
 	cData *cd = new cData();
@@ -277,7 +277,7 @@ int GetOrgPoint(int aOrgID, vector<MapPoint*>* aPointList)
 int SetOrgPoint( int aOrgID, int aCmd, const MapPoint* aPoint )
 {
     ///////////////////////////////////////////////////
-    //return KErrNone;
+    return KErrNone;
     ///////////////////////////////////////////////////
     cData *cd = new cData();
 	int iResult = 0;
@@ -328,32 +328,32 @@ int SetOrgPoint( int aOrgID, int aCmd, const MapPoint* aPoint )
 int GetOrgLine(int aOrgID, const vector<MapPoint*>& aPointList, vector<LineInfo*>* aLineList)
 {
     ///////////////////////////////////////////////////
-    //LineInfo *line = new LineInfo;
-    //line->iLineID = 1;
-    //line->iLineName = _T("成局1段");
-    //line->iStartKm = (aPointList)[0]->iKM;
-    //line->iStartNo = KFirstDay;
-    //line->iLineKmLonLat.push_back(aPointList[0]);
-    //line->iLineKmTime.push_back(100);
-    //line->iLineKmLonLat.push_back(aPointList[1]);
-    //line->iLineKmTime.push_back(100);
-    //line->iLineKmLonLat.push_back(aPointList[2]);
-    //line->iLineKmTime.push_back(100);
-    //line->iLineKmLonLat.push_back(aPointList[3]);
-    //line->iLineKmTime.push_back(100);
-    //aLineList->push_back(line);
+    LineInfo *line = new LineInfo;
+    line->iLineID = 1;
+    line->iLineName = _T("成局1段");
+    line->iStartKm = (aPointList)[0]->iKM;
+    line->iStartNo = KFirstDay;
+    line->iLineKmLonLat.push_back(aPointList[0]);
+    line->iLineKmTime.push_back(100);
+    line->iLineKmLonLat.push_back(aPointList[1]);
+    line->iLineKmTime.push_back(100);
+    line->iLineKmLonLat.push_back(aPointList[2]);
+    line->iLineKmTime.push_back(100);
+    line->iLineKmLonLat.push_back(aPointList[3]);
+    line->iLineKmTime.push_back(100);
+    aLineList->push_back(line);
 
-    //line = new LineInfo;
-    //line->iLineID = 2;
-    //line->iLineName = _T("成局2段");
-    //line->iStartKm = aPointList[1]->iKM;
-    //line->iStartNo = KThirdDay;
-    //line->iLineKmLonLat.push_back(aPointList[1]);
-    //line->iLineKmTime.push_back(0);
-    //line->iLineKmLonLat.push_back(aPointList[3]);
-    //line->iLineKmTime.push_back(0);
-    //aLineList->push_back(line);
-    //return KErrNone;
+    line = new LineInfo;
+    line->iLineID = 2;
+    line->iLineName = _T("成局2段");
+    line->iStartKm = aPointList[1]->iKM;
+    line->iStartNo = KThirdDay;
+    line->iLineKmLonLat.push_back(aPointList[1]);
+    line->iLineKmTime.push_back(0);
+    line->iLineKmLonLat.push_back(aPointList[3]);
+    line->iLineKmTime.push_back(0);
+    aLineList->push_back(line);
+    return KErrNone;
     ///////////////////////////////////////////////////
     aLineList->clear();
 	lallOrgLine llist ;
@@ -418,7 +418,12 @@ int GetOrgLine(int aOrgID, const vector<MapPoint*>& aPointList, vector<LineInfo*
 
 int SetOrgLine( int aOrgID, int aCmd, const LineInfo* aLine )
 {
-
+    ///////////////////////////////////////////////////
+    return KErrNone;
+    ///////////////////////////////////////////////////
+//#define CMD_LINE_ADD 0x33
+//#define CMD_LINE_MODIFY 0x34
+//#define CMD_LINE_DELETE 0x35
 	cData *cd = new cData();
 	MangLine Ml;
 	int iResult = 0;
@@ -510,7 +515,34 @@ int SetOrgLine( int aOrgID, int aCmd, const LineInfo* aLine )
 
 int GetOrgStaff(int aOrgID, vector<StaffInfo*>* aStaffList)
 {
+    ///////////////////////////////////////////////////
+    StaffInfo* staff = new StaffInfo;
+    staff->iID = _T("1");
+    staff->iOrgID = aOrgID;
+    staff->iPassword = _T("111");
+    staff->iLoginPermission = TRUE;
+    staff->iName = _T("张三");
+    staff->iPermissionGroup = 0;
+    aStaffList->push_back(staff);
 
+    staff = new StaffInfo;
+    staff->iID = _T("2");;
+    staff->iOrgID = aOrgID;
+    staff->iPassword = _T("");
+    staff->iLoginPermission = FALSE;
+    staff->iName = _T("李四");
+    staff->iPermissionGroup = 1;
+    aStaffList->push_back(staff);
+
+    staff = new StaffInfo;
+    staff->iID = _T("3");;
+    staff->iOrgID = aOrgID;
+    staff->iName = _T("王五");
+    staff->iPassword = _T("");
+    staff->iLoginPermission = FALSE;
+    staff->iPermissionGroup = 2;
+    aStaffList->push_back(staff);
+    return KErrNone;
     ///////////////////////////////////////////////////
 	cData *cd = new cData();
 	lUser lPoint;
@@ -538,7 +570,7 @@ int GetOrgStaff(int aOrgID, vector<StaffInfo*>* aStaffList)
 int SetOrgStaff( int aOrgID, int aCmd, const StaffInfo* aStaff )
 {
     ///////////////////////////////////////////////////
-    //return KErrNone;
+    return KErrNone;
     ///////////////////////////////////////////////////
    // aStaff->
 	/*
@@ -643,11 +675,11 @@ int SetOrgStaff( int aOrgID, int aCmd, const StaffInfo* aStaff )
 int GetCalendarSchedule(int aOrgID, const vector<StaffInfo*>* ListStaff, CalendarSchedule* aSchedule)
 {
     ///////////////////////////////////////////////////
- //   aSchedule->iCaledarID = 1;
- //   aSchedule->iOrgID = aOrgID;
- //   aSchedule->iStartDay = 1288915200;
- //   aSchedule->iPeriods = 3;
-	//return KErrNone;
+    aSchedule->iCaledarID = 1;
+    aSchedule->iOrgID = aOrgID;
+    aSchedule->iStartDay = 1288915200;
+    aSchedule->iPeriods = 3;
+	return KErrNone;
     ///////////////////////////////////////////////////
 	cData *cd = new cData();
 	OrgPxInfo oInfo ;
@@ -695,7 +727,7 @@ int GetCalendarSchedule(int aOrgID, const vector<StaffInfo*>* ListStaff, Calenda
 int SetCalendarSchedule(int aOrgID, const CalendarSchedule* aSchedule/*, const <StaffInfo*>*ListStaff*/)
 {
     ///////////////////////////////////////////////////
-	 //return KErrNone;
+	 return KErrNone;
     ///////////////////////////////////////////////////
 	cData *cd = new cData();
 	pb *p = new pb();
@@ -751,7 +783,7 @@ int SetEmergencyTask( int aOrgID, int aCmd, const EmergencyTaskInfo* aEmergencyT
 int GetOrgDevice( int aOrgID, vector<DeviceInfo*>* aDeviceList )
 {
     ///////////////////////////////////////////////////
-    //return KErrNone;
+    return KErrNone;
     ///////////////////////////////////////////////////
 	cData *cd = new cData();
 	//if(cd->iSocketState < 0)
@@ -785,7 +817,7 @@ int GetOrgDevice( int aOrgID, vector<DeviceInfo*>* aDeviceList )
 int SetOrgDevice( int aOrgID, int aCmd, const DeviceInfo* aDeviceList )
 {
     ///////////////////////////////////////////////////
-    //return KErrNone;
+    return KErrNone;
     ///////////////////////////////////////////////////
 //#define CMD_DEVICE_ADD 0x40
 //#define CMD_DEVICE_MODIFY 0x41
@@ -871,7 +903,7 @@ int GetStaffScheduleTrack(int aStaffID, time_t aDate, vector<double>* aRecordLon
 int GetPictureInfo( int aOrgID, time_t aStartDate, time_t aEndDate, vector<PictureInfo*>* aPictureList )
 {
     ///////////////////////////////////////////////////
-    //return KErrNone;
+    return KErrNone;
     ///////////////////////////////////////////////////
 	CString sStart = _T("2011-1-1");//Time2Strings(aStartDate);
 	CString eTimes = _T("2011-11-1");//Time2Strings(aEndDate);
@@ -911,6 +943,33 @@ int GetPictureInfo( int aOrgID, time_t aStartDate, time_t aEndDate, vector<Pictu
 int SavePictureToDirect( int aOrgID, const PictureInfo* aPicture, CString aToDirect )
 {
     return KErrNone;
+}
+
+
+int GetReportInfoList( int aOrgID, int aMonth, vector<ReportInfo*>* aReportList )
+{
+    /////////////////////////////////////////////////////
+    ReportInfo* report = new ReportInfo;
+    report->iOrgID = aOrgID;
+    report->iStaffName = _T("Admin");
+    report->iReportDay = GetCurrentTime();
+    report->iPlanArrived = 50;
+    report->iActualArrived = 40;
+    report->iAbnormal = 10;
+    aReportList->push_back(report);
+
+    report = new ReportInfo;
+    report->iOrgID = aOrgID;
+    report->iStaffName = _T("admin2");
+    report->iReportDay = GetCurrentTime();
+    report->iPlanArrived = 60;
+    report->iActualArrived = 40;
+    report->iAbnormal = 20;
+    aReportList->push_back(report);
+
+    return KErrNone;
+    /////////////////////////////////////////////////////
+
 }
 
 time_t Time2Strings1(CString sec)
