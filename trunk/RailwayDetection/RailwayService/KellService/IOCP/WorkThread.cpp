@@ -198,18 +198,29 @@ int CWorkThread::DealSendData(LPOverKeyPire pKeyOverPire, void* parameter)
 	ASSERT(parameter);
 	if(pKeyOverPire && parameter)
 	{
-		int nSendCount;
+		int nTemp;
+		int nErrorCode = 0;
 		CWorkThread* pWorkThread = (CWorkThread*)parameter;
 
-		nSendCount = send(pKeyOverPire->pireOverLappedex.wsaClientSocket, 
-							pKeyOverPire->pireOverLappedex.wsaBuffer,
-							pKeyOverPire->pireOverLappedex.wsaWSABUF.len,
-							0);
-
-		if(nSendCount != SOCKET_ERROR)
-			return 0;
-		else
-			return 1;
+		while(1)
+		{
+			nTemp = send(pKeyOverPire->pireOverLappedex.wsaClientSocket, 
+				pKeyOverPire->pireOverLappedex.wsaBuffer,
+				pKeyOverPire->pireOverLappedex.wsaWSABUF.len,
+				0);
+			if(nTemp == SOCKET_ERROR)
+			{
+				nErrorCode = WSAGetLastError();
+				if(WSAEWOULDBLOCK == nErrorCode)
+				{
+					Sleep(0);
+					continue;
+				}
+				return 1;
+			}
+			break;
+		}
+		return 0;
 	}
 	return -1;
 }

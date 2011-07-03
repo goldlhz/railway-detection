@@ -629,7 +629,7 @@ struct GetPicData_Download_Type
 	unsigned  int nTtlePacket;
 	unsigned  int nCurrentPacket;
 	unsigned  int nPagesize;
-	char		  picBuffer[1024*3];
+	char		  picBuffer[1024];
 };
 typedef Pack_Shell_Type<GetPicData_Upload_Type> GetPicData_Upload_Pack;
 typedef Pack_Shell_Type<GetPicData_Download_Type> GetPicData_Download_Pack;
