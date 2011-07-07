@@ -23,7 +23,7 @@ public:
 public:
     CString m_LoginAccount;
     CString m_LoginPassword;
-    Permission m_LoginPermission;
+    PermissionGroup m_LoginPermission;
     int m_LoginOrgID;
     //int m_LoginPermission;
 // ÖØÐ´

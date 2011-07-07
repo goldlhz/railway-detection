@@ -1082,7 +1082,7 @@ void CRWDSClientView::OnSetDevice()
 void CRWDSClientView::OnUpdateSetEmergencytask(CCmdUI *pCmdUI)
 {
     // TODO: 在此添加命令更新用户界面处理程序代码
-    if (!m_CurrentPermission.iOperate)
+    if (!m_CurrentPermission.iBasical)
     {//登录者不能设置任务
         pCmdUI->Enable(FALSE);
     }
@@ -1092,7 +1092,7 @@ void CRWDSClientView::OnUpdateSetEmergencytask(CCmdUI *pCmdUI)
 void CRWDSClientView::OnUpdateSetLine(CCmdUI *pCmdUI)
 {
     // TODO: 在此添加命令更新用户界面处理程序代码
-    if (!m_CurrentPermission.iOperate)
+    if (!m_CurrentPermission.iBasical)
     {//登录者不能设置任务
         pCmdUI->Enable(FALSE);
     }
@@ -1102,7 +1102,7 @@ void CRWDSClientView::OnUpdateSetLine(CCmdUI *pCmdUI)
 void CRWDSClientView::OnUpdateSetOrganization(CCmdUI *pCmdUI)
 {
     // TODO: 在此添加命令更新用户界面处理程序代码
-    if (!m_CurrentPermission.iOperate)
+    if (!m_CurrentPermission.iBasical)
     {//登录者不能设置任务
         pCmdUI->Enable(FALSE);
     }
@@ -1112,7 +1112,7 @@ void CRWDSClientView::OnUpdateSetOrganization(CCmdUI *pCmdUI)
 void CRWDSClientView::OnUpdateSetPoint(CCmdUI *pCmdUI)
 {
     // TODO: 在此添加命令更新用户界面处理程序代码
-    if (!m_CurrentPermission.iOperate)
+    if (!m_CurrentPermission.iBasical)
     {//登录者不能设置任务
         pCmdUI->Enable(FALSE);
     }
@@ -1122,7 +1122,7 @@ void CRWDSClientView::OnUpdateSetPoint(CCmdUI *pCmdUI)
 void CRWDSClientView::OnUpdateSetSchedule(CCmdUI *pCmdUI)
 {
     // TODO: 在此添加命令更新用户界面处理程序代码
-    if (!m_CurrentPermission.iOperate)
+    if (!m_CurrentPermission.iBasical)
     {//登录者不能设置任务
         pCmdUI->Enable(FALSE);
     }
@@ -1132,7 +1132,7 @@ void CRWDSClientView::OnUpdateSetSchedule(CCmdUI *pCmdUI)
 void CRWDSClientView::OnUpdateSetStaff(CCmdUI *pCmdUI)
 {
     // TODO: 在此添加命令更新用户界面处理程序代码
-    if (!m_CurrentPermission.iOperate)
+    if (!m_CurrentPermission.iBasical)
     {//登录者不能设置任务
         pCmdUI->Enable(FALSE);
     }
@@ -1141,7 +1141,7 @@ void CRWDSClientView::OnUpdateSetStaff(CCmdUI *pCmdUI)
 void CRWDSClientView::OnUpdateSetDevice(CCmdUI *pCmdUI)
 {
     // TODO: 在此添加命令更新用户界面处理程序代码
-    if (!m_CurrentPermission.iOperate)
+    if (!m_CurrentPermission.iBasical)
     {//登录者不能设置任务
         pCmdUI->Enable(FALSE);
     }

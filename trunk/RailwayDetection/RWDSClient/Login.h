@@ -20,12 +20,12 @@ public:
     CString GetLoginPassword();
     void SetLoginPassword(const CString& aPassword);
     int GetLoginOrgID();
-    Permission GetLoginPermission();
+    PermissionGroup GetLoginPermission();
 private:
     CString m_LoginAccount;
     CString m_LoginPassword;
     int m_LoginOrgID;
-    Permission m_LoginPermission;
+    PermissionGroup m_LoginPermission;
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV Ö§³Ö
 

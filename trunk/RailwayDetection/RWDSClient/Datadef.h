@@ -17,6 +17,8 @@ extern const int StrStartNoCount;
 extern const CString StrClientCaption;
 extern const CString strPictureErrorType[];
 extern const int strPictureErrorTypeCount;
+extern const CString strPointState[];
+extern const int strPointStateCount;
 
 #define ENCODERAILWAYFULLNAME(aStr, aRailLine, aKm, aLineDirect)\
 	aStr.Format(RailLineName[aRailLine]+_T("%.2f")+StrKm+DirectName[aLineDirect], aKm);
@@ -88,6 +90,19 @@ enum PointState
     KPointNormal = 0
 };
 
+#define PERMISSIONSETPOINT 0x0001
+#define PERMISSIONSETLINE 0x0002
+#define PERMISSIONSETSTAFF 0x0004
+#define PERMISSIONSCHEDULE 0x0008
+#define PERMISSIONSETEMERGENCY 0x0010
+#define PERMISSIONSETORG 0x0020
+#define PERMISSIONSETDEVICE 0x0040
+#define PERMISSIONSETPERMISSIONGROUP 0x0080
+#define PERMISSIONVIEWPICTURE 0x0100
+#define PERMISSIONVIEWVOICE 0x0200
+#define PERMISSIONVIEWRECORDE 0x0400
+#define PERMISSIONVIEWREPORT 0x0800
+
 typedef struct _Single
 {
     _Single()
@@ -99,7 +114,7 @@ typedef struct _Single
     int iBasical;
     int iOperate;
     int iReportForm;
-}Permission;
+}PermissionGroup;
 
 typedef struct _MapPoint
 {
@@ -209,10 +224,9 @@ typedef struct _Emergency
     vector<int> iStaffOrgID;
     vector<CString> iStaffID;
     vector<CString> iStaffName;
-    vector<StaffInfo*> iAppointStaff;
 }EmergencyTaskInfo;
 
-typedef struct _EmergencyCount//紧急任务的统计信息
+typedef struct _EmergencyLogs//紧急任务的统计信息
 {
     int iTaskID;//
     int iStaffOrgID;
@@ -220,7 +234,7 @@ typedef struct _EmergencyCount//紧急任务的统计信息
     CString iStaffName;
     unsigned int iTotalTime;
     double iTotalKM;
-}EmergencyCount;
+}EmergencyLogs;
 
 typedef struct _RecordStaff//员工所巡查流水
 {

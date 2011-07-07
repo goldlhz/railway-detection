@@ -2,7 +2,7 @@
 #include "Datadef.h"
 
 //登录验证
-int VerifyLogin( CString& aLoginAccount, CString& aLoginPassword, int* orgID, Permission *pPower);
+int VerifyLogin( CString& aLoginAccount, CString& aLoginPassword, int* orgID, PermissionGroup *pPower);
 
 //获取登录者权限
 int GetLoginerPermission(const CString& aLoginAccount);
@@ -33,7 +33,7 @@ int GetEmergencyTask(int aOrgID, vector<EmergencyTaskInfo*>* aEmergency);
 int SetEmergencyTask(int aOrgID, int aCmd, const EmergencyTaskInfo* aEmergencyTask);
 
 //统计紧急任务
-int GetEmergencyCount(int aTaskID, vector<EmergencyCount*>* aEmergencyStaff);
+int GetEmergencyLogs(int aTaskID, vector<EmergencyLogs*>* aEmergencyStaff);
 
 //获取紧急任务人员列表
 //获取/设置设备
@@ -53,7 +53,7 @@ int GetStaffScheduleTrack(CString aStaffID, time_t aDate, RecordStaff* aRecord )
 //获取机构月报表
 int GetReportInfoList(int aOrgID, int aYear, int aMonth, vector<ReportInfo*>* aReportList);
 //获取日明细
-int GetReportDetail(CString aStaffID, CString aTime, ReportDetail* aReportList);
+int GetReportDetail(CString aStaffID, time_t aTime, ReportDetail* aReportList);
 
 
 int GetOrgMonthPx(GetOrgPxEx const sValue,vector<getorgpxlistresultEx*> *Value);

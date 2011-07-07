@@ -6,7 +6,7 @@
 
 #define TESTCODE
 
-int VerifyLogin( CString& aLoginAccount, CString& aLoginPassword, int* orgID, Permission *pPower)
+int VerifyLogin( CString& aLoginAccount, CString& aLoginPassword, int* orgID, PermissionGroup *pPower)
 {
     ///////////////////////////////////////////////////
 #ifdef TESTCODE
@@ -801,8 +801,20 @@ int SetEmergencyTask( int aOrgID, int aCmd, const EmergencyTaskInfo* aEmergencyT
 	return KErrNone;
 }
 
-int GetEmergencyCount( int aTaskID, vector<EmergencyCount*>* aEmergencyStaff )
+int GetEmergencyLogs( int aTaskID, vector<EmergencyLogs*>* aEmergencyStaff )
 {
+    ///////////////////////////////////////////////////
+#ifdef TESTCODE
+    EmergencyLogs* logs = new EmergencyLogs;
+    logs->iTaskID = aTaskID;
+    logs->iStaffID = _T("123123");
+    logs->iStaffOrgID = 1;
+    logs->iTotalKM = 10.25;
+    logs->iTotalTime = 10223;
+    aEmergencyStaff->push_back(logs);
+    return KErrNone;
+#endif
+    ///////////////////////////////////////////////////
     return KErrNone;
 }
 
@@ -1052,7 +1064,7 @@ int GetStaffScheduleTrack(CString aStaffID, time_t aDate, RecordStaff* aRecord )
     return KErrNone;
 }
 
-int GetReportDetail(CString aStaffID, CString aTime, ReportDetail* aReportList)
+int GetReportDetail(CString aStaffID, time_t aTime, ReportDetail* aReportList)
 {//Ã÷Ï¸
     return KErrNone;
 }

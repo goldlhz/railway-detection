@@ -71,7 +71,7 @@ public:
 	void MapxCleanAllFeature(CString aLayerName);
     void DestroyReportForm();
 protected:
-    Permission m_CurrentPermission;
+    PermissionGroup m_CurrentPermission;
 	bool m_SymbolMove;
 	CMapX m_MapX;
 	CString m_SymbolLayer;

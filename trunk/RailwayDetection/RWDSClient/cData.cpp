@@ -49,7 +49,7 @@ int cData::UserLog(char * UserName,char *UserPwd,int *Orgid,int *p1,int *p2,int 
 	{
 		return -1;
 	}
-	LoginRerquestResult ls;
+	//LoginRerquestResult ls;
 	memset(cTempBuf,0,sizeof(cTempBuf));
 	int it = 11 + sizeof(LoginRerquestResult);
 	Sleep(10);
@@ -1145,7 +1145,7 @@ int cData::GetOrgMonthPx(getorgpx const sValue,lOrgMonth *llist)
 	return 1;
 }
 
-bool cData::getPic(const Getrealpic sValue,CString aToDirect)
+int cData::getPic(const Getrealpic sValue,CString aToDirect)
 {
 	string picBuf;
 	char pDataBuffer[11 + sizeof(Getrealpic)];
