@@ -1400,6 +1400,10 @@ int  CLogicManager::DealGetUrgencyMissionListPack(DWORD dNumberOfBytes,
 						m_getUrgencyMissionListDownPack.gDataBodyPack.strETime = strTemp;
 						strTemp.LockBuffer();
 
+						pRecordset->GetFieldValue("jj_name", strTemp);
+						m_getUrgencyMissionListDownPack.gDataBodyPack.strRWName = strTemp;
+						strTemp.LockBuffer();
+
 						pRecordset->GetFieldValue("JJ_State", nTemp);
 						m_getUrgencyMissionListDownPack.gDataBodyPack.nState = nTemp;
 
@@ -1415,7 +1419,7 @@ int  CLogicManager::DealGetUrgencyMissionListPack(DWORD dNumberOfBytes,
 						pRecordset->GetFieldValue("Jj_Endp", nTemp);
 						m_getUrgencyMissionListDownPack.gDataBodyPack.nEPoint = nTemp;
 
-						m_getUrgencyMissionListDownPack.nBodyLength = 78;
+						m_getUrgencyMissionListDownPack.nBodyLength = 118;
 						m_DataPackPares.PackGetUrgencyMissionListDownBuild(pBuffer, m_getUrgencyMissionListDownPack);
 						pKeyOverPire->pireOverLappedex.wsaWSABUF.len = m_getUrgencyMissionListDownPack.nBodyLength + 11;
 
@@ -1472,6 +1476,25 @@ int  CLogicManager::DealGetUrgencyWorkerListPack(DWORD dNumberOfBytes,
 						m_getUrgencyWorkerListDownPack.gDataBodyPack.strJj_Pid = strTemp;
 						strTemp.LockBuffer();
 
+
+
+
+
+
+
+						pRecordset->GetFieldValue("Jj_Pid", strTemp);
+						m_getUrgencyWorkerListDownPack.gDataBodyPack.strJj_Name = strTemp;
+						strTemp.LockBuffer();
+
+						pRecordset->GetFieldValue("Jj_long", nTemp);
+						m_getUrgencyWorkerListDownPack.gDataBodyPack.nJj_OrgID = nTemp;
+
+
+
+
+
+
+
 						pRecordset->GetFieldValue("Jj_time", strTemp);
 						m_getUrgencyWorkerListDownPack.gDataBodyPack.strJj_Time = strTemp;
 						strTemp.LockBuffer();
@@ -1479,7 +1502,7 @@ int  CLogicManager::DealGetUrgencyWorkerListPack(DWORD dNumberOfBytes,
 						pRecordset->GetFieldValue("Jj_long", nTemp);
 						m_getUrgencyWorkerListDownPack.gDataBodyPack.nJj_long = nTemp;
 
-						m_getUrgencyWorkerListDownPack.nBodyLength = 57;
+						m_getUrgencyWorkerListDownPack.nBodyLength = 137;
 						m_DataPackPares.PackGetUrgencyWorkerListDownBuild(pBuffer, m_getUrgencyWorkerListDownPack);
 						pKeyOverPire->pireOverLappedex.wsaWSABUF.len = m_getUrgencyMissionListDownPack.nBodyLength + 11;
 
