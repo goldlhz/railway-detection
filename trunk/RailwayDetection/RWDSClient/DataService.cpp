@@ -526,7 +526,7 @@ int SetOrgLine( int aOrgID, int aCmd, const LineInfo* aLine )
 		return ResultOk;
 }
 
-int GetOrgStaff(int aOrgID, vector<StaffInfo*>* aStaffList)
+int GetOrgStaff(int aOrgID, const vector<DeviceInfo*>& aDeviceList, vector<StaffInfo*>* aStaffList)
 {
     ///////////////////////////////////////////////////
 #ifdef TESTCODE
@@ -537,6 +537,11 @@ int GetOrgStaff(int aOrgID, vector<StaffInfo*>* aStaffList)
     staff->iLoginPermission = TRUE;
     staff->iName = _T("张三");
     staff->iPermissionGroup = 0;
+    if (aDeviceList.size() > 0)
+    {
+        staff->iTakeDevice = aDeviceList[0];
+    }
+    
     aStaffList->push_back(staff);
 
     staff = new StaffInfo;
@@ -545,7 +550,11 @@ int GetOrgStaff(int aOrgID, vector<StaffInfo*>* aStaffList)
     staff->iPassword = _T("");
     staff->iLoginPermission = FALSE;
     staff->iName = _T("李四");
-    staff->iPermissionGroup = 1;
+    staff->iPermissionGroup = 0;
+    if (aDeviceList.size() > 0)
+    {
+        staff->iTakeDevice = aDeviceList[0];
+    }
     aStaffList->push_back(staff);
 
     staff = new StaffInfo;
@@ -554,7 +563,11 @@ int GetOrgStaff(int aOrgID, vector<StaffInfo*>* aStaffList)
     staff->iName = _T("王五");
     staff->iPassword = _T("");
     staff->iLoginPermission = FALSE;
-    staff->iPermissionGroup = 2;
+    staff->iPermissionGroup = 0;
+    if (aDeviceList.size() > 0)
+    {
+        staff->iTakeDevice = aDeviceList[0];
+    }
     aStaffList->push_back(staff);
     return KErrNone;
 #endif
@@ -571,8 +584,16 @@ int GetOrgStaff(int aOrgID, vector<StaffInfo*>* aStaffList)
 			staff->iPassword = _T("");
 			staff->iLoginPermission = TRUE;
 			staff->iName = iter->name;
-			staff->Pda1 = iter->pda1;
-			staff->Pda2 = iter->pda2;
+            for (size_t i=0; i<aDeviceList.size(); i++)
+            {
+                if (aDeviceList[i]->iDevID == iter->pda1)
+                {
+                    staff->iTakeDevice = aDeviceList[i];
+                    break;
+                }
+            }
+			//staff->Pda1 = iter->pda1;
+			//staff->Pda2 = iter->pda2;
 			staff->iPermissionGroup = iter->PowerGroup ;
 			aStaffList->push_back(staff);
 		}
@@ -622,8 +643,8 @@ int SetOrgStaff( int aOrgID, int aCmd, const StaffInfo* aStaff )
 			cTEMP.ReleaseBuffer();
 
 			aUser.orgid = aStaff->iOrgID;
-			aUser.pda1 = aStaff->Pda1 ;
-			aUser.pda2 = aStaff->Pda2;
+			aUser.pda1 = aStaff->iTakeDevice->iDevID;
+			//aUser.pda2 = aStaff->iTakeDevice->iDevID;
 			aUser.PowerGroup = aStaff->iPermissionGroup;
 			int iLogin = 1;
 			if(aStaff->iLoginPermission)iLogin = 1;
@@ -655,8 +676,8 @@ int SetOrgStaff( int aOrgID, int aCmd, const StaffInfo* aStaff )
 			cTEMP.ReleaseBuffer();
 
 			eUser.orgid = aStaff->iOrgID;
-			eUser.pda1 = aStaff->Pda1 ;
-			eUser.pda2 = aStaff->Pda2;
+			eUser.pda1 = aStaff->iTakeDevice->iDevID;
+			//eUser.pda2 = aStaff->Pda2;
 			eUser.PowerGroup = aStaff->iPermissionGroup;
 			int iLogin = 1;
 			if(aStaff->iLoginPermission)iLogin = 1;
@@ -822,6 +843,12 @@ int GetOrgDevice( int aOrgID, vector<DeviceInfo*>* aDeviceList )
 {
     ///////////////////////////////////////////////////
 #ifdef TESTCODE
+    DeviceInfo* device = new DeviceInfo;
+    device->iDeviceType = KPicture;
+    device->iOrgID = aOrgID;
+    device->iDevID = 1;
+    device->iPhoneNum = _T("18602812345");
+    aDeviceList->push_back(device);
     return KErrNone;
 #endif
     ///////////////////////////////////////////////////

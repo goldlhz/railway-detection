@@ -34,10 +34,11 @@ void CEmergencyTask::DoDataExchange(CDataExchange* pDX)
     DDX_Control(pDX, IDC_COMBO_EMERGENCYSTATUS, m_ComboEmergencyStatus);
     //    DDX_Control(pDX, IDC_EMERGENCY_ALLPOINT, m_ListAllPoint);
     //    DDX_Control(pDX, IDC_EMERGENCY_SELETED, m_ListSelectedPoint);
-    DDX_Control(pDX, IDC_COMBO_STARTKM, m_Combo_StartKM);
-    DDX_Control(pDX, IDC_COMBO_ENDKM, m_Combo_EndKM);
+    //DDX_Control(pDX, IDC_COMBO_STARTKM, m_Combo_StartKM);
+    //DDX_Control(pDX, IDC_COMBO_ENDKM, m_Combo_EndKM);
     //DDX_Control(pDX, IDC_LIST_EMSELETED, m_ListEmSeletedStaff);
     //DDX_Control(pDX, IDC_LIST_EMUNSELETED, m_ListEmUnseletedStaff);
+    DDX_Control(pDX, IDC_COMBO_RAILLINE, m_ComboRailLine);
 }
 
 
@@ -76,18 +77,18 @@ BOOL CEmergencyTask::OnInitDialog()
     m_ComboEmergencyStatus.AddString(_T("正常"));
     m_ComboEmergencyStatus.AddString(_T("结束"));
 
-    CString str;
-    for(size_t i=0; i<m_CRWDSClientView->m_CurrentOrg->iMapPoint.size(); i++)
-    {
-        
-        ENCODERAILWAYFULLNAME(str, m_CRWDSClientView->m_CurrentOrg->iMapPoint[i]->iRailLine, 
-                              m_CRWDSClientView->m_CurrentOrg->iMapPoint[i]->iKM, 
-                              m_CRWDSClientView->m_CurrentOrg->iMapPoint[i]->iDirect);
-        m_Combo_StartKM.AddString(str);
-        //m_Combo_StartKM.SetItemData(i, reinterpret_cast<DWORD_PTR>(m_CRWDSClientView->m_MapPoint[i]));
-        m_Combo_EndKM.AddString(str);
-        //m_Combo_EndKM.SetItemData(i, reinterpret_cast<DWORD_PTR>(m_CRWDSClientView->m_MapPoint[i]));
-    }
+    //CString str;
+    //for(size_t i=0; i<m_CRWDSClientView->m_CurrentOrg->iMapPoint.size(); i++)
+    //{
+    //    
+    //    ENCODERAILWAYFULLNAME(str, m_CRWDSClientView->m_CurrentOrg->iMapPoint[i]->iRailLine, 
+    //                          m_CRWDSClientView->m_CurrentOrg->iMapPoint[i]->iKM, 
+    //                          m_CRWDSClientView->m_CurrentOrg->iMapPoint[i]->iDirect);
+    //    m_Combo_StartKM.AddString(str);
+    //    //m_Combo_StartKM.SetItemData(i, reinterpret_cast<DWORD_PTR>(m_CRWDSClientView->m_MapPoint[i]));
+    //    m_Combo_EndKM.AddString(str);
+    //    //m_Combo_EndKM.SetItemData(i, reinterpret_cast<DWORD_PTR>(m_CRWDSClientView->m_MapPoint[i]));
+    //}
 
     int count = m_CRWDSClientView->m_CurrentOrg->iEmergency.size();
     CString id;
@@ -103,7 +104,7 @@ BOOL CEmergencyTask::OnInitDialog()
         name = task->iTaskName;
         if (task->iBeginKm)
         {
-            startKm.Format(_T("%.0f"), task->iBeginKm->iKM);
+            startKm.Format(_T("%.0f"), task->iBeginKm);
         }
         else
         {
@@ -111,7 +112,7 @@ BOOL CEmergencyTask::OnInitDialog()
         }
         if (task->iEndKm)
         {
-            endKm.Format(_T("%.0f"), task->iEndKm->iKM);
+            endKm.Format(_T("%.0f"), task->iEndKm);
         }
         else
         {
@@ -178,20 +179,20 @@ void CEmergencyTask::OnLvnItemchangedEmergencylist(NMHDR *pNMHDR, LRESULT *pResu
     GetDlgItem(IDC_EDIT_ENDHOUR)->SetWindowText(strEndHour);
     GetDlgItem(IDC_EDIT_ENDMINUTE)->SetWindowText(strEndMin);
 
-    m_Combo_StartKM.SetCurSel(-1);
-    m_Combo_EndKM.SetCurSel(-1);
+    //m_Combo_StartKM.SetCurSel(-1);
+    //m_Combo_EndKM.SetCurSel(-1);
 
-    for (size_t i=0; i<m_CRWDSClientView->m_CurrentOrg->iMapPoint.size(); i++)
-    {
-        if (m_CRWDSClientView->m_CurrentOrg->iMapPoint[i] == task->iBeginKm)
-        {
-            m_Combo_StartKM.SetCurSel(i);
-        }
-        if (m_CRWDSClientView->m_CurrentOrg->iMapPoint[i] == task->iEndKm)
-        {
-            m_Combo_EndKM.SetCurSel(i);
-        }
-    }
+    //for (size_t i=0; i<m_CRWDSClientView->m_CurrentOrg->iMapPoint.size(); i++)
+    //{
+    //    if (m_CRWDSClientView->m_CurrentOrg->iMapPoint[i] == task->iBeginKm)
+    //    {
+    //        m_Combo_StartKM.SetCurSel(i);
+    //    }
+    //    if (m_CRWDSClientView->m_CurrentOrg->iMapPoint[i] == task->iEndKm)
+    //    {
+    //        m_Combo_EndKM.SetCurSel(i);
+    //    }
+    //}
     *pResult = 0;
 }
 
@@ -265,17 +266,24 @@ void CEmergencyTask::OnBnClickedBtnEmergencymodify()
     GetDlgItem(IDC_EDIT_EMERGENCYNAME)->GetWindowText(task->iTaskName);
     
     task->iStatus = static_cast<EmergencyStatus>(m_ComboEmergencyStatus.GetCurSel());
-    CString str;
-    if (m_Combo_StartKM.GetCurSel() > -1)
-    {
-        task->iBeginKm = m_CRWDSClientView->m_CurrentOrg->iMapPoint[m_Combo_StartKM.GetCurSel()];
-        
-    }
-    if (m_Combo_EndKM.GetCurSel() > -1)
-    {
-        task->iEndKm = m_CRWDSClientView->m_CurrentOrg->iMapPoint[m_Combo_EndKM.GetCurSel()];
+    task->iLineName = static_cast<RailLine>(m_ComboRailLine.GetCurSel());
 
-    }
+    CString strBegin;
+    CString strEnd;
+    GetDlgItem(IDC_EDIT_EMERGENCYSTARTKM)->GetWindowText(strBegin);
+    GetDlgItem(IDC_EDIT_EMERGENCYENDKM)->GetWindowText(strEnd);
+    task->iBeginKm = _ttof(strBegin);
+    task->iEndKm = _ttof(strEnd);
+    //if (m_Combo_StartKM.GetCurSel() > -1)
+    //{
+    //    task->iBeginKm = m_CRWDSClientView->m_CurrentOrg->iMapPoint[m_Combo_StartKM.GetCurSel()];
+    //    
+    //}
+    //if (m_Combo_EndKM.GetCurSel() > -1)
+    //{
+    //    task->iEndKm = m_CRWDSClientView->m_CurrentOrg->iMapPoint[m_Combo_EndKM.GetCurSel()];
+
+    //}
     GetDlgItem(IDC_EDIT_EMERGENCYREMARK)->GetWindowText(task->iEmergencyRemark);
 
     CString strBeginHour;
@@ -304,17 +312,10 @@ void CEmergencyTask::OnBnClickedBtnEmergencymodify()
     AfxMessageBox(_T("修改成功"), MB_OK);
 
     m_ListCtrl.SetItemText(select, 0, task->iTaskName);
+    m_ListCtrl.SetItemText(select, 2, strBegin);
+    m_ListCtrl.SetItemText(select, 3, strEnd);
 
-    str = _T("");
-    if(task->iBeginKm)
-        str.Format(_T("%s%.0f"), RailLineName[task->iBeginKm->iRailLine], task->iBeginKm->iKM);
-    m_ListCtrl.SetItemText(select, 2, str);
-
-    str = _T("");
-    if(task->iEndKm)
-        str.Format(_T("%s%.0f"), RailLineName[task->iEndKm->iRailLine], task->iEndKm->iKM);
-    m_ListCtrl.SetItemText(select, 3, str);
-
+    CString str;
     if (task->iStatus == KNormal)
         str = _T("正常");
     else
@@ -346,9 +347,10 @@ void CEmergencyTask::OnBnClickedBtnEmergencydelete()
     GetDlgItem(IDC_EDIT_ENDHOUR)->SetWindowText(_T(""));
     GetDlgItem(IDC_EDIT_ENDMINUTE)->SetWindowText(_T(""));
 
-    m_Combo_StartKM.SetCurSel(-1);
-    m_Combo_EndKM.SetCurSel(-1);
+    //m_Combo_StartKM.SetCurSel(-1);
+    //m_Combo_EndKM.SetCurSel(-1);
     m_ComboEmergencyStatus.SetCurSel(-1);
+    m_ComboRailLine.SetCurSel(-1);
 
     m_SeletedTask = NULL;
     delete task;
