@@ -1357,15 +1357,16 @@ bool CAccessBaseData::UpLoadUrgencyReleasePack(const UrgencyRelease_Upload_Pack&
 		{
 		case 0:			// add
 			{
-				sprintf_s(m_strBuffer, INPUTSQLBUFFERS, "insert into T_JJ(Jj_StartP, Jj_Endp, Jj_StartD, Jj_endd, JJ_State, Jj_lineid, jj_org) \
-														values(%d, %d, '%s', '%s', %d, %d, %d)",
+				sprintf_s(m_strBuffer, INPUTSQLBUFFERS, "insert into T_JJ(Jj_StartP, Jj_Endp, Jj_StartD, Jj_endd, JJ_State, Jj_lineid, jj_org, jj_name) \
+														values(%d, %d, '%s', '%s', %d, %d, %d, '%s')",
 					urgencyReleaseUpPack.gDataBodyPack.nStartPointID,
 					urgencyReleaseUpPack.gDataBodyPack.nEndPointID,
 					urgencyReleaseUpPack.gDataBodyPack.strStartTime.c_str(),
 					urgencyReleaseUpPack.gDataBodyPack.strEndTime.c_str(),
 					urgencyReleaseUpPack.gDataBodyPack.nState,
 					urgencyReleaseUpPack.gDataBodyPack.nLineID,
-					urgencyReleaseUpPack.gDataBodyPack.nOrgID);
+					urgencyReleaseUpPack.gDataBodyPack.nOrgID,
+					urgencyReleaseUpPack.gDataBodyPack.strRWName.c_str());
 				nErrorCode = 0;
 			}
 			break;
