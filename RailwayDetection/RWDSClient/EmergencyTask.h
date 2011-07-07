@@ -47,4 +47,5 @@ public:
 //    afx_msg void OnBnClickedBtnEmaddstaff();
 //    afx_msg void OnBnClickedBtnEmremovestaff();
     afx_msg void OnBnClickedBtnSetemstaff();
+    afx_msg void OnNMDblclkEmergencylist(NMHDR *pNMHDR, LRESULT *pResult);
 };

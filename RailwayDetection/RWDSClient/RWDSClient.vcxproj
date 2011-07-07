@@ -127,13 +127,21 @@
     <None Include="UserImages.bmp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CApplication.h" />
     <ClInclude Include="cData.h" />
+    <ClInclude Include="CFont0.h" />
     <ClInclude Include="ClassView.h" />
     <ClInclude Include="CmdDefine.h" />
+    <ClInclude Include="CRange.h" />
+    <ClInclude Include="CWorkbook.h" />
+    <ClInclude Include="CWorkbooks.h" />
+    <ClInclude Include="CWorksheet.h" />
+    <ClInclude Include="CWorksheets.h" />
     <ClInclude Include="Datadef.h" />
     <ClInclude Include="DataListControl.h" />
     <ClInclude Include="DataService.h" />
     <ClInclude Include="DeviceList.h" />
+    <ClInclude Include="EmergencyLogs.h" />
     <ClInclude Include="EmergencyTask.h" />
     <ClInclude Include="ErrorDefine.h" />
     <ClInclude Include="FileView.h" />
@@ -160,6 +168,7 @@
     <ClInclude Include="RWDSClientView.h" />
     <ClInclude Include="Schedule.h" />
     <ClInclude Include="StaffList.h" />
+    <ClInclude Include="StaffLogs.h" />
     <ClInclude Include="StaticData.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -174,6 +183,7 @@
     <ClCompile Include="DataListControl.cpp" />
     <ClCompile Include="DataService.cpp" />
     <ClCompile Include="DeviceList.cpp" />
+    <ClCompile Include="EmergencyLogs.cpp" />
     <ClCompile Include="EmergencyTask.cpp" />
     <ClCompile Include="FileView.cpp" />
     <ClCompile Include="LineList.cpp" />
@@ -196,6 +206,7 @@
     <ClCompile Include="RWDSClientView.cpp" />
     <ClCompile Include="Schedule.cpp" />
     <ClCompile Include="StaffList.cpp" />
+    <ClCompile Include="StaffLogs.cpp" />
     <ClCompile Include="StaticData.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

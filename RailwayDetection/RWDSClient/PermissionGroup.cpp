@@ -67,9 +67,9 @@ BOOL CPermissionGroup::OnInitDialog()
     m_CheckBoxGroup.push_back(&m_CheckBox11);
     m_CheckBoxGroup.push_back(&m_CheckBox12);
 
-    m_ComboPermissionGroup.AddString(_T("设置权限"));
-    m_ComboPermissionGroup.AddString(_T("操作权限"));
-    m_ComboPermissionGroup.AddString(_T("报表权限"));
+    m_ComboPermissionGroup.AddString(_T("权限组1"));
+    m_ComboPermissionGroup.AddString(_T("权限组2"));
+    m_ComboPermissionGroup.AddString(_T("权限组3"));
 
     return TRUE;  // return TRUE unless you set the focus to a control
     // 异常: OCX 属性页应返回 FALSE
@@ -98,12 +98,26 @@ void CPermissionGroup::OnCbnSelchangeComboGroup()
 void CPermissionGroup::OnBnClickedBtnPermisstiongroupmodify()
 {
     // TODO: 在此添加控件通知处理程序代码
-    int index = m_ComboPermissionGroup.GetCurSel();
-    int per = 0;
+    
+    int permissionValue = 0;
     for (size_t i=0; i<m_CheckBoxGroup.size(); i++)
     {
         //m_CheckBox12.GetCheck();
-        per = per | (m_CheckBoxGroup[i]->GetCheck()<<i);
+        permissionValue = permissionValue | (m_CheckBoxGroup[i]->GetCheck()<<i);
     }
-    int tmp = per;
+    int index = m_ComboPermissionGroup.GetCurSel();
+    switch (index)
+    {
+    case 0:
+        theApp.m_LoginPermission.iBasical = permissionValue;
+        break;
+    case 1:
+        theApp.m_LoginPermission.iOperate = permissionValue;
+        break;
+    case 2:
+        theApp.m_LoginPermission.iReportForm = permissionValue;
+        break;
+    default:
+        break;
+    }
 }

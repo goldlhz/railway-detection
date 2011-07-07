@@ -90,7 +90,7 @@ int CLogin::GetLoginOrgID()
     return m_LoginOrgID;
 }
 
-Permission CLogin::GetLoginPermission()
+PermissionGroup CLogin::GetLoginPermission()
 {
     return m_LoginPermission;
 }

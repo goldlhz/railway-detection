@@ -34,4 +34,6 @@ public:
     afx_msg void OnNMDblclkListReport(NMHDR *pNMHDR, LRESULT *pResult);
     afx_msg void OnBnClickedBtnViewdetail();
     afx_msg void OnBnClickedCancel();
+    afx_msg void OnBnClickedBtnExportreport();
+    void GetCellName(int nRow, int nCol, CString &strName);
 };

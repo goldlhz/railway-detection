@@ -66,17 +66,28 @@ BOOL COrgTree::OnInitDialog()
     m_ListSelectedData.InsertColumn(1, _T("姓名"), LVCFMT_LEFT, clientRect.Width()/2);
     if (m_EmergencyTask)
     {
-        StaffInfo* staff;
-        for (size_t i=0; i<m_EmergencyTask->iAppointStaff.size(); i++)
-        {//初始化紧急任务安排人员
-            staff = m_EmergencyTask->iAppointStaff[i];
-            CString str;
-            str.Format(_T("%d"), staff->iOrgID);
+        //StaffInfo* staff;
+        //for (size_t i=0; i<m_EmergencyTask->iAppointStaff.size(); i++)
+        //{//初始化紧急任务安排人员
+        //    staff = m_EmergencyTask->iAppointStaff[i];
+        //    CString str;
+        //    str.Format(_T("%d"), staff->iOrgID);
+        //    m_ListSelectedData.InsertItem(i, str);
+        //    m_ListSelectedData.SetItemText(i, 1, staff->iName);
+        //    m_ListSelectedData.SetItemData(i, (DWORD_PTR)staff);
+        //}
+        CString str;
+        for (size_t i=0; i<m_EmergencyTask->iStaffOrgID.size() && i<m_EmergencyTask->iStaffID.size(); i++)
+        {
+            str.Format(_T("%d"), m_EmergencyTask->iStaffOrgID[i]);
             m_ListSelectedData.InsertItem(i, str);
-            m_ListSelectedData.SetItemText(i, 1, staff->iName);
-            m_ListSelectedData.SetItemData(i, (DWORD_PTR)staff);
+            m_ListSelectedData.SetItemText(i, 1, m_EmergencyTask->iStaffID[i]);
+            StaffInfo* staffTmp = new StaffInfo;
+            staffTmp->iOrgID = m_EmergencyTask->iStaffOrgID[i];
+            staffTmp->iID = m_EmergencyTask->iStaffID[i];
+            staffTmp->iName = m_EmergencyTask->iStaffName[i];
+            m_ListSelectedData.SetItemData(i, (DWORD_PTR)staffTmp);
         }
-        
     }
 
 
@@ -105,21 +116,21 @@ void COrgTree::OnTvnItemexpandingTreeOrg(NMHDR *pNMHDR, LRESULT *pResult)
     // TODO: 在此添加控件通知处理程序代码
     if (pNMTreeView->action ==  TVE_EXPAND)
     {
-        HTREEITEM curItem = reinterpret_cast<LPNMTREEVIEW>(pNMHDR)->itemNew.hItem;
-        if (!m_TreeOrg.ItemHasChildren(curItem))
-        {
-            return;
-        }
-        HTREEITEM childItem = m_TreeOrg.GetChildItem(curItem);
-        OrganizationInfo* curOrg = (OrganizationInfo*) m_TreeOrg.GetItemData(curItem);
-        //m_RWDSClientView->m_CurrentOrg = curOrg;
-        if (m_TreeOrg.GetItemText(childItem).Compare(_T("")) == 0)
-        {//第一次展开
-            if (curOrg->iStaff.size() == 0)
-            {//获取该机构的人员
-                //GetOrgStaff(curOrg->iOrgID, &(curOrg->iStaff));
-            }
-        }
+        //HTREEITEM curItem = reinterpret_cast<LPNMTREEVIEW>(pNMHDR)->itemNew.hItem;
+        //if (!m_TreeOrg.ItemHasChildren(curItem))
+        //{
+        //    return;
+        //}
+        //HTREEITEM childItem = m_TreeOrg.GetChildItem(curItem);
+        //OrganizationInfo* curOrg = (OrganizationInfo*) m_TreeOrg.GetItemData(curItem);
+        ////m_RWDSClientView->m_CurrentOrg = curOrg;
+        //if (m_TreeOrg.GetItemText(childItem).Compare(_T("")) == 0)
+        //{//第一次展开
+        //    if (curOrg->iStaff.size() == 0)
+        //    {//获取该机构的人员
+        //        //GetOrgStaff(curOrg->iOrgID, &(curOrg->iStaff));
+        //    }
+        //}
     }
 
     *pResult = 0;
@@ -241,11 +252,18 @@ void COrgTree::InsertListSelectedData()
     for (int i=0; i<m_ListSelectedData.GetItemCount(); i++)
     {
         addedStaff = (StaffInfo*)m_ListSelectedData.GetItemData(i);
-        if (staff == addedStaff)
+        if (staff->iID == addedStaff->iID
+            && staff->iOrgID == addedStaff->iOrgID
+            && staff->iName == addedStaff->iName)
         {
             flagInsert = FALSE;
             break;
         }
+        //if (staff == addedStaff)
+        //{
+        //    flagInsert = FALSE;
+        //    break;
+        //}
     }
 
     if (flagInsert)
@@ -274,10 +292,17 @@ void COrgTree::OnBnClickedBtnDeletedata()
 void COrgTree::OnBnClickedBtnOk()
 {
     // TODO: 在此添加控件通知处理程序代码
-    m_EmergencyTask->iAppointStaff.clear();
+
+    m_EmergencyTask->iStaffID.clear();
+    m_EmergencyTask->iStaffName.clear();
+    m_EmergencyTask->iStaffOrgID.clear();
+    StaffInfo* staff = NULL;
     for (int i=0; i<m_ListSelectedData.GetItemCount(); i++)
     {
-        m_EmergencyTask->iAppointStaff.push_back((StaffInfo*)m_ListSelectedData.GetItemData(i));
+        staff = (StaffInfo*)m_ListSelectedData.GetItemData(i);
+        m_EmergencyTask->iStaffID.push_back(staff->iID);
+        m_EmergencyTask->iStaffOrgID.push_back(staff->iOrgID);
+        m_EmergencyTask->iStaffName.push_back(staff->iName);
     }
     CDialogEx::OnOK();
 }

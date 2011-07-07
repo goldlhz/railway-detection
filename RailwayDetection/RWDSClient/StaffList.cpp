@@ -75,9 +75,9 @@ BOOL CStaffList::OnInitDialog()
         //str.Format(_T("%d"), staff->iArrangeLine.size());
         //m_ListCtrl.SetItemText(i, 2, str);
     }
-    m_ComboStaffPermission.AddString(_T("设置权限"));
-    m_ComboStaffPermission.AddString(_T("操作权限"));
-    m_ComboStaffPermission.AddString(_T("报表权限"));
+    m_ComboStaffPermission.AddString(_T("权限组1"));
+    m_ComboStaffPermission.AddString(_T("权限组2"));
+    m_ComboStaffPermission.AddString(_T("权限组3"));
 
     int comboIndex = m_ComboStaffDevice.AddString(_T("未指定"));
     m_ComboStaffDevice.SetItemData(comboIndex, NULL);
@@ -261,19 +261,19 @@ void CStaffList::OnBnClickedBtnDelstaff()
         }
     }
 
-    EmergencyTaskInfo* task = NULL;
-    for (size_t i=0; i<m_CRWDSClientView->m_CurrentOrg->iEmergency.size(); i++)
-    {//删除紧急任务关联的员工
-        task = m_CRWDSClientView->m_CurrentOrg->iEmergency[i];
-        for (size_t j=0; j<task->iAppointStaff.size(); j++)
-        {
-            if (m_SeletedStaff == task->iAppointStaff[j])
-            {
-                task->iAppointStaff.erase(task->iAppointStaff.begin()+j);
-                break;
-            }
-        }
-    }
+    //EmergencyTaskInfo* task = NULL;
+    //for (size_t i=0; i<m_CRWDSClientView->m_CurrentOrg->iEmergency.size(); i++)
+    //{//删除紧急任务关联的员工
+    //    task = m_CRWDSClientView->m_CurrentOrg->iEmergency[i];
+    //    for (size_t j=0; j<task->iAppointStaff.size(); j++)
+    //    {
+    //        if (m_SeletedStaff == task->iAppointStaff[j])
+    //        {
+    //            task->iAppointStaff.erase(task->iAppointStaff.begin()+j);
+    //            break;
+    //        }
+    //    }
+    //}
     //SetEmergencyTask(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_EMERGENCY_MODIFY, task);
 
     for (size_t i=0; i<m_CRWDSClientView->m_CurrentOrg->iStaff.size(); i++)

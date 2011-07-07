@@ -36,3 +36,8 @@ const CString strPictureErrorType[] = {
                                        _T("Î´Öª¹ÊÕÏ")
                                       };
 const int strPictureErrorTypeCount = 1;
+
+const CString strPointState[] = {
+                                _T("Õý³£")
+                                };
+const int strPointStateCount = 1;

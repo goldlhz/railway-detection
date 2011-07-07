@@ -9,6 +9,7 @@
 #include "DataService.h"
 #include "CmdDefine.h"
 #include "OrgTree.h"
+#include "EmergencyLogs.h"
 
 
 // CEmergencyTask 对话框
@@ -51,6 +52,7 @@ BEGIN_MESSAGE_MAP(CEmergencyTask, CDialogEx)
 //    ON_BN_CLICKED(IDC_BTN_EMADDSTAFF, &CEmergencyTask::OnBnClickedBtnEmaddstaff)
 //    ON_BN_CLICKED(IDC_BTN_EMREMOVESTAFF, &CEmergencyTask::OnBnClickedBtnEmremovestaff)
 ON_BN_CLICKED(IDC_BTN_SETEMSTAFF, &CEmergencyTask::OnBnClickedBtnSetemstaff)
+ON_NOTIFY(NM_DBLCLK, IDC_EMERGENCYLIST, &CEmergencyTask::OnNMDblclkEmergencylist)
 END_MESSAGE_MAP()
 
 
@@ -93,21 +95,23 @@ BOOL CEmergencyTask::OnInitDialog()
     CString startKm;
     CString endKm;
     CString flag;
+    EmergencyTaskInfo* task = NULL;
     for (int i=0; i<count; i++)
     {
-        id.Format(_T("%d"), m_CRWDSClientView->m_CurrentOrg->iEmergency[i]->iTaskID);
-        name = m_CRWDSClientView->m_CurrentOrg->iEmergency[i]->iTaskName;
-        if (m_CRWDSClientView->m_CurrentOrg->iEmergency[i]->iBeginKm)
+        task = m_CRWDSClientView->m_CurrentOrg->iEmergency[i];
+        id.Format(_T("%d"), task->iTaskID);
+        name = task->iTaskName;
+        if (task->iBeginKm)
         {
-            startKm.Format(_T("%.0f"), m_CRWDSClientView->m_CurrentOrg->iEmergency[i]->iBeginKm->iKM);
+            startKm.Format(_T("%.0f"), task->iBeginKm->iKM);
         }
         else
         {
             startKm = _T("");
         }
-        if (m_CRWDSClientView->m_CurrentOrg->iEmergency[i]->iEndKm)
+        if (task->iEndKm)
         {
-            endKm.Format(_T("%.0f"), m_CRWDSClientView->m_CurrentOrg->iEmergency[i]->iEndKm->iKM);
+            endKm.Format(_T("%.0f"), task->iEndKm->iKM);
         }
         else
         {
@@ -118,7 +122,8 @@ BOOL CEmergencyTask::OnInitDialog()
         m_ListCtrl.SetItemText(i, 1, id);
         m_ListCtrl.SetItemText(i, 2, startKm);
         m_ListCtrl.SetItemText(i, 3, endKm);
-        if (m_CRWDSClientView->m_CurrentOrg->iEmergency[i]->iStatus == KNormal)
+        m_ListCtrl.SetItemData(i, (DWORD_PTR) task);
+        if (task->iStatus == KNormal)
         {
             flag = _T("正常");
         }
@@ -240,6 +245,7 @@ void CEmergencyTask::OnBnClickedBtnEmergencyadd()
 	m_ListCtrl.SetItemText(count, 2, startKm);
 	m_ListCtrl.SetItemText(count, 3, endKm);
     m_ListCtrl.SetItemText(count, 4, flag);
+    m_ListCtrl.SetItemData(count, (DWORD_PTR)task);
 
     m_SeletedTask = NULL;
 }
@@ -366,4 +372,24 @@ void CEmergencyTask::OnBnClickedBtnSetemstaff()
     staffTree.DoModal();
     SetEmergencyTask(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_EMERGENCY_MODIFYSTAFF,
                      m_SeletedTask);
+}
+
+
+void CEmergencyTask::OnNMDblclkEmergencylist(NMHDR *pNMHDR, LRESULT *pResult)
+{
+    LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+    // TODO: 在此添加控件通知处理程序代码
+    POSITION pos;
+    pos = m_ListCtrl.GetFirstSelectedItemPosition();
+    // 得到项目索引
+    int select = m_ListCtrl.GetNextSelectedItem(pos);  
+    if (select<0)
+    {
+        return;
+    }
+    EmergencyTaskInfo* task = (EmergencyTaskInfo*)m_ListCtrl.GetItemData(select);
+    CEmergencyLogs logs;
+    logs.SetEmgergencyTask(task);
+    logs.DoModal();
+    *pResult = 0;
 }

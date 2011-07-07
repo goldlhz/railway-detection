@@ -8,6 +8,13 @@
 #include "DataService.h"
 #include "ErrorDefine.h"
 #include "DataListControl.h"
+#include "CApplication.h"
+#include "CWorkbooks.h"
+#include "CWorksheets.h"
+#include "CRange.h"
+#include "CFont0.h"
+#include "CWorkbook.h"
+#include "CWorksheet.h"
 
 
 // CReport 对话框
@@ -37,6 +44,7 @@ BEGIN_MESSAGE_MAP(CReport, CDialogEx)
     ON_NOTIFY(NM_DBLCLK, IDC_LIST_REPORT, &CReport::OnNMDblclkListReport)
     ON_BN_CLICKED(IDC_BTN_VIEWDETAIL, &CReport::OnBnClickedBtnViewdetail)
     ON_BN_CLICKED(IDCANCEL, &CReport::OnBnClickedCancel)
+    ON_BN_CLICKED(IDC_BTN_EXPORTREPORT, &CReport::OnBnClickedBtnExportreport)
 END_MESSAGE_MAP()
 
 
@@ -156,4 +164,129 @@ void CReport::OnBnClickedCancel()
     m_RWDSClientView->m_OpenReportForm = FALSE;
     CWnd::DestroyWindow();
     //CDialogEx::OnCancel();
+}
+
+//获取单元头的函数：
+
+void   CReport::GetCellName(int nRow, int nCol, CString &strName) 
+{ 
+    int nSeed = nCol; 
+    CString strRow; 
+    char cCell = 'A' + nCol - 1;
+    strName.Format(_T("%c"), cCell); 
+    strRow.Format(_T( "%d "), nRow); 
+    strName += strRow; 
+}
+
+void CReport::OnBnClickedBtnExportreport()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CString strFile = _T("E:\\Test.xlsx");
+    COleVariant covTrue((short)TRUE), covFalse((short)FALSE), covOptional((long)DISP_E_PARAMNOTFOUND,   VT_ERROR); 
+    CApplication   app; 
+    CWorkbooks   books; 
+    CWorkbook   book; 
+    CWorksheets   sheets; 
+    CWorksheet   sheet; 
+    CRange   range; 
+    CFont0   font;
+    if (!app.CreateDispatch(_T("Excel.Application")))
+    {
+        AfxMessageBox(_T("创建失败！"));
+        return;
+    }
+    //Get   a   new   workbook. 
+    books = app.get_Workbooks();
+    book = books.Add(covOptional);
+    sheets = book.get_Worksheets();
+    sheet = sheets.get_Item(COleVariant((short)1));
+
+    CHeaderCtrl   *pmyHeaderCtrl; 
+    pmyHeaderCtrl = m_ListCtrl.GetHeaderCtrl();//此句取得CListCtrl控件的列表頭
+    int   iRow,iCol; 
+    int   m_cols   =   pmyHeaderCtrl-> GetItemCount(); 
+    int   m_rows = m_ListCtrl.GetItemCount(); 
+    HDITEM   hdi; 
+    TCHAR     lpBuffer[256]; 
+    bool       fFound   =   false; 
+    hdi.mask   =   HDI_TEXT; 
+    hdi.pszText   =   lpBuffer; 
+    hdi.cchTextMax   =   256; 
+    CString   colname; 
+    CString strTemp;
+    for(iCol=0;   iCol <m_cols;   iCol++)//将列表的标题头写入EXCEL 
+    { 
+        GetCellName(1 ,iCol + 1, colname);
+        range   =   sheet.get_Range(COleVariant(colname),COleVariant(colname)); 
+        pmyHeaderCtrl-> GetItem(iCol,   &hdi); 
+        range.put_Value2(COleVariant(hdi.pszText));
+        int   nWidth   =   m_ListCtrl.GetColumnWidth(iCol)/6; 
+        //得到第iCol+1列   
+        range.AttachDispatch(range.get_Item(_variant_t((long)(iCol+1)),vtMissing).pdispVal,true);   
+
+        //设置列宽  
+        range.put_ColumnWidth(_variant_t((long)nWidth));
+    } 
+
+    range   =   sheet.get_Range(COleVariant( _T("A1 ")),   COleVariant(colname)); 
+    range.put_RowHeight(_variant_t((long)50));//设置行的高度 
+    font = range.get_Font();
+    font.put_Bold(covTrue);
+    range.put_VerticalAlignment(COleVariant((short)-4108));//xlVAlignCenter   =   -4108
+
+    COleSafeArray   saRet; 
+    DWORD   numElements[]={m_rows,m_cols};       //5x2   element   array 
+    saRet.Create(VT_BSTR,   2,   numElements); 
+    range   =   sheet.get_Range(COleVariant( _T("A2 ")),covOptional); 
+    range = range.get_Resize(COleVariant((short)m_rows),COleVariant((short)m_cols));
+    long   index[2]; 
+    range   =   sheet.get_Range(COleVariant( _T("A2 ")),covOptional); 
+    range   =   range.get_Resize(COleVariant((short)m_rows),COleVariant((short)m_cols)); 
+    for   (   iRow   =   1;   iRow   <=   m_rows;   iRow++)//将列表内容写入EXCEL 
+    { 
+        for   (   iCol   =   1;   iCol   <=   m_cols;   iCol++)   
+        { 
+            index[0]=iRow-1; 
+            index[1]=iCol-1; 
+            CString   szTemp; 
+            szTemp=m_ListCtrl.GetItemText(iRow-1,iCol-1); 
+            BSTR   bstr   =   szTemp.AllocSysString(); 
+            saRet.PutElement(index,bstr); 
+            SysFreeString(bstr); 
+        } 
+    } 
+    range.put_Value2(COleVariant(saRet));
+
+    //       Cnterior cellinterior;
+    //       range   =   sheet.get_Range(COleVariant( _T("A1 ")),covOptional); 
+    //       range   =   range.get_Resize(COleVariant((short)1),COleVariant((short)m_cols)); 
+    //       books = range.get_Interior();
+    //       cellinterior.AttachDispatch(books); 
+    //       cellinterior.put_ColorIndex(COleVariant((short)37));//设置EXCEL头一行的背景颜色
+    //       for(   iRow=1;   iRow   <=   m_rows;   iRow++)//设置EXCEL其余的背景颜色（颜色交替变换）
+    //       { 
+    //                 int   state=iRow%2; 
+    //                 CString   index; 
+    //                 index.Format( _T("A%d "),iRow+1); 
+    //                 range   =   sheet.get_Range(COleVariant(index),covOptional); 
+    //                 range   =   range.get_Resize(COleVariant((short)1),COleVariant((short)m_cols)); 
+    //                 books=range.get_Interior(); 
+    //                 cellinterior.AttachDispatch(books); 
+    //                 if(!state) 
+    //                          cellinterior.put_ColorIndex(COleVariant((short)36));
+    //                 else 
+    //                          cellinterior.put_ColorIndex(COleVariant((short)24));
+    //       } 
+
+    saRet.Detach(); 
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    book.SaveCopyAs(COleVariant(strFile)); 
+    //       cellinterior.ReleaseDispatch(); 
+    book.put_Saved(true);
+    book.ReleaseDispatch();   
+    books.ReleaseDispatch();   
+    app.Quit(); 
+    app.ReleaseDispatch();
 }
