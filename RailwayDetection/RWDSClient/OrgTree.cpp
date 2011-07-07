@@ -194,8 +194,12 @@ void COrgTree::OnTvnSelchangedTreeOrg(NMHDR *pNMHDR, LRESULT *pResult)
     {
         HTREEITEM childItem = m_TreeOrg.GetChildItem(curItem);
         if (!childItem || childItem && m_TreeOrg.GetItemText(childItem).Compare(_T("")) == 0)
-        {//
-            GetOrgStaff(curOrg->iOrgID, &(curOrg->iStaff));
+        {//未获取此机构人员
+            if (curOrg->iDevice.size() == 0)
+            {
+                GetOrgDevice(curOrg->iOrgID, &curOrg->iDevice);
+            }
+            GetOrgStaff(curOrg->iOrgID, curOrg->iDevice, &(curOrg->iStaff));
         }
     }
     m_ListOrgData.DeleteAllItems();
@@ -203,6 +207,10 @@ void COrgTree::OnTvnSelchangedTreeOrg(NMHDR *pNMHDR, LRESULT *pResult)
     for(size_t i=0; i<curOrg->iStaff.size(); i++)
     {
         staff = curOrg->iStaff[i];
+        if (staff->iTakeDevice == NULL)
+        {//若员工没有关联设备，则不能选择为紧急任务人员
+            continue;
+        }
         CString str;
         str.Format(_T("%d"), curOrg->iOrgID);
         m_ListOrgData.InsertItem(i, str);

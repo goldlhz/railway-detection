@@ -187,10 +187,11 @@ typedef struct _Staff
     CString iPassword;
     //vector<LineInfo*> iArrangeLine;//巡查路线
     BOOL iLoginPermission;
-    DeviceInfo* iTakeDevice;
+    DeviceInfo* iTakeDevice;    //所持设备
+    //int iDevID;
     //Permission iPermission;
-	int Pda1;
-	int Pda2;//设备id号
+	//int Pda1;
+	//int Pda2;
 	int iPermissionGroup;
 }StaffInfo;
 
@@ -215,8 +216,9 @@ typedef struct _Emergency
 {
     int iTaskID;
     CString iTaskName;
-    MapPoint* iBeginKm;//开始处
-    MapPoint* iEndKm;//终点
+    RailLine iLineName;
+    double iBeginKm;//开始处
+    double iEndKm;//终点
     time_t iBeginTime;//开始处时间
     time_t iEndTime;//终点处时间
     EmergencyStatus iStatus;//0正常，1结束

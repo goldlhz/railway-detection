@@ -205,18 +205,18 @@ void CPointList::OnBnClickedBtnPointdelete()
 		}
 	}
 
-    for(size_t i=0; i<m_CRWDSClientView->m_CurrentOrg->iEmergency.size(); i++)
-    {//删除线紧急任务中设置的点
-        if (point == m_CRWDSClientView->m_CurrentOrg->iEmergency[i]->iBeginKm)
-        {
-            m_CRWDSClientView->m_CurrentOrg->iEmergency[i]->iBeginKm = NULL;
-        }
-        if (point == m_CRWDSClientView->m_CurrentOrg->iEmergency[i]->iEndKm)
-        {
-            m_CRWDSClientView->m_CurrentOrg->iEmergency[i]->iEndKm = NULL;
-        }
-        SetEmergencyTask(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_EMERGENCY_MODIFY, m_CRWDSClientView->m_CurrentOrg->iEmergency[i]);
-    }
+    //for(size_t i=0; i<m_CRWDSClientView->m_CurrentOrg->iEmergency.size(); i++)
+    //{//删除线紧急任务中设置的点
+    //    if (point == m_CRWDSClientView->m_CurrentOrg->iEmergency[i]->iBeginKm)
+    //    {
+    //        m_CRWDSClientView->m_CurrentOrg->iEmergency[i]->iBeginKm = NULL;
+    //    }
+    //    if (point == m_CRWDSClientView->m_CurrentOrg->iEmergency[i]->iEndKm)
+    //    {
+    //        m_CRWDSClientView->m_CurrentOrg->iEmergency[i]->iEndKm = NULL;
+    //    }
+    //    SetEmergencyTask(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_EMERGENCY_MODIFY, m_CRWDSClientView->m_CurrentOrg->iEmergency[i]);
+    //}
     SetOrgPoint(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_POINT_DELETE, point);
 	delete point;
 

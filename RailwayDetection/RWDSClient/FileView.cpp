@@ -269,8 +269,16 @@ void CFileView::GetOrgData(OrganizationInfo* aOrg)
     Sleep(10);
     GetOrgPoint(aOrg->iOrgID, &aOrg->iMapPoint);
     GetOrgLine(aOrg->iOrgID, aOrg->iMapPoint, &aOrg->iLine);
-    GetOrgStaff(aOrg->iOrgID, &aOrg->iStaff);
-    GetOrgDevice(aOrg->iOrgID, &aOrg->iDevice);
+    if (aOrg->iDevice.size() == 0)
+    {
+        GetOrgDevice(aOrg->iOrgID, &aOrg->iDevice);
+    }
+
+    if (aOrg->iStaff.size() == 0)
+    {//若员工在配置紧急任务时已经获取过，则不需要再次获取
+        GetOrgStaff(aOrg->iOrgID, aOrg->iDevice, &aOrg->iStaff);
+    }
+    
     GetCalendarSchedule(aOrg->iOrgID, &aOrg->iStaff, aOrg->iCalendar);
     messageBox->DestroyWindow();
     delete messageBox;

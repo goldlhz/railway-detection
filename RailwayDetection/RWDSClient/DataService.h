@@ -21,7 +21,7 @@ int GetOrgLine(int aOrgID, const vector<MapPoint*>& aPointList, vector<LineInfo*
 int SetOrgLine(int aOrgID, int aCmd, const LineInfo* aLine);
 
 //获取/设置员工信息
-int GetOrgStaff(int aOrgID, vector<StaffInfo*>* aStaffList);
+int GetOrgStaff(int aOrgID, const vector<DeviceInfo*>& aDeviceList, vector<StaffInfo*>* aStaffList);
 int SetOrgStaff(int aOrgID, int aCmd, const StaffInfo* aStaff);
 
 //获取/设置排班表
