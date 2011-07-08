@@ -1475,26 +1475,14 @@ int  CLogicManager::DealGetUrgencyWorkerListPack(DWORD dNumberOfBytes,
 						pRecordset->GetFieldValue("Jj_Pid", strTemp);
 						m_getUrgencyWorkerListDownPack.gDataBodyPack.strJj_Pid = strTemp;
 						strTemp.LockBuffer();
-
-
-
-
-
-
-
-						pRecordset->GetFieldValue("Jj_Pid", strTemp);
+						
+						pRecordset->GetFieldValue("username", strTemp);
 						m_getUrgencyWorkerListDownPack.gDataBodyPack.strJj_Name = strTemp;
 						strTemp.LockBuffer();
 
-						pRecordset->GetFieldValue("Jj_long", nTemp);
+						pRecordset->GetFieldValue("userOrg", nTemp);
 						m_getUrgencyWorkerListDownPack.gDataBodyPack.nJj_OrgID = nTemp;
-
-
-
-
-
-
-
+												
 						pRecordset->GetFieldValue("Jj_time", strTemp);
 						m_getUrgencyWorkerListDownPack.gDataBodyPack.strJj_Time = strTemp;
 						strTemp.LockBuffer();
@@ -1502,9 +1490,9 @@ int  CLogicManager::DealGetUrgencyWorkerListPack(DWORD dNumberOfBytes,
 						pRecordset->GetFieldValue("Jj_long", nTemp);
 						m_getUrgencyWorkerListDownPack.gDataBodyPack.nJj_long = nTemp;
 
-						m_getUrgencyWorkerListDownPack.nBodyLength = 137;
+						m_getUrgencyWorkerListDownPack.nBodyLength = 101;
 						m_DataPackPares.PackGetUrgencyWorkerListDownBuild(pBuffer, m_getUrgencyWorkerListDownPack);
-						pKeyOverPire->pireOverLappedex.wsaWSABUF.len = m_getUrgencyMissionListDownPack.nBodyLength + 11;
+						pKeyOverPire->pireOverLappedex.wsaWSABUF.len = m_getUrgencyWorkerListDownPack.nBodyLength + 11;
 
 						nTemp = DealSendData(pKeyOverPire, pWorkThread);
 						if(0 != nTemp)
@@ -1518,7 +1506,7 @@ int  CLogicManager::DealGetUrgencyWorkerListPack(DWORD dNumberOfBytes,
 
 	m_DataPackPares.FillGetUrgencyWorkerListFailPack(m_getUrgencyWorkerListDownPack);
 	m_DataPackPares.PackGetUrgencyWorkerListDownBuild(pBuffer, m_getUrgencyWorkerListDownPack);
-	pKeyOverPire->pireOverLappedex.wsaWSABUF.len = m_getUrgencyMissionListDownPack.nBodyLength + 11;
+	pKeyOverPire->pireOverLappedex.wsaWSABUF.len = m_getUrgencyWorkerListDownPack.nBodyLength + 11;
 
 	DealSendData(pKeyOverPire, pWorkThread);
 	return 0;

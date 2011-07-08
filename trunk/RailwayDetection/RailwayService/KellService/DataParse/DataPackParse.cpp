@@ -1412,7 +1412,7 @@ void CDataPackParse::FillGetUrgencyWorkerListFailPack(GetUrgencyWorkerList_Downl
 {
 	getUrgencyWorkerListDownLoadPack.nBeginIdentify = PACK_IDENTIFY;
 	getUrgencyWorkerListDownLoadPack.nMsgNumber = GETURGENCYWORKERLIST_PACK;
-	getUrgencyWorkerListDownLoadPack.nBodyLength = 137;
+	getUrgencyWorkerListDownLoadPack.nBodyLength = 101;
 
 	getUrgencyWorkerListDownLoadPack.gDataBodyPack.nTtlePacket = 0;
 	getUrgencyWorkerListDownLoadPack.gDataBodyPack.nCurrentPacket = 0;
@@ -2747,19 +2747,20 @@ bool CDataPackParse::ParseUrgencyReleasePackData(const char* pDataBuffer, Urgenc
 		memset(m_tempBuffer2, 0x00, TEMP_BUFFER_SIZE);
 		memset(m_tempBuffer3, 0x00, TEMP_BUFFER_SIZE);
 
-		memcpy(m_tempBuffer1, pDataBuffer + 12, 25);
-		memcpy(m_tempBuffer2, pDataBuffer + 37, 25);
-		memcpy(m_tempBuffer3, pDataBuffer + 62, 40);
+		memcpy(m_tempBuffer1, pDataBuffer + 16, 25);
+		memcpy(m_tempBuffer2, pDataBuffer + 41, 25);
+		memcpy(m_tempBuffer3, pDataBuffer + 66, 40);
 
 		urgencyReleaseUpLoadPack.gDataBodyPack.nType = *((unsigned int*)(pDataBuffer));
-		urgencyReleaseUpLoadPack.gDataBodyPack.nStartPointID = *((unsigned int*)(pDataBuffer + 4));
-		urgencyReleaseUpLoadPack.gDataBodyPack.nEndPointID = *((unsigned int*)(pDataBuffer + 8));
+		urgencyReleaseUpLoadPack.gDataBodyPack.nID = *((unsigned int*)(pDataBuffer + 4));
+		urgencyReleaseUpLoadPack.gDataBodyPack.nStartPointID = *((unsigned int*)(pDataBuffer + 8));
+		urgencyReleaseUpLoadPack.gDataBodyPack.nEndPointID = *((unsigned int*)(pDataBuffer + 12));
 		urgencyReleaseUpLoadPack.gDataBodyPack.strStartTime = m_tempBuffer1;
 		urgencyReleaseUpLoadPack.gDataBodyPack.strEndTime = m_tempBuffer2;
 		urgencyReleaseUpLoadPack.gDataBodyPack.strRWName = m_tempBuffer3;
-		urgencyReleaseUpLoadPack.gDataBodyPack.nStartPointID = *((unsigned int*)(pDataBuffer + 102));
-		urgencyReleaseUpLoadPack.gDataBodyPack.nLineID = *((unsigned int*)(pDataBuffer + 106));
-		urgencyReleaseUpLoadPack.gDataBodyPack.nOrgID = *((unsigned int*)(pDataBuffer + 110));
+		urgencyReleaseUpLoadPack.gDataBodyPack.nState = *((unsigned int*)(pDataBuffer + 106));
+		urgencyReleaseUpLoadPack.gDataBodyPack.nLineID = *((unsigned int*)(pDataBuffer + 110));
+		urgencyReleaseUpLoadPack.gDataBodyPack.nOrgID = *((unsigned int*)(pDataBuffer + 114));
 
 		return true;
 	}
@@ -2782,9 +2783,12 @@ bool CDataPackParse::ParseUrgencyWorkerPackData(const char* pDataBuffer, Urgency
 	ASSERT(pDataBuffer);
 	if(pDataBuffer)
 	{
+		memset(m_tempBuffer1, 0x00, TEMP_BUFFER_SIZE);
+		memcpy(m_tempBuffer1, pDataBuffer + 8, 20);
+
 		urgencyWorkerUpLoadPack.gDataBodyPack.nType = *((unsigned int*)(pDataBuffer));
 		urgencyWorkerUpLoadPack.gDataBodyPack.nJJ_ID = *((unsigned int*)(pDataBuffer + 4));
-		urgencyWorkerUpLoadPack.gDataBodyPack.nJJ_PID = *((unsigned int*)(pDataBuffer + 8));
+		urgencyWorkerUpLoadPack.gDataBodyPack.strJJ_PID = m_tempBuffer1;
 		urgencyWorkerUpLoadPack.gDataBodyPack.nJJ_PDevice = *((unsigned int*)(pDataBuffer + 12));
 
 
@@ -2890,11 +2894,12 @@ bool CDataPackParse::BuildGetUrgencyMissionListPackData(char* pDataBuffer, const
 		*((unsigned int*)(pDataBuffer + 4)) = getUrgencyMissionListDownLoadPack.gDataBodyPack.nCurrentPacket;
 		memcpy(pDataBuffer + 8, getUrgencyMissionListDownLoadPack.gDataBodyPack.strSTime.c_str(), getUrgencyMissionListDownLoadPack.gDataBodyPack.strSTime.length());
 		memcpy(pDataBuffer + 38, getUrgencyMissionListDownLoadPack.gDataBodyPack.strETime.c_str(), getUrgencyMissionListDownLoadPack.gDataBodyPack.strETime.length());
-		*((unsigned int*)(pDataBuffer + 58)) = getUrgencyMissionListDownLoadPack.gDataBodyPack.nState;
-		*((unsigned int*)(pDataBuffer + 62)) = getUrgencyMissionListDownLoadPack.gDataBodyPack.nID;
-		*((unsigned int*)(pDataBuffer + 66)) = getUrgencyMissionListDownLoadPack.gDataBodyPack.nLineID;
-		*((unsigned int*)(pDataBuffer + 70)) = getUrgencyMissionListDownLoadPack.gDataBodyPack.nSPoint;
-		*((unsigned int*)(pDataBuffer + 74)) = getUrgencyMissionListDownLoadPack.gDataBodyPack.nEPoint;
+		memcpy(pDataBuffer + 58, getUrgencyMissionListDownLoadPack.gDataBodyPack.strRWName.c_str(), getUrgencyMissionListDownLoadPack.gDataBodyPack.strRWName.length());
+		*((unsigned int*)(pDataBuffer + 98)) = getUrgencyMissionListDownLoadPack.gDataBodyPack.nState;
+		*((unsigned int*)(pDataBuffer + 102)) = getUrgencyMissionListDownLoadPack.gDataBodyPack.nID;
+		*((unsigned int*)(pDataBuffer + 106)) = getUrgencyMissionListDownLoadPack.gDataBodyPack.nLineID;
+		*((unsigned int*)(pDataBuffer + 110)) = getUrgencyMissionListDownLoadPack.gDataBodyPack.nSPoint;
+		*((unsigned int*)(pDataBuffer + 114)) = getUrgencyMissionListDownLoadPack.gDataBodyPack.nEPoint;
 
 		return true;
 	}
@@ -3182,7 +3187,7 @@ bool CDataPackParse::ParseUrgencyMissionDeletePackData(const char* pDataBuffer, 
 	ASSERT(pDataBuffer);
 	if(pDataBuffer)
 	{
-		urgencyMissionDeleteUpLoadPack.gDataBodyPack.nOrgID = *((unsigned int*)(pDataBuffer));
+		urgencyMissionDeleteUpLoadPack.gDataBodyPack.nJJRW = *((unsigned int*)(pDataBuffer));
 		return true;
 	}
 	return false;

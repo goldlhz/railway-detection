@@ -1373,16 +1373,17 @@ bool CAccessBaseData::UpLoadUrgencyReleasePack(const UrgencyRelease_Upload_Pack&
 
 		case 1:			// edit
 			{
-				sprintf_s(m_strBuffer, INPUTSQLBUFFERS, "update T_JJ set Jj_StartP = %d, Jj_Endp = %d, Jj_StartD ='%s', Jj_endd = '%s', JJ_State = %d, , Jj_lineid = %d, jj_org  = %d \
+				sprintf_s(m_strBuffer, INPUTSQLBUFFERS, "update T_JJ set Jj_StartP = %d, Jj_Endp = %d, Jj_StartD ='%s', Jj_endd = '%s', JJ_State = %d, Jj_lineid = %d, jj_org  = %d, jj_name = '%s' \
 														where Jj_Id = %d",
 					urgencyReleaseUpPack.gDataBodyPack.nStartPointID,
 					urgencyReleaseUpPack.gDataBodyPack.nEndPointID,
 					urgencyReleaseUpPack.gDataBodyPack.strStartTime.c_str(),
 					urgencyReleaseUpPack.gDataBodyPack.strEndTime.c_str(),
 					urgencyReleaseUpPack.gDataBodyPack.nState,
-					urgencyReleaseUpPack.gDataBodyPack.nID,
 					urgencyReleaseUpPack.gDataBodyPack.nLineID,
-					urgencyReleaseUpPack.gDataBodyPack.nOrgID);
+					urgencyReleaseUpPack.gDataBodyPack.nOrgID,
+					urgencyReleaseUpPack.gDataBodyPack.strRWName.c_str(),
+					urgencyReleaseUpPack.gDataBodyPack.nID);
 				nErrorCode = 0;
 			}
 			break;
@@ -1442,29 +1443,29 @@ bool CAccessBaseData::UpLoadUrgencyWorkerPack(const UrgencyWorker_Upload_Pack& u
 		{
 		case 0:			// add
 			{
-				sprintf_s(m_strBuffer, INPUTSQLBUFFERS, "insert into t_jjry(Jj_id, Jj_Pid, Jj_pDevice) values(%d, %d, %d)",
+				sprintf_s(m_strBuffer, INPUTSQLBUFFERS, "insert into t_jjry(Jj_id, Jj_Pid, Jj_pDevice) values(%d, '%s', %d)",
 					urgencyWorkerUpPack.gDataBodyPack.nJJ_ID,
-					urgencyWorkerUpPack.gDataBodyPack.nJJ_PID,
+					urgencyWorkerUpPack.gDataBodyPack.strJJ_PID.c_str(),
 					urgencyWorkerUpPack.gDataBodyPack.nJJ_PDevice);
 				nErrorCode = 0;
 			}
 			break;
 
-		case 1:			// edit
-			{
-				sprintf_s(m_strBuffer, INPUTSQLBUFFERS, "update t_jjry set Jj_id = %d, Jj_Pid = %d, Jj_pDevice = %d where Jy_Id = %d",
-					urgencyWorkerUpPack.gDataBodyPack.nJJ_ID,
-					urgencyWorkerUpPack.gDataBodyPack.nJJ_PID,
-					urgencyWorkerUpPack.gDataBodyPack.nJJ_PDevice,
-					urgencyWorkerUpPack.gDataBodyPack.nID);
-				nErrorCode = 0;
-			}
-			break;
+		//case 1:			// edit
+		//	{
+		//		sprintf_s(m_strBuffer, INPUTSQLBUFFERS, "update t_jjry set Jj_id = %d, Jj_Pid = '%s', Jj_pDevice = %d where Jy_Id = %d",
+		//			urgencyWorkerUpPack.gDataBodyPack.nJJ_ID,
+		//			urgencyWorkerUpPack.gDataBodyPack.strJJ_PID,
+		//			urgencyWorkerUpPack.gDataBodyPack.nJJ_PDevice,
+		//			urgencyWorkerUpPack.gDataBodyPack.nID);
+		//		nErrorCode = 0;
+		//	}
+		//	break;
 
-		case 2:			// del
+		case 1:			// del
 			{
-				sprintf_s(m_strBuffer, INPUTSQLBUFFERS, "delete t_jjry where Jy_Id = %d",
-					urgencyWorkerUpPack.gDataBodyPack.nID);
+				sprintf_s(m_strBuffer, INPUTSQLBUFFERS, "delete t_jjry where Jj_Pid = '%s'",
+					urgencyWorkerUpPack.gDataBodyPack.strJJ_PID.c_str());
 				nErrorCode = 0;
 			}
 			break;
@@ -1607,7 +1608,7 @@ CADORecordset* CAccessBaseData::UploadGetUrgencyWorkerListPack(const GetUrgencyW
 	if(m_pDatabase)
 	{
 		memset(m_strBuffer, 0x00, INPUTSQLBUFFERS);
-		sprintf_s(m_strBuffer, INPUTSQLBUFFERS, "select * from t_jjry where jj_id = %d",
+		sprintf_s(m_strBuffer, INPUTSQLBUFFERS, "select *, (select top 1 [user_name] from t_user where t_user.user_oper = t_jjry.jj_pid) as username, (select top 1 User_Org from t_user where t_user.user_oper = t_jjry.jj_pid) as userOrg from t_jjry where jj_id = %d",
 			askDeviceListUpPack.gDataBodyPack.nJJID);
 
 		if(!m_pDatabase->IsOpen())
@@ -1977,7 +1978,7 @@ bool CAccessBaseData::UpLoadUrgencyMissionDeletePack(const UrgencyMissionDelete_
 
 		memset(m_strBuffer, 0x00, INPUTSQLBUFFERS);
 		sprintf_s(m_strBuffer, INPUTSQLBUFFERS, "Delete from t_jjry where jj_id = %d",
-			urgencyMissionDeleteUpPack.gDataBodyPack.nOrgID);
+			urgencyMissionDeleteUpPack.gDataBodyPack.nJJRW);
 
 		if(!m_pDatabase->IsOpen())
 		{
