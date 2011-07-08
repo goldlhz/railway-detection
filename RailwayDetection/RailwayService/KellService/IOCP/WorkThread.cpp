@@ -177,7 +177,7 @@ bool CWorkThread::InitWorkThread(
 
 	string strConnection;
 
-	m_pAdoDatabase->SetConnectionTimeout(5);
+	m_pAdoDatabase->SetConnectionTimeout(10);
 	strConnection= FormatConnectString(pGobalConfig);
 
 	if(m_pAdoDatabase->Open(strConnection.c_str()))
@@ -523,10 +523,12 @@ string CWorkThread::FormatConnectString(CGobalConfig* pGobalConfig)
 	if(pGobalConfig)
 	{
 		char strConnection[MAX_PATH];
-
 		sprintf_s(strConnection, MAX_PATH, "Provider=SQLOLEDB.1;Password=%s;Persist Security Info=True;User ID=%s;Initial Catalog=%s;Data Source=%s",
 			pGobalConfig->GetPassword().c_str(), pGobalConfig->GetUserName().c_str(), pGobalConfig->GetDatabase().c_str(), pGobalConfig->GetHost().c_str());
 
+		//sprintf_s(strConnection, MAX_PATH, "Provider=SQLOLEDB.1;Persist Security Info=False;Initial Catalog=%s;Data Source=%s",
+		//	pGobalConfig->GetDatabase().c_str(), pGobalConfig->GetHost().c_str());
+		
 		return strConnection;
 	}
 	return "";
