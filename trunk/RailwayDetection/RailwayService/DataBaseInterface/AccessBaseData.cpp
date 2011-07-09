@@ -117,47 +117,52 @@ bool CAccessBaseData::UploadLoginPack(const Login_UpLoad_Pack& loginUpPack,
 				goto ErrorDeal;
 			}
 
-			int nUserID = 0;
+			//int nUserID = 0;
 			int nOrgID = 0;
 			int nPowerGroup = 0;
 
-			m_adoRecordSet.GetFieldValue("User_Id", nUserID);
+			//m_adoRecordSet.GetFieldValue("User_Id", nUserID);
 			m_adoRecordSet.GetFieldValue("User_Org", nOrgID);
 			m_adoRecordSet.GetFieldValue("User_PGroup", nPowerGroup);
+
 			loginDownPack.gDataBodyPack.nOrgID = nOrgID;
+			loginDownPack.gDataBodyPack.nUser_PGroup = nPowerGroup;
+			loginDownPack.gDataBodyPack.nPower2 = 0;
+			loginDownPack.gDataBodyPack.nPower3 = 0;
 
+			nErrorCode = 0;
+			//memset(m_strBuffer, 0x00, INPUTSQLBUFFERS);
+			//sprintf_s(m_strBuffer, INPUTSQLBUFFERS, "select * from T_PowerGroup where Power_Id=%d", nPowerGroup);
 
-			memset(m_strBuffer, 0x00, INPUTSQLBUFFERS);
-			sprintf_s(m_strBuffer, INPUTSQLBUFFERS, "select * from T_PowerGroup where Power_Id=%d", nPowerGroup);
+			//if(m_adoRecordSet.Open(m_pDatabase->GetActiveConnection(), m_strBuffer))
+			//{
+			//	if(m_adoRecordSet.GetRecordCount() <= 0)
+			//	{
+			//		goto ErrorDeal;
+			//	}
 
-			if(m_adoRecordSet.Open(m_pDatabase->GetActiveConnection(), m_strBuffer))
-			{
-				if(m_adoRecordSet.GetRecordCount() <= 0)
-				{
-					goto ErrorDeal;
-				}
+			//	//m_adoRecordSet.GetFieldValue("Group1", (unsigned long&)loginDownPack.gDataBodyPack.nPower1);
 
-				m_adoRecordSet.GetFieldValue("Group1", (unsigned long&)loginDownPack.gDataBodyPack.nPower1);
-				m_adoRecordSet.GetFieldValue("Group2", (unsigned long&)loginDownPack.gDataBodyPack.nPower2);
-				m_adoRecordSet.GetFieldValue("Group3", (unsigned long&)loginDownPack.gDataBodyPack.nPower3);
+			//	m_adoRecordSet.GetFieldValue("Group2", (unsigned long&)loginDownPack.gDataBodyPack.nPower2);
+			//	m_adoRecordSet.GetFieldValue("Group3", (unsigned long&)loginDownPack.gDataBodyPack.nPower3);
 
-				string strTime = GetCurrentTimeByFormat();
+			//	string strTime = GetCurrentTimeByFormat();
 
-				memset(m_strBuffer, 0x00, INPUTSQLBUFFERS);
+			//	memset(m_strBuffer, 0x00, INPUTSQLBUFFERS);
 
-				sprintf_s(m_strBuffer, INPUTSQLBUFFERS, 
-					"update T_User set User_LoginTimes = User_LoginTimes + 1, \
-					User_LastLoginTimes = '%s' where User_Id = %d",
-					strTime.c_str(),
-					nUserID);
+			//	sprintf_s(m_strBuffer, INPUTSQLBUFFERS, 
+			//		"update T_User set User_LoginTimes = User_LoginTimes + 1, \
+			//		User_LastLoginTimes = '%s' where User_Id = %d",
+			//		strTime.c_str(),
+			//		nUserID);
 
-				if(!m_pDatabase->Execute(m_strBuffer))
-				{
-					goto ErrorDeal;
-				}
+			//	if(!m_pDatabase->Execute(m_strBuffer))
+			//	{
+			//		goto ErrorDeal;
+			//	}
 
-				nErrorCode = 0;
-			}
+			//	nErrorCode = 0;
+			//}
 		}
 
 ErrorDeal:
@@ -335,11 +340,11 @@ CADORecordset* CAccessBaseData::UploadAskOrgListPack(const AskOrgList_UpLoad_Pac
 
 		if(askOrgListUpPack.gDataBodyPack.nOrgID == 0)
 		{
-			sprintf_s(m_strBuffer, INPUTSQLBUFFERS, "select * from t_org");
+			sprintf_s(m_strBuffer, INPUTSQLBUFFERS, "select * from t_org order by org_lev asc");
 		}
 		else
 		{
-			sprintf_s(m_strBuffer, INPUTSQLBUFFERS, "select * from t_org where dbo.cherkorg(%d, org_id) = 1",
+			sprintf_s(m_strBuffer, INPUTSQLBUFFERS, "select * from t_org where dbo.cherkorg(%d, org_id) = 1 order by org_lev asc",
 				askOrgListUpPack.gDataBodyPack.nOrgID);
 		}
 

@@ -225,7 +225,7 @@ private:
 		void* pWorkThread,
 		void* pFunDealSendData);
 private:
-	void FillPicStoreStruct(GPSPIC_Pack& gpsPicUpLoadPack, string strTel);
+	void FillPicStoreStruct(GPSPIC_Pack& gpsPicUpLoadPack, string strTel, int nType);
 	bool BuildPicDir(string strDir);
 
 	CDataPackParse			m_DataPackPares;
