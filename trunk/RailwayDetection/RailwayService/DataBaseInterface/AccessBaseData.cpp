@@ -1422,6 +1422,19 @@ bool CAccessBaseData::UpLoadUrgencyReleasePack(const UrgencyRelease_Upload_Pack&
 				nErrorCode = 1;
 				goto ErrorDeal;
 			}
+
+			if(0 == urgencyReleaseUpPack.gDataBodyPack.nType)
+			{
+				memset(m_strBuffer, 0x00, INPUTSQLBUFFERS);
+				sprintf_s(m_strBuffer, INPUTSQLBUFFERS, "SELECT MAX(Jj_Id) AS Expr1 FROM T_JJ");
+
+				if(m_adoRecordSet.Open(m_pDatabase->GetActiveConnection(), m_strBuffer))
+				{
+					m_adoRecordSet.GetFieldValue("Expr1", nErrorCode);
+					goto ErrorDeal;
+				}
+				nErrorCode = 0;
+			}
 		}
 
 ErrorDeal:

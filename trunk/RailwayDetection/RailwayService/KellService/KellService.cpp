@@ -38,9 +38,9 @@ int APIENTRY _tWinMain(
 	ghInstance = hInstance;
 	glpCmdLine = lpCmdLine;
 
-	CIOCPManager iocpManger;
-	iocpManger.InitSysParam(ghInstance, glpCmdLine);
-	iocpManger.RunService();
+	//CIOCPManager iocpManger;
+	//iocpManger.InitSysParam(ghInstance, glpCmdLine);
+	//iocpManger.RunService();
 
 
 	strcpy(lpCmdLineData, lpCmdLine);
