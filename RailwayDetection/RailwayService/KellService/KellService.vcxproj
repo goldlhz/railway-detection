@@ -64,8 +64,12 @@
       <StackCommitSize>40960</StackCommitSize>
     </Link>
     <PostBuildEvent>
-      <Command>copy ..\ConfigFileLib\System.ini ..\Bin\BinD\System.ini
-copy ..\ConfigFileLib\loger.ini ..\Bin\BinD\LogPlugin\loger.ini</Command>
+      <Command>copy ..\ConfigFileLib\启动服务器.bat ..\Bin\BinR\启动服务器.bat
+copy ..\ConfigFileLib\停止服务器.bat ..\Bin\BinR\停止服务器.bat
+copy ..\ConfigFileLib\卸载服务器.bat ..\Bin\BinR\卸载服务器.bat
+copy ..\ConfigFileLib\注册服务器.bat ..\Bin\BinR\注册服务器.bat
+copy ..\ConfigFileLib\System.ini ..\Bin\BinR\System.ini
+copy ..\ConfigFileLib\loger.ini ..\Bin\BinR\LogPlugin\loger.ini</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -89,7 +93,11 @@ copy ..\ConfigFileLib\loger.ini ..\Bin\BinD\LogPlugin\loger.ini</Command>
       <StackCommitSize>40960</StackCommitSize>
     </Link>
     <PostBuildEvent>
-      <Command>copy ..\ConfigFileLib\System.ini ..\Bin\BinR\System.ini
+      <Command>copy ..\ConfigFileLib\启动服务器.bat ..\Bin\BinR\启动服务器.bat
+copy ..\ConfigFileLib\停止服务器.bat ..\Bin\BinR\停止服务器.bat
+copy ..\ConfigFileLib\卸载服务器.bat ..\Bin\BinR\卸载服务器.bat
+copy ..\ConfigFileLib\注册服务器.bat ..\Bin\BinR\注册服务器.bat
+copy ..\ConfigFileLib\System.ini ..\Bin\BinR\System.ini
 copy ..\ConfigFileLib\loger.ini ..\Bin\BinR\LogPlugin\loger.ini</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>

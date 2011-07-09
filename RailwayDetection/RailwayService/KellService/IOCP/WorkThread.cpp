@@ -86,6 +86,16 @@ unsigned int CWorkThread::ExecuteThread()
 			{
 				TRACE(("服务器GetQueuedCompletionStatus收到未知错误:%d\n"), nErrorCode);
 				WriteLogInfo(LOG_DEBUG, _T("CWorkThread::ExecuteThread(), GetQueuedCompletionStatus返回一个未知错误:%d,但此时套接字好像还可以用,暂时不关闭套接字"), nErrorCode);
+			
+				if(pireCompletionKey)
+				{
+					m_pSocketPool->CloseSpecSocket(pireCompletionKey->keyOptSocket);
+					m_pMemoryPool->ReleaseOverKeyPire(pireOverLappedex);
+
+					m_pSocketPool->RecycleSocket();
+					m_pMemoryPool->RecycleMemory();
+				}
+				
 				continue;
 			}
 		}
