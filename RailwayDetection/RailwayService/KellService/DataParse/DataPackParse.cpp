@@ -82,15 +82,17 @@ bool CDataPackParse::PackGPSUpParse(const char* pDataBuffer,
 	return false;
 }
 
-bool CDataPackParse::PackGPSUpPicParse(string& strDestGPSContext, string& strDestGPSPicContext)
+bool CDataPackParse::PackGPSUpPicParse(string& strDestGPSContext, string& strDestGPSPicContext, int& nType)
 {
 	int nSite;
+
 	unsigned int nPicLength;
 
 	nSite = ParseGPSPicDataSite(strDestGPSContext);
 	if(-1 != nSite)
 	{
 		nPicLength = *(unsigned int*)(&strDestGPSContext[nSite]);
+		nType = *(unsigned short*)(&strDestGPSContext[nSite + 4 + nPicLength]);
 		strDestGPSPicContext.append(&strDestGPSContext[nSite + 4], nPicLength);
 
 		return true;
@@ -160,7 +162,7 @@ void CDataPackParse::FillLoginFailPack(Login_DownLoad_Pack& loginDownLoadPack)
 	loginDownLoadPack.nBodyLength = 20;
 
 	loginDownLoadPack.gDataBodyPack.nResult = 1;
-	loginDownLoadPack.gDataBodyPack.nPower1 = 0;
+	loginDownLoadPack.gDataBodyPack.nUser_PGroup = 0;
 	loginDownLoadPack.gDataBodyPack.nPower2 = 0;
 	loginDownLoadPack.gDataBodyPack.nPower3 = 0;
 	loginDownLoadPack.gDataBodyPack.nOrgID = 0;
@@ -1969,7 +1971,7 @@ bool CDataPackParse::BuildLoginPackData(char* pDataBuffer, const Login_DownLoad_
 	if(pDataBuffer)
 	{
 		*((unsigned int*)(pDataBuffer)) = loginDownLoadPack.gDataBodyPack.nResult;
-		*((unsigned int*)(pDataBuffer + 4)) = loginDownLoadPack.gDataBodyPack.nPower1;
+		*((unsigned int*)(pDataBuffer + 4)) = loginDownLoadPack.gDataBodyPack.nUser_PGroup;
 		*((unsigned int*)(pDataBuffer + 8)) = loginDownLoadPack.gDataBodyPack.nPower2;
 		*((unsigned int*)(pDataBuffer + 12)) = loginDownLoadPack.gDataBodyPack.nPower3;
 		*((unsigned int*)(pDataBuffer + 16)) = loginDownLoadPack.gDataBodyPack.nOrgID;
@@ -3036,10 +3038,10 @@ bool CDataPackParse::ParseSetPointPackData(const char* pDataBuffer, SetPoint_Upl
 		setPointUpLoadPack.gDataBodyPack.nPointId = *((unsigned int*)(pDataBuffer + 4));
 		setPointUpLoadPack.gDataBodyPack.nIRailLine = *((unsigned int*)(pDataBuffer + 8));
 
-		setPointUpLoadPack.gDataBodyPack.dIKM = *((unsigned int*)(pDataBuffer + 12));
-		setPointUpLoadPack.gDataBodyPack.dILon = *((unsigned int*)(pDataBuffer + 20));
-		setPointUpLoadPack.gDataBodyPack.dILat = *((unsigned int*)(pDataBuffer + 28));
-		setPointUpLoadPack.gDataBodyPack.nIDirect = *((int*)(pDataBuffer + 32));
+		setPointUpLoadPack.gDataBodyPack.dIKM = *((double*)(pDataBuffer + 12));
+		setPointUpLoadPack.gDataBodyPack.dILon = *((double*)(pDataBuffer + 20));
+		setPointUpLoadPack.gDataBodyPack.dILat = *((double*)(pDataBuffer + 28));
+		setPointUpLoadPack.gDataBodyPack.nIDirect = *((int*)(pDataBuffer + 36));
 
 		return true;
 	}

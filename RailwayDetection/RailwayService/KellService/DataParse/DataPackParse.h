@@ -18,7 +18,7 @@ public:
 	// 缺省认为buffer的长度为1024
 	bool PackGPSUpParse(const char* pDataBuffer, GPS_UpLoad_Pack& gpsUpLoadPack, 
 		DWORD& dNumberOfBytes, string& strGPSContext, string& strTel);	// 解析上行数据包
-	bool PackGPSUpPicParse(string& strDestGPSContext, string& strDestGPSPicContext);
+	bool PackGPSUpPicParse(string& strDestGPSContext, string& strDestGPSPicContext, int& nType);
 	
 	int  PackGPSDownBuild(char* pDataBuffer, const GPS_DownLoad_Pack& gpsDownLoadPack);	// 格式化下行数据包
 	void FillGPSFailPack(GPS_DownLoad_Pack& gpsDownLoadPack);							// 填写失败时的返回包
