@@ -71,7 +71,7 @@ struct Login_Upload_Type
 struct Login_DownLoad_Type
 {
 	unsigned int nResult;					// 0成功或1失败
-	unsigned int nPower1;
+	unsigned int nUser_PGroup;
 	unsigned int nPower2;
 	unsigned int nPower3;
 	unsigned int nOrgID;					// 机构号
@@ -511,6 +511,7 @@ struct UrgencyRelease_Upload_Type
 	unsigned int nEndPointID;
 	string		 strStartTime;
 	string		 strEndTime;
+	string		 strRWName;
 	unsigned int nState;
 	unsigned int nLineID;
 	unsigned int nOrgID;
@@ -527,9 +528,8 @@ typedef Pack_Shell_Type<UrgencyRelease_Download_Type> UrgencyRelease_Download_Pa
 struct UrgencyWorker_Upload_Type 
 {
 	unsigned int nType;
-	unsigned int nID;
 	unsigned int nJJ_ID;
-	unsigned int nJJ_PID;
+	string       strJJ_PID;
 	unsigned int nJJ_PDevice;
 };
 
@@ -592,6 +592,7 @@ struct GetUrgencyMissionList_Download_Type
 	unsigned  int nCurrentPacket;
 	string		  strSTime;
 	string		  strETime;
+	string		  strRWName;
 	unsigned  int nState;
 	unsigned  int nID;
 	unsigned  int nLineID;
@@ -612,6 +613,8 @@ struct GetUrgencyWorkerList_Download_Type
 	unsigned  int nTtlePacket;
 	unsigned  int nCurrentPacket;
 	string		  strJj_Pid;
+	string		  strJj_Name;
+	unsigned  int nJj_OrgID;
 	string		  strJj_Time;
 	unsigned  int nJj_long;
 };
@@ -770,7 +773,7 @@ typedef Pack_Shell_Type<WorkerPollQuery_Download_Type> WorkerPollQuery_Download_
 // 紧急任务人员删除msgnum=0x31
 struct UrgencyMissionDelete_Upload_Type
 {
-	unsigned  int nOrgID;
+	unsigned  int nJJRW;
 };
 struct UrgencyMissionDelete_Download_Type
 {
