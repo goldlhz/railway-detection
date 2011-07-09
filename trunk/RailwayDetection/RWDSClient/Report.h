@@ -26,7 +26,7 @@ private:
     CRWDSClientView* m_RWDSClientView;
 public:
     CListCtrl m_ListCtrl;
-    CComboBox m_ComboReportMonth;
+    //CComboBox m_ComboReportMonth;
 public:
     virtual BOOL OnInitDialog();
     
@@ -36,4 +36,5 @@ public:
     afx_msg void OnBnClickedCancel();
     afx_msg void OnBnClickedBtnExportreport();
     void GetCellName(int nRow, int nCol, CString &strName);
+    void ViewReportDetail(ReportInfo* aReport);
 };

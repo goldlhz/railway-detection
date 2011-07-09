@@ -87,6 +87,10 @@ BEGIN_MESSAGE_MAP(CRWDSClientView, CView)
 	ON_COMMAND(ID_REVIEW_VOICE, &CRWDSClientView::OnReviewVoice)
     ON_COMMAND(ID_REPORT_MONTH, &CRWDSClientView::OnReportMonth)
     ON_COMMAND(ID_SET_PERMISSIONGROUP, &CRWDSClientView::OnSetPermissiongroup)
+    ON_UPDATE_COMMAND_UI(ID_REVIEW_PICTURE, &CRWDSClientView::OnUpdateReviewPicture)
+    ON_UPDATE_COMMAND_UI(ID_REVIEW_VOICE, &CRWDSClientView::OnUpdateReviewVoice)
+    ON_UPDATE_COMMAND_UI(ID_REPORT_MONTH, &CRWDSClientView::OnUpdateReportMonth)
+    ON_UPDATE_COMMAND_UI(ID_REVIEW_RECORDSTAFF, &CRWDSClientView::OnUpdateReviewRecordstaff)
 END_MESSAGE_MAP()
 
 BEGIN_EVENTSINK_MAP(CRWDSClientView, CView)
@@ -210,29 +214,29 @@ CRWDSClientDoc* CRWDSClientView::GetDocument() const // 非调试版本是内联的
 
 int CRWDSClientView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
-    PRINTTRACE(_T("123"));
+    //PRINTTRACE(_T("123"));
 	if (CView::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
-    PRINTTRACE(_T("456"));
+    //PRINTTRACE(_T("456"));
 	gClientView = this;
 	// TODO:  在此添加您专用的创建代码
-	CString strLic = _T("uQnZi2sFw22L0-MRa8pYX-2E6P1077-3N6M0499-5C038223-10884-12802-36882-8029");
-	BSTR bstrLic = strLic.AllocSysString();
-	if(!m_MapX.Create(NULL, WS_VISIBLE, CRect(0,0,100,100), this, IDC_MAP, NULL, FALSE, bstrLic))
+	//CString strLic = _T("uQnZi2sFw22L0-MRa8pYX-2E6P1077-3N6M0499-5C038223-10884-12802-36882-8029");
+	//BSTR bstrLic = strLic.AllocSysString();
+	if(!m_MapX.Create(NULL, WS_VISIBLE, CRect(0,0,100,100), this, IDC_MAP, NULL, FALSE))
 	{
         m_MapLoaded = FALSE;
 		//return -1;
 	}
-    PRINTTRACE(_T("789"));
-	::SysFreeString(bstrLic); 
+    //PRINTTRACE(_T("789"));
+	//::SysFreeString(bstrLic); 
 	//if(!m_MapX.Create(NULL, WS_VISIBLE, CRect(0,0,100,100), this, IDC_MAP))
 	//{
 	//	return -1;
 	//}
     if (m_MapLoaded)
     {
-        PRINTTRACE(_T("111111"));
+        //PRINTTRACE(_T("111111"));
 	    try 
         {	
             //CString curDir;
@@ -301,19 +305,19 @@ int CRWDSClientView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	    }
 	    catch (COleDispatchException *e) 
 	    {
-            PRINTTRACE(_T("aaaa"));
+            //PRINTTRACE(_T("aaaa"));
 		    e->ReportError();
 		    e->Delete();
 	    } 
 	    catch (COleException *e)
 	    {
-            PRINTTRACE(_T("bbbbbbb"));
+            //PRINTTRACE(_T("bbbbbbb"));
 		    e->ReportError();
 		    e->Delete();
 	    }
         m_MapX.SetRedrawInterval(2000);
     }
-	PRINTTRACE(_T("ccccccccc"));
+	//PRINTTRACE(_T("ccccccccc"));
 	m_FileView = &((CMainFrame *)AfxGetApp()->m_pMainWnd)->GetFileView();
 	//m_FileView->SetRWDSClientView(this);
 	//m_FileView->FillFileView();
@@ -323,6 +327,11 @@ int CRWDSClientView::OnCreate(LPCREATESTRUCT lpCreateStruct)
     //获取初始化数据
     m_Org.clear();
     GetOrgTree(theApp.m_LoginOrgID, &m_Org);
+    if (m_Org.size() == 0)
+    {
+        AfxMessageBox(_T("机构获取失败，请重新登录"));
+        return -1;
+    }
     //OrganizationInfo* org = m_Org[0];
 	MapxCleanAllFeature(m_SymbolLayer);
 
@@ -330,6 +339,36 @@ int CRWDSClientView::OnCreate(LPCREATESTRUCT lpCreateStruct)
     m_CurrentPermission.iBasical = theApp.m_LoginPermission.iBasical;
     m_CurrentPermission.iOperate = theApp.m_LoginPermission.iOperate;
     m_CurrentPermission.iReportForm = theApp.m_LoginPermission.iReportForm;
+
+    //读取铁路线
+    CStdioFile file;
+    CString filename = GetModulePath() + _T("\\linename.cfg");
+    if( file.Open(filename, CFile::modeRead) )
+    {
+        CString strLine;
+        CString strName;
+        CString strNo;
+        while(file.ReadString(strLine))
+        {
+            int equare = strLine.Find('=', 0);
+            if (equare == -1)
+            {
+                continue;
+            }
+            strName = strLine.Left(equare);
+            strNo = strLine.Right(strLine.GetLength() - equare - 1);
+            strRailLineName.push_back(strName);
+            strRailLineNameCount++;
+        }
+    }
+    else
+    {//不能打开文件，填入默认值
+        for (int i=0; i<50; i++)
+        {
+            strRailLineName.push_back(_T("未知线路"));
+        }
+        strRailLineNameCount = 50;
+    }
 	return 0;
 }
 
@@ -499,17 +538,23 @@ CString CRWDSClientView::LoadMapInfoFromFile()
 	CString curDir;
 	curDir = GetModulePath();
     CString mapPath = _T("");
-    if(!pFile.Open(curDir + _T("\\map.cfg"), CFile::modeRead, &e))
-    {//return default
 
-        mapPath = curDir + _T("\\map\\") + m_MapName;
+    if(pFile.Open(curDir + _T("\\map.cfg"), CFile::modeRead, &e))
+    {
+        char* tmp = mapPath.GetBuffer(MAX_PATH);
+        memset(tmp, '\0', MAX_PATH);
+        pFile.Read(tmp, MAX_PATH);
+        mapPath.ReleaseBuffer();
+        if (mapPath.Left(1) == ".")
+        {//文件设置为当前路径
+            mapPath = curDir + mapPath.Right(mapPath.GetLength()-1);
+        }
+        int pos = mapPath.ReverseFind('\\');
+        m_MapName = mapPath.Right(mapPath.GetLength() - pos -1 );
     }
     else
     {
-        pFile.Read(mapPath.GetBuffer(MAX_PATH), MAX_PATH);
-        mapPath.ReleaseBuffer();
-        int pos = mapPath.ReverseFind('\\');
-        m_MapName = mapPath.Right(mapPath.GetLength() - pos);
+        mapPath = curDir + _T("\\map\\") + m_MapName;
     }
     return mapPath;
 }
@@ -844,73 +889,6 @@ void CRWDSClientView::OnTimer(UINT_PTR nIDEvent)
 }
 
 
-void CRWDSClientView::OnReviewRecorddevice()
-{
-    // TODO: 在此添加命令处理程序代码
-}
-
-
-void CRWDSClientView::OnReviewRecordstaff()
-{
-    // TODO: 在此添加命令处理程序代码
-    m_DisplayFlag = KStaffLog;
-    CRecordStaff rstaff(this);
-    if(m_CurrentOrg && rstaff.DoModal() == IDOK)
-    {
-        if (!m_StaffRecord)
-        {
-            m_StaffRecord = new RecordStaff;
-        }
-        int recordSelect = rstaff.GetSelect();
-       // m_StaffRecord->iStaff = m_CurrentOrg->iStaff[recordSelect];
-
-        //获取员工巡查记录
-        //GetStaffCurrentTrack(rstaff.GetPickDateTime(), m_StaffRecord);
-        //vector<double> recordLon;
-        //vector<double> recordLat;
-        //GetStaffScheduleTrack(_ttoi(m_CurrentOrg->iStaff[recordSelect]->iID), rstaff.GetPickDateTime(), 
-        //    &recordLon, &recordLat);
-        //GetStaffScheduleTrack()
-        MapxCleanAllFeature(m_SymbolLayer);
-        MapxCleanAllFeature(m_TrackLayer);
-
-        MapPoint* point = NULL;
-        LineInfo* line = NULL;
-        double centerX = 0.0;
-        double centerY = 0.0;
-        //for (size_t i=0; i<m_StaffRecord->iStaff->iArrangeLine.size(); i++)
-        //{//显示该员工所设计的路线
-        //    line = m_StaffRecord->iStaff->iArrangeLine[i];
-        //    for (size_t j=0; j<line->iLineKmLonLat.size(); j++)
-        //    {
-        //        point = line->iLineKmLonLat[j];
-        //        MapxDrawCircle(point->iLon, point->iLat, m_SymbolLayer);
-        //        if (centerX == 0 || centerY == 0)
-        //        {
-        //            centerX = point->iLon;
-        //            centerY = point->iLat;
-        //        }
-        //    }
-        //}
-
-        for (size_t i=0; i<m_StaffRecord->iRecordLon.size() && i<m_StaffRecord->iRecordLat.size() ; i++)
-        {//描绘员工巡查路线
-            MapxDrawCircle(m_StaffRecord->iRecordLon[i], m_StaffRecord->iRecordLat[i], m_TrackLayer, miColorRed);
-            if (centerX == 0 || centerY == 0)
-            {
-                centerX = m_StaffRecord->iRecordLon[0];
-                centerY = m_StaffRecord->iRecordLat[0];
-            }
-        }
-        m_MapX.SetCenterX(centerX);
-        m_MapX.SetCenterY(centerY);
-        m_MapX.SetZoom(m_InitZoom/256);
-        CMainFrame* mainFrame = (CMainFrame *)GetParentFrame();
-        //CString str;
-        //str = m_StaffRecord->iStaff->iName + _T("巡查记录");
-        //mainFrame->m_wndStatusBar.SetPaneText(mainFrame->m_wndStatusBar.CommandToIndex(ID_RECORD), str);
-    }
-}
 
 void CRWDSClientView::DeleteAllMapPoint()
 {
@@ -1052,9 +1030,6 @@ void CRWDSClientView::OnSetEmergencytask()
     task.DoModal();
 }
 
-
-
-
 void CRWDSClientView::OnSetOrganization()
 {
     // TODO: 在此添加命令处理程序代码
@@ -1073,7 +1048,7 @@ void CRWDSClientView::OnSetDevice()
     if (!m_CurrentOrg)
     {
         AfxMessageBox(_T("请选择机构"));
-            return;
+        return;
     }
     CDeviceList device(this);
     device.DoModal();
@@ -1082,7 +1057,7 @@ void CRWDSClientView::OnSetDevice()
 void CRWDSClientView::OnUpdateSetEmergencytask(CCmdUI *pCmdUI)
 {
     // TODO: 在此添加命令更新用户界面处理程序代码
-    if (!m_CurrentPermission.iBasical)
+    if (!(m_CurrentPermission.iBasical & PERMISSIONSETEMERGENCY) )
     {//登录者不能设置任务
         pCmdUI->Enable(FALSE);
     }
@@ -1092,7 +1067,7 @@ void CRWDSClientView::OnUpdateSetEmergencytask(CCmdUI *pCmdUI)
 void CRWDSClientView::OnUpdateSetLine(CCmdUI *pCmdUI)
 {
     // TODO: 在此添加命令更新用户界面处理程序代码
-    if (!m_CurrentPermission.iBasical)
+    if (!(m_CurrentPermission.iBasical & PERMISSIONSETLINE) )
     {//登录者不能设置任务
         pCmdUI->Enable(FALSE);
     }
@@ -1102,7 +1077,7 @@ void CRWDSClientView::OnUpdateSetLine(CCmdUI *pCmdUI)
 void CRWDSClientView::OnUpdateSetOrganization(CCmdUI *pCmdUI)
 {
     // TODO: 在此添加命令更新用户界面处理程序代码
-    if (!m_CurrentPermission.iBasical)
+    if (!(m_CurrentPermission.iBasical & PERMISSIONSETORG) )
     {//登录者不能设置任务
         pCmdUI->Enable(FALSE);
     }
@@ -1112,7 +1087,7 @@ void CRWDSClientView::OnUpdateSetOrganization(CCmdUI *pCmdUI)
 void CRWDSClientView::OnUpdateSetPoint(CCmdUI *pCmdUI)
 {
     // TODO: 在此添加命令更新用户界面处理程序代码
-    if (!m_CurrentPermission.iBasical)
+    if (!(m_CurrentPermission.iBasical & PERMISSIONSETPOINT) )
     {//登录者不能设置任务
         pCmdUI->Enable(FALSE);
     }
@@ -1122,7 +1097,7 @@ void CRWDSClientView::OnUpdateSetPoint(CCmdUI *pCmdUI)
 void CRWDSClientView::OnUpdateSetSchedule(CCmdUI *pCmdUI)
 {
     // TODO: 在此添加命令更新用户界面处理程序代码
-    if (!m_CurrentPermission.iBasical)
+    if (!(m_CurrentPermission.iBasical & PERMISSIONSCHEDULE) )
     {//登录者不能设置任务
         pCmdUI->Enable(FALSE);
     }
@@ -1132,7 +1107,7 @@ void CRWDSClientView::OnUpdateSetSchedule(CCmdUI *pCmdUI)
 void CRWDSClientView::OnUpdateSetStaff(CCmdUI *pCmdUI)
 {
     // TODO: 在此添加命令更新用户界面处理程序代码
-    if (!m_CurrentPermission.iBasical)
+    if (!(m_CurrentPermission.iBasical & PERMISSIONSETSTAFF) )
     {//登录者不能设置任务
         pCmdUI->Enable(FALSE);
     }
@@ -1141,7 +1116,47 @@ void CRWDSClientView::OnUpdateSetStaff(CCmdUI *pCmdUI)
 void CRWDSClientView::OnUpdateSetDevice(CCmdUI *pCmdUI)
 {
     // TODO: 在此添加命令更新用户界面处理程序代码
-    if (!m_CurrentPermission.iBasical)
+    if (!(m_CurrentPermission.iBasical & PERMISSIONSETDEVICE) )
+    {//登录者不能设置任务
+        pCmdUI->Enable(FALSE);
+    }
+}
+
+
+void CRWDSClientView::OnUpdateReviewPicture(CCmdUI *pCmdUI)
+{
+    // TODO: 在此添加命令更新用户界面处理程序代码
+    if (!(m_CurrentPermission.iBasical & PERMISSIONVIEWPICTURE) )
+    {//登录者不能设置任务
+        pCmdUI->Enable(FALSE);
+    }
+}
+
+
+void CRWDSClientView::OnUpdateReviewVoice(CCmdUI *pCmdUI)
+{
+    // TODO: 在此添加命令更新用户界面处理程序代码
+    if (!(m_CurrentPermission.iBasical & PERMISSIONVIEWVOICE) )
+    {//登录者不能设置任务
+        pCmdUI->Enable(FALSE);
+    }
+}
+
+
+void CRWDSClientView::OnUpdateReportMonth(CCmdUI *pCmdUI)
+{
+    // TODO: 在此添加命令更新用户界面处理程序代码
+    if (!(m_CurrentPermission.iBasical & PERMISSIONVIEWREPORT) )
+    {//登录者不能设置任务
+        pCmdUI->Enable(FALSE);
+    }
+}
+
+
+void CRWDSClientView::OnUpdateReviewRecordstaff(CCmdUI *pCmdUI)
+{
+    // TODO: 在此添加命令更新用户界面处理程序代码
+    if (!(m_CurrentPermission.iBasical & PERMISSIONVIEWRECORDE))
     {//登录者不能设置任务
         pCmdUI->Enable(FALSE);
     }
@@ -1155,7 +1170,7 @@ void CRWDSClientView::OnResetOrg()
     //清空树形结构
     pMain->m_wndFileView.CleanFileView();
     //重新获取机构
-    //m_Org.clear();
+    m_Org.clear();
     DeleteOrgListElement(&m_Org);
     GetOrgTree(theApp.m_LoginOrgID, &m_Org);
     pMain->m_wndFileView.FillFileView();
@@ -1167,6 +1182,7 @@ void CRWDSClientView::OnReviewPicture()
     // TODO: 在此添加命令处理程序代码
     if (!m_CurrentOrg)
     {
+        AfxMessageBox(_T("请选择机构"));
         return;
     }
     CPitureReview picture(this);
@@ -1177,6 +1193,11 @@ void CRWDSClientView::OnReviewPicture()
 void CRWDSClientView::OnReviewVoice()
 {
 	// TODO: 在此添加命令处理程序代码
+    if (!m_CurrentOrg)
+    {
+        AfxMessageBox(_T("请选择机构"));
+        return;
+    }
 	CVoiceList voice;
 	voice.DoModal();
 }
@@ -1187,6 +1208,7 @@ void CRWDSClientView::OnReportMonth()
     // TODO: 在此添加命令处理程序代码
     if (!m_CurrentOrg)
     {
+        AfxMessageBox(_T("请选择机构"));
         return;
     }
     if (!m_OpenReportForm)
@@ -1195,6 +1217,75 @@ void CRWDSClientView::OnReportMonth()
         m_ReportForm->Create(IDD_REVIEWREPORT);
         m_ReportForm->ShowWindow(SW_SHOW); 
         m_OpenReportForm = TRUE;
+    }
+}
+
+
+void CRWDSClientView::OnReviewRecorddevice()
+{
+    // TODO: 在此添加命令处理程序代码
+}
+
+
+void CRWDSClientView::OnReviewRecordstaff()
+{
+    // TODO: 在此添加命令处理程序代码
+    if (!m_CurrentOrg)
+    {
+        AfxMessageBox(_T("请选择机构"));
+        return;
+    }
+    m_DisplayFlag = KStaffLog;
+    CRecordStaff rstaff(this);
+    if(m_CurrentOrg && rstaff.DoModal() == IDOK)
+    {
+        if (!m_StaffRecord)
+        {
+            m_StaffRecord = new RecordStaff;
+        }
+        m_StaffRecord->iRecordLat.clear();
+        m_StaffRecord->iRecordLon.clear();
+        m_StaffRecord->iArrivedTime.clear();
+        //int recordSelect = rstaff.GetSelect();
+        time_t pickTime = rstaff.GetPickDateTime();
+        StaffInfo* staff = rstaff.GetSelectedStaff();
+        GetStaffScheduleTrack(staff->iID, pickTime, m_StaffRecord);
+
+        MapxCleanAllFeature(m_SymbolLayer);
+        MapxCleanAllFeature(m_TrackLayer);
+
+        MapPoint* point = NULL;
+        LineInfo* line = NULL;
+        double centerX = 0.0;
+        double centerY = 0.0;
+        
+        if (m_StaffRecord->iRecordLon.size() > 0 
+            && m_StaffRecord->iRecordLat.size() > 0)
+        {
+            for (size_t i=0; i<m_StaffRecord->iRecordLon.size() && i<m_StaffRecord->iRecordLat.size() ; i++)
+            {//描绘员工巡查路线
+                MapxDrawCircle(m_StaffRecord->iRecordLon[i], m_StaffRecord->iRecordLat[i], m_TrackLayer, miColorRed);
+                if (centerX == 0 || centerY == 0)
+                {
+                    centerX = m_StaffRecord->iRecordLon[0];
+                    centerY = m_StaffRecord->iRecordLat[0];
+                }
+            }
+            if (m_MapLoaded)
+            {
+                m_MapX.SetCenterX(centerX);
+                m_MapX.SetCenterY(centerY);
+                m_MapX.SetZoom(m_InitZoom/256);
+            }
+            CMainFrame* mainFrame = (CMainFrame *)GetParentFrame();
+            CString str;
+            str = staff->iName + _T("巡查记录");
+            mainFrame->m_wndStatusBar.SetPaneText(mainFrame->m_wndStatusBar.CommandToIndex(ID_RECORD), str);
+        }
+        else
+        {
+            AfxMessageBox(_T("无该员工记录"));
+        }
     }
 }
 

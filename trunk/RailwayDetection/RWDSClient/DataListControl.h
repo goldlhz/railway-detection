@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <afx.h>
 
-#define ENABLETRACE
+//#define ENABLETRACE
 
 #ifdef ENABLETRACE
 #define PRINTTRACE(a) \

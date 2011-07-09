@@ -121,10 +121,12 @@ typedef struct
 typedef struct
 {
 	unsigned  int type;//0 add 1 edit 
+	unsigned  int iTaskId; 
 	unsigned  int startPointId;
 	unsigned  int endPointId;
 	char  startTime[25];
 	char  endTime[25];
+	char  rwName[40];
 	unsigned  int state;
 	unsigned int lineid;
 	unsigned  int orgid;

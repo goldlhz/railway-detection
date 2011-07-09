@@ -32,7 +32,7 @@ private:
     CButton m_BtnSetPassword;
     CListCtrl m_ListCtrl;
     CComboBox m_ComboStaffDevice;
-    CComboBox m_ComboStaffPermission;
+    //CComboBox m_ComboStaffPermission;
 public:
 
     virtual BOOL OnInitDialog();
@@ -47,4 +47,5 @@ public:
     
 
 
+    afx_msg void OnBnClickedBtnSetpermission();
 };

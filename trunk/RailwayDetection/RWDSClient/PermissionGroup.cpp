@@ -14,7 +14,7 @@ IMPLEMENT_DYNAMIC(CPermissionGroup, CDialogEx)
 CPermissionGroup::CPermissionGroup(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CPermissionGroup::IDD, pParent)
 {
-
+    m_PermissionValue = 0;
 }
 
 CPermissionGroup::~CPermissionGroup()
@@ -71,6 +71,11 @@ BOOL CPermissionGroup::OnInitDialog()
     m_ComboPermissionGroup.AddString(_T("权限组2"));
     m_ComboPermissionGroup.AddString(_T("权限组3"));
 
+    for (size_t i=0; i<m_CheckBoxGroup.size(); i++)
+    {
+        m_CheckBoxGroup[i]->SetCheck(0x01 & m_PermissionValue>>i);
+    }
+
     return TRUE;  // return TRUE unless you set the focus to a control
     // 异常: OCX 属性页应返回 FALSE
 }
@@ -105,19 +110,31 @@ void CPermissionGroup::OnBnClickedBtnPermisstiongroupmodify()
         //m_CheckBox12.GetCheck();
         permissionValue = permissionValue | (m_CheckBoxGroup[i]->GetCheck()<<i);
     }
-    int index = m_ComboPermissionGroup.GetCurSel();
-    switch (index)
-    {
-    case 0:
-        theApp.m_LoginPermission.iBasical = permissionValue;
-        break;
-    case 1:
-        theApp.m_LoginPermission.iOperate = permissionValue;
-        break;
-    case 2:
-        theApp.m_LoginPermission.iReportForm = permissionValue;
-        break;
-    default:
-        break;
-    }
+    m_PermissionValue = permissionValue;
+    OnOK();
+    //int index = m_ComboPermissionGroup.GetCurSel();
+    //switch (index)
+    //{
+    //case 0:
+    //    theApp.m_LoginPermission.iBasical = permissionValue;
+    //    break;
+    //case 1:
+    //    theApp.m_LoginPermission.iOperate = permissionValue;
+    //    break;
+    //case 2:
+    //    theApp.m_LoginPermission.iReportForm = permissionValue;
+    //    break;
+    //default:
+    //    break;
+    //}
+}
+
+unsigned int CPermissionGroup::GetPermisstionValue()
+{
+    return m_PermissionValue;
+}
+
+void CPermissionGroup::SetPermissionValue( unsigned int aPermissionValue )
+{
+    m_PermissionValue = aPermissionValue;
 }

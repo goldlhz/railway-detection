@@ -20,6 +20,7 @@ public:
 public:
     int GetSelect();
     time_t GetPickDateTime();
+    StaffInfo* GetSelectedStaff();
     void SetDateVisible(BOOL aVisible);
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV Ö§³Ö
@@ -32,6 +33,7 @@ private:
     CButton m_RadioCurrentTrack;
     int m_Select;
     CTime m_PickDateTime;
+    StaffInfo* m_Staff;
 public:
     afx_msg void OnBnClickedOk();
     afx_msg void OnBnClickedCancel();

@@ -58,9 +58,9 @@ BOOL CStaffLogs::OnInitDialog()
     m_ListCtrl.InsertColumn(1, _T("实到时间"), LVCFMT_LEFT, clientRect.Width()/3);
     m_ListCtrl.InsertColumn(2, _T("状态"), LVCFMT_LEFT, clientRect.Width()/3);
     CString textShow;
-    textShow.Format(_T("员工:%s, 计划到达: %d, 实际到达: %d, 未到达: %d, 异常: %d"),
-                    m_Report->iStaffName, m_Report->iPlanArrived, m_Report->iActualArrived,
-                    m_Report->iUnArrived, m_Report->iAbnormal);
+    textShow.Format(_T("员工:%s, 计划到达: %d, 实际到达: %d, 异常: %d, 未到达: %d"),
+        m_Report->iStaffName, m_Report->iPlanArrived, m_Report->iActualArrived, 
+        m_Report->iAbnormal, m_Report->iUnArrived);
     GetDlgItem(IDC_STAFFLOGS)->SetWindowText(textShow);
 
     m_Detail.iDay = _T("");
@@ -70,9 +70,10 @@ BOOL CStaffLogs::OnInitDialog()
     GetReportDetail(m_Report->iStaffName, m_Report->iReportDay, &m_Detail);
     for (size_t i=0; i<m_Detail.iActualArrivedTime.size() && i<m_Detail.iPlanArrivedTime.size() && i<m_Detail.iState.size(); i++)
     {
+        int state = m_Detail.iState[i] < strPointStateCount ? m_Detail.iState[i]:0;
         m_ListCtrl.InsertItem(i, m_Detail.iPlanArrivedTime[i]);
         m_ListCtrl.SetItemText(i, 1, m_Detail.iPlanArrivedTime[i]);
-        m_ListCtrl.SetItemText(i, 2, strPointState[m_Detail.iState[i]]);
+        m_ListCtrl.SetItemText(i, 2, strPointState[state]);
     }
 
     return TRUE;  // return TRUE unless you set the focus to a control

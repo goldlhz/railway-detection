@@ -73,11 +73,10 @@ void CPitureReview::OnBnClickedBtnDownloadpicture()
     for (size_t i=0; i<m_PictureList.size(); i++)
     {
         picture = m_PictureList[i];
+        int errType = picture->iErrorType < strPictureErrorTypeCount ? picture->iErrorType:0;
         m_ListCtrl.InsertItem(i, picture->iPicName);
-        //CTime shootingTime(picture->iShootingTime);
-        //CString str = shootingTime.Format(_T("%Y-%m-%d %H:%M:%S"));//2011-1-1 12:00:00
         m_ListCtrl.SetItemText(i, 1, picture->iShootingTime);
-        m_ListCtrl.SetItemText(i, 2, strPictureErrorType[picture->iErrorType]);
+        m_ListCtrl.SetItemText(i, 2, strPictureErrorType[errType]);
         m_ListCtrl.SetItemData(i, (DWORD_PTR)picture);
     }
 }

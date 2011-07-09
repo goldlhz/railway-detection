@@ -323,7 +323,7 @@ typedef struct
 	unsigned  int totlePacket;
 	unsigned  int CurrentPacket;
 	unsigned  int Pagesize;
-	char param [1024];
+	char param [1024*3];
 }realpiclist;
 //获取某天巡检
 typedef struct
@@ -367,14 +367,62 @@ typedef lryxj1result::iterator Iterryxj1result;
 ////紧急任务人员删除
 typedef struct
 {
-	unsigned  int iOrgid;
+	unsigned  int iTaskId;
 }jjDel;
 
 typedef struct
 {
 	unsigned  int iresult;
 }jDleRersult;
+//紧急任务列表
+typedef struct
+{
+unsigned  int Orgid;
+}Getjj;
 
+typedef struct
+{
+	unsigned  int totlePacket;
+	unsigned  int CurrentPacket;
+	char stime[30];
+	char etime[20];
+	char  rwName[40];
+	unsigned  int state;
+	unsigned  int id;////////
+	unsigned  int lineid;
+	unsigned  int spoint;
+	unsigned  int epoint;
+}jjListresult;
+typedef list<jjListresult> ljjListresult;
+typedef ljjListresult::iterator IterljjListresult;
+
+////
+typedef struct
+{
+unsigned  int jjid;
+}Getjjry;
+
+
+	//unsigned  int nTtlePacket;
+	//unsigned  int nCurrentPacket;
+	//string		  strJj_Pid;
+	//string		  strJj_Name;
+	//unsigned  int nJj_OrgID;
+	//string		  strJj_Time;
+	//unsigned  int nJj_long
+
+typedef struct
+{
+unsigned  int totlePacket;
+unsigned  int CurrentPacket;
+char Jj_Pid[20];
+char		  strJj_Name[40];
+unsigned  int nJj_OrgID;
+char Jj_time[25];
+unsigned  int Jj_long;
+}jjryListresult;
+typedef list<jjryListresult> ljjryListresult;
+typedef ljjryListresult::iterator IterlljjryListresult;
 //////////////////////
 //////////////////////////////////////////////////////////////////////////
 ///
@@ -422,6 +470,10 @@ typedef struct
 #define GETGPSDATE_PACKET               0x30
 #define DELALLJJRY_PACKET               0x31
 #define XJMX_PACKET                     0x32
+
+#define GETJJRWLIST_PACKET              0x27
+#define GETJJRWRYLIST_PACKET            0x28
+#define DELETERY_PACKET                 0x31
 
 #define NoSocket                        0x00
 #define NoData                          0x01

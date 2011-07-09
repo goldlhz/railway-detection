@@ -15,6 +15,7 @@ CRecordStaff::CRecordStaff(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CRecordStaff::IDD, pParent)
 {
     m_CRWDSClientView = static_cast<CRWDSClientView*>(pParent);
+    
 }
 
 CRecordStaff::~CRecordStaff()
@@ -46,11 +47,13 @@ BOOL CRecordStaff::OnInitDialog()
     CDialogEx::OnInitDialog();
 
     // TODO:  在此添加额外的初始化
+    m_Staff = NULL;;
     if (m_CRWDSClientView->m_DisplayFlag == KStaffLog)
     {
         for(size_t i=0; i<m_CRWDSClientView->m_CurrentOrg->iStaff.size(); i++)
         {
             m_ComboRecord.AddString(m_CRWDSClientView->m_CurrentOrg->iStaff[i]->iName);
+            m_ComboRecord.SetItemData(i, (DWORD_PTR)m_CRWDSClientView->m_CurrentOrg->iStaff[i]);
         }
     }
     else if (m_CRWDSClientView->m_DisplayFlag == KDeviceLog)
@@ -89,12 +92,15 @@ void CRecordStaff::OnBnClickedOk()
     }
     else if (GetCheckedRadioButton(IDC_RADIO_CURRENTTRACK, IDC_RADIO_RECORD) == IDC_RADIO_CURRENTTRACK)
     {
-        m_PickDateTime = CTime::GetTickCount();
+        m_PickDateTime = CTime::GetCurrentTime();
     }
     else
     {
-        AfxMessageBox(_T("请记录"));
+        AfxMessageBox(_T("请选择时间"));
+        return;
     }
+
+    m_Staff = (StaffInfo*)m_ComboRecord.GetItemData(m_ComboRecord.GetCurSel());
 
     CDialogEx::OnOK();
 }
@@ -142,6 +148,11 @@ void CRecordStaff::SetDateVisible( BOOL aVisible )
 time_t CRecordStaff::GetPickDateTime()
 {
     return m_PickDateTime.GetTime();
+}
+
+StaffInfo* CRecordStaff::GetSelectedStaff()
+{
+    return m_Staff;
 }
 
 

@@ -2,17 +2,29 @@
 #include "TCPTransmit.h"
 #include "cData.h"
 #include "hXJ.h"
+#include <shlwapi.h>
 
 
 
 const int port = 9527 ;
-const char* destIp = "192.168.0.192\0";
+const char* destIp = "182.143.211.1\0";
 cData::cData(void)
 {
 	cs = new CTCPClient();
 	iSocketState = 0;
-	iSocketState = cs->Open(port,(char*)destIp);
+	//CString str;
+	char ip[30];
+	memset(ip,0,30);
 
+    CString modDir;
+    GetModuleFileName(NULL, modDir.GetBuffer(MAX_PATH), MAX_PATH); 
+    modDir.ReleaseBuffer();
+    int pos;   
+    pos = modDir.ReverseFind('\\');   
+    modDir = modDir.Left(pos);
+    CString filename = modDir + _T("\\sys.ini");
+	::GetPrivateProfileString("ip","host","127.0.0.1",ip,30,filename); 
+	iSocketState = cs->Open(port,ip);
 }
 //select datename(dw,'2011-1-4 1:2:3') 取星期几
 int cData::UserLog(char * UserName,char *UserPwd,int *Orgid,int *p1,int *p2,int *p3)
@@ -49,7 +61,6 @@ int cData::UserLog(char * UserName,char *UserPwd,int *Orgid,int *p1,int *p2,int 
 	{
 		return -1;
 	}
-	//LoginRerquestResult ls;
 	memset(cTempBuf,0,sizeof(cTempBuf));
 	int it = 11 + sizeof(LoginRerquestResult);
 	Sleep(10);
@@ -62,12 +73,15 @@ int cData::UserLog(char * UserName,char *UserPwd,int *Orgid,int *p1,int *p2,int 
 		return -1;
 	}
 
-	DepressPacket(lr,dUser_Login,cTempBuf);
+	if(DepressPacket(lr,dUser_Login,cTempBuf))
+	{
 	*Orgid = lr.Orgid ;
 	*p1   = lr.Power1;
 	*p2 = lr.Power2;
 	*p3 = lr.Power3;
-
+	}
+	else 
+		lr.iResult = 1;
 	delete pDataBuffer;
 	return lr.iResult;
 }
@@ -103,7 +117,14 @@ int cData::AddOrgs(AddOrg *aOrg)
 	{
 		return -1;
 	}
-	DepressPacket(lr,ADDORG_PACK,cTempBuf);
+
+	if(DepressPacket(lr,ADDORG_PACK,cTempBuf))
+	{
+		lr.iResult = 0;
+	}else
+	{
+		lr.iResult = 1;
+	}
 
 	return lr.iResult;
 }
@@ -136,8 +157,14 @@ int cData::EditOrgs(EditOrg *aOrg)
 	{
 		return -1;
 	}
-	DepressPacket(lr,MODIFYORG_PACK,cTempBuf);
-
+	//DepressPacket(lr,MODIFYORG_PACK,cTempBuf);
+	if(DepressPacket(lr,MODIFYORG_PACK,cTempBuf))
+	{
+		lr.iResult = 0;
+	}else
+	{
+		iResult = 1;
+	}
 	return lr.iResult;
 }
 
@@ -169,8 +196,14 @@ int cData::DelOrgs(DelOrg *aOrg)
 	{
 		return -1;
 	}
-	DepressPacket(lr,DELETEORG_PACK,cTempBuf);
-
+	//DepressPacket(lr,DELETEORG_PACK,cTempBuf);
+		if(DepressPacket(lr,DELETEORG_PACK,cTempBuf))
+	{
+		lr.iResult = 0;
+	}else
+	{
+		iResult = 1;
+	}
 	return lr.iResult;
 }
 
@@ -201,8 +234,14 @@ int cData::AddUsers(AddUser *aUser)
 	{
 		return -1;
 	}
-	DepressPacket(lr,ADDWORKER_PACK,cTempBuf);
-
+	//DepressPacket(lr,ADDWORKER_PACK,cTempBuf);
+	if(DepressPacket(lr,ADDWORKER_PACK,cTempBuf))
+	{
+		lr.result = 0;
+	}else
+	{
+		lr.result = 1;
+	}
 	return lr.result;
 }
 
@@ -233,8 +272,15 @@ int cData::EditUsers(EditUser *aUser)
 	{
 		return -1;
 	}
-	DepressPacket(lr,MODIFYWORKER_PACK,cTempBuf);
+//	DepressPacket(lr,MODIFYWORKER_PACK,cTempBuf);
 
+			if(DepressPacket(lr,MODIFYWORKER_PACK,cTempBuf))
+	{
+		lr.result = 0;
+	}else
+	{
+		lr.result = 1;
+	}
 	return lr.result;
 }
 
@@ -265,8 +311,14 @@ int cData::DelUsers(DelUser *aUser)
 	{
 		return -1;
 	}
-	DepressPacket(lr,DELETEWORKER_PACK,cTempBuf);
-
+	//DepressPacket(lr,DELETEWORKER_PACK,cTempBuf);
+				if(DepressPacket(lr,DELETEWORKER_PACK,cTempBuf))
+	{
+		lr.result = 0;
+	}else
+	{
+		lr.result = 1;
+	}
 	return lr.result;
 }
 
@@ -297,7 +349,14 @@ int cData::AddPowers(AddPower *aPower)
 	{
 		return -1;
 	}
-	DepressPacket(lr,ADDPOWERGROUP_PACK	,cTempBuf);
+	//DepressPacket(lr,ADDPOWERGROUP_PACK	,cTempBuf);
+	if(DepressPacket(lr,ADDPOWERGROUP_PACK,cTempBuf))
+	{
+		lr.result = 0;
+	}else
+	{
+		lr.result = 1;
+	}
 
 	return lr.result;
 }
@@ -328,8 +387,14 @@ int cData::EditPowers(EditPower *aPower)
 	{
 		return -1;
 	}
-	DepressPacket(lr,MODIFYPOWERGROUP_PACK	,cTempBuf);
-
+	//DepressPacket(lr,MODIFYPOWERGROUP_PACK	,cTempBuf);
+	if(DepressPacket(lr,MODIFYPOWERGROUP_PACK,cTempBuf))
+	{
+		lr.result = 0;
+	}else
+	{
+		lr.result = 1;
+	}
 	return lr.result;
 }
 int cData::DelPowers(DelGPower *aPower)
@@ -359,8 +424,14 @@ int cData::DelPowers(DelGPower *aPower)
 	{
 		return -1;
 	}
-	DepressPacket(lr,DELETEPOWERGROUP_PACK	,cTempBuf);
-
+//	DepressPacket(lr,DELETEPOWERGROUP_PACK	,cTempBuf);
+	if(DepressPacket(lr,DELETEPOWERGROUP_PACK,cTempBuf))
+	{
+		lr.result = 0;
+	}else
+	{
+		lr.result = 1;
+	}
 	return lr.result;
 }
 int cData::AddDevices(AddDevice *aPower)
@@ -390,8 +461,14 @@ int cData::AddDevices(AddDevice *aPower)
 	{
 		return -1;
 	}
-	DepressPacket(lr,ADDDEVICE_PACK	,cTempBuf);
-
+//	DepressPacket(lr,ADDDEVICE_PACK	,cTempBuf);
+	if(DepressPacket(lr,ADDDEVICE_PACK,cTempBuf))
+	{
+		lr.result = 0;
+	}else
+	{
+		lr.result = 1;
+	}
 	return lr.result;
 }
 int cData::EditDevices(EditDevice *aPower)
@@ -421,8 +498,14 @@ int cData::EditDevices(EditDevice *aPower)
 	{
 		return -1;
 	}
-	DepressPacket(lr,MODIFYDEVICE_PACK	,cTempBuf);
-
+	//DepressPacket(lr,MODIFYDEVICE_PACK	,cTempBuf);
+	if(DepressPacket(lr,MODIFYDEVICE_PACK,cTempBuf))
+	{
+		lr.result = 0;
+	}else
+	{
+		lr.result = 1;
+	}
 	return lr.result;
 }
 
@@ -453,8 +536,14 @@ int cData::DelDevices(DelDevice *aPower)
 	{
 		return -1;
 	}
-	DepressPacket(lr,DELETEDEVICE_PACK	,cTempBuf);
-
+//	DepressPacket(lr,DELETEDEVICE_PACK	,cTempBuf);
+if(DepressPacket(lr,DELETEDEVICE_PACK,cTempBuf))
+	{
+		lr.result = 0;
+	}else
+	{
+		lr.result = 1;
+	}
 	return lr.result;
 }
 int cData::GetOrgList(int Orgid,lOrg *plOrg)
@@ -499,6 +588,10 @@ int cData::GetOrgList(int Orgid,lOrg *plOrg)
 		{
 			plOrg->push_back(lr);
 			iTotleCount = lr.iTotle ;
+			if(lr.iTotle == lr.iHasRecv)
+			{
+				break;
+			}
 		}
 	}
 	if(plOrg->size() != iTotleCount)
@@ -547,6 +640,8 @@ int cData::GetUserList(int Orgid, int iType,lUser *lPoint)
 		{
 			lPoint->push_back(lr);
 			iTotleCount = lr.iTotle ;
+			if(lr.iTotle == lr.iHasRecv)
+				break;
 		}
 	}
 	if(lPoint->size() != iTotleCount)
@@ -595,6 +690,8 @@ int cData::GetDeviceList(RequestDeviceList rs,lDevice *lPoint)
 		{
 			lPoint->push_back(lr);
 			iTotleCount = lr.iTotle ;
+			if(lr.iTotle == lr.iHasRecv)
+				break;
 		}
 	}
 	if(lPoint->size() != iTotleCount)
@@ -639,6 +736,8 @@ int cData::GetPowerList(RequestPowerList rs,lPower *lPoint)
 		{
 			lPoint->push_back(lr);
 			iTotleCount = lr.iTotle ;
+			if(lr.iTotle == lr.iHasRecv)
+				break;
 		}
 	}
 	if(lPoint->size() != iTotleCount)
@@ -685,6 +784,8 @@ int cData::GetPointList(Sgps const sValue,lGps *llist)
 		{
 			llist->push_back(lr);
 			iTotleCount = lr.iTotle ;
+			if(lr.iTotle == lr.HasSendPacket)
+				break;
 		}
 	}
 	if(llist->size() != iTotleCount)
@@ -730,6 +831,8 @@ int cData::GetLineName(GetLinesName const sValue,lLineName *llist)
 		{
 			llist->push_back(lr);
 			iTotleCount = lr.iTotle ;
+			if(lr.iTotle == lr.HasSendPacket)
+				break;
 		}
 	}
 	if(llist->size() != iTotleCount)
@@ -766,9 +869,10 @@ int cData::SetxjTime(xj const sValue)
 	{
 		return -1;
 	}
-	DepressPacket(lr,SETTINGPOLLINGTIME_PACK	,cTempBuf);
+	if(DepressPacket(lr,SETTINGPOLLINGTIME_PACK	,cTempBuf))
+		return lr.result;
 
-	return lr.result;
+	return 1;
 }
 //巡检时间设计
 int cData::SetMangLine(MangLine const sValue)
@@ -1001,6 +1105,8 @@ int cData::GetOrgPoint(int const sValue,lOrgLine *llist)
 		{
 			llist->push_back(lr);
 			iTotleCount = lr.iTotle ;
+			if(lr.iTotle == lr.iHasRecv)
+				break;
 		}
 	}
 	if(llist->size() != iTotleCount)
@@ -1136,6 +1242,8 @@ int cData::GetOrgMonthPx(getorgpx const sValue,lOrgMonth *llist)
 		{
 			llist->push_back(lr);
 			iTotleCount = lr.totlePacket;
+			if(lr.totlePacket == lr.CurrentPacket)
+				break;
 		}
 	}
 	if(llist->size() != iTotleCount)
@@ -1145,7 +1253,7 @@ int cData::GetOrgMonthPx(getorgpx const sValue,lOrgMonth *llist)
 	return 1;
 }
 
-int cData::getPic(const Getrealpic sValue,CString aToDirect)
+int cData::getPic(const Getrealpic sValue, CString aToDirect)
 {
 	string picBuf;
 	char pDataBuffer[11 + sizeof(Getrealpic)];
@@ -1167,6 +1275,7 @@ int cData::getPic(const Getrealpic sValue,CString aToDirect)
 	char p[1024*100*3];
 	memset(p,0,1024*100*3);
 	int i =0;
+	bool bResult = false;
 	while(1)
 	{
 		Sleep(5);
@@ -1192,23 +1301,23 @@ int cData::getPic(const Getrealpic sValue,CString aToDirect)
 			if(lr.CurrentPacket == lr.totlePacket)
 			{
 
-                
                 if(!PathFileExists(aToDirect))
                 {
                     CFile logFile;
                     logFile.Open(aToDirect, CFile::modeCreate | CFile::modeWrite);
                     logFile.Write(p,lr.Pagesize);
+					bResult = true;
                 }
 
 				break;
 			}
 		}else
 		{
-			return false;
+			return bResult;
 		}
 	}
 	//sTemp = p;
-	return true;
+	return bResult;
 }
 
 int cData::setPoint(const PointMang sValue)
@@ -1280,6 +1389,8 @@ int cData::GetOrgLine(const Orglines sValue,lallOrgLine *llist)
 		{
 			llist->push_back(lr);
 			iTotleCount = lr.totlePacket;
+			if(lr.CurrentPacket == lr.totlePacket)
+				break;
 		}
 		
 	}
@@ -1328,7 +1439,8 @@ int cData::rGetLineTime(const rLinePointTime sValue,lrLinePointTimeResult *llist
 		{
 			llist->push_back(lr);
 			iTotleCount = lr.totlePacket;
-	
+			if(lr.totlePacket == lr.CurrentPacket)
+				break;
 		}
 	}
 	return 0;
@@ -1370,6 +1482,8 @@ int cData::rGetOPb(const rOrgPB sValue,lUser *lPoint)
 		{
 			lPoint->push_back(lr);
 			iTotleCount = lr.iTotle ;
+			if(lr.iTotle == lr.iHasRecv)
+				break;
 		}
 	}
 	if(lPoint->size() != iTotleCount)
@@ -1416,6 +1530,8 @@ int cData::PGPSDayData(const UserGps value,lOrgLineResult *lPoint)
 		{
 			lPoint->push_back(lr);
 			iTotleCount = lr.totlePacket ;
+			if(lr.CurrentPacket == lr.totlePacket)
+				break;
 		}
 	}
 	if(lPoint->size() != iTotleCount)
@@ -1461,6 +1577,8 @@ int cData::GetXjRymx(const ryxj1 value,lryxj1result *lPoint)
 		{
 			lPoint->push_back(lr);
 			iTotleCount = lr.totlePacket ;
+		if(lr.CurrentPacket == lr.totlePacket)
+				break;
 		}
 	}
 	if(lPoint->size() != iTotleCount)
@@ -1471,7 +1589,7 @@ int cData::GetXjRymx(const ryxj1 value,lryxj1result *lPoint)
 }
 
 //删除全部 解决任务下面的人员
-int cData::GetXjRymx(const jjDel value)
+int cData::DelXjRymx(const jjDel value)
 {
 	char pDataBuffer[11 + sizeof(jjDel)];
 	memset(pDataBuffer,0,sizeof(pDataBuffer));
@@ -1498,9 +1616,112 @@ int cData::GetXjRymx(const jjDel value)
 	{
 		return -1;
 	}
-	DepressPacket(lr,DELALLJJRY_PACKET	,cTempBuf);
+	if(DepressPacket(lr,DELALLJJRY_PACKET	,cTempBuf))
+		return lr.result;
+	return 1;
 
-	return lr.result;
+}
+
+//获取紧急任务列表
+int cData::GetJJRWList(const int orgid,ljjListresult *lPoint)
+{
+	
+//	jjListresult;
+//typedef list<jjListresult> ljjListresult;
+//typedef ljjListresult::iterator IterljjListresult;
+	char pDataBuffer[11 + sizeof(int)];
+	memset(pDataBuffer,0,sizeof(pDataBuffer));
+	BaseStruct bs;
+	bs.nBodyLength = sizeof(int);
+	bs.nMsgNumber = GETJJRWLIST_PACKET;
+	BuildDataPackShell(pDataBuffer, &bs);
+	memcpy(pDataBuffer+7,&orgid,sizeof(int));
+
+	int iResult = cs->Write(pDataBuffer,11 + sizeof(int));
+	if(iResult < iSocketState)
+	{
+		return -1;
+	}
+	int iTotleCount = 0;
+	lPoint->clear();
+	while(1)
+	{
+
+		jjListresult lr;
+		int it = 11 + sizeof(jjListresult);
+		char cTempBuf[11 + sizeof(jjListresult)];
+		memset(cTempBuf,0,it);
+		Sleep(2);
+		iResult = cs->Read(cTempBuf,it);
+
+		if(iResult < 1)
+		{
+			break;
+		}
+		memset(&lr,0,sizeof(lr));
+		if(DepressPacket(lr,GETJJRWLIST_PACKET,cTempBuf))
+		{
+			lPoint->push_back(lr);
+			iTotleCount = lr.totlePacket ;
+			if(lr.CurrentPacket == lr.totlePacket)
+				break;
+		}
+	}
+	if(lPoint->size() != iTotleCount)
+	{
+		return -2;
+	}
+	return 1;
+}
+	//获取紧急任务人员列表
+int cData::GetJJry(const int rwid,ljjryListresult *lPoint)
+{
+//	jjryListresult;
+//typedef list<jjryListresult> ljjryListresult;
+//typedef ljjryListresult::iterator IterlljjryListresult;
+	char pDataBuffer[11 + sizeof(int)];
+	memset(pDataBuffer,0,sizeof(pDataBuffer));
+	BaseStruct bs;
+	bs.nBodyLength = sizeof(int);
+	bs.nMsgNumber = GETJJRWRYLIST_PACKET;
+	BuildDataPackShell(pDataBuffer, &bs);
+	memcpy(pDataBuffer+7,&rwid,sizeof(int));
+
+	int iResult = cs->Write(pDataBuffer,11 + sizeof(int));
+	if(iResult < iSocketState)
+	{
+		return -1;
+	}
+	int iTotleCount = 0;
+	lPoint->clear();
+	while(1)
+	{
+
+		jjryListresult lr;
+		int it = 11 + sizeof(jjryListresult);
+		char cTempBuf[11 + sizeof(jjryListresult)];
+		memset(cTempBuf,0,it);
+		Sleep(2);
+		iResult = cs->Read(cTempBuf,it);
+
+		if(iResult < 1)
+		{
+			break;
+		}
+		memset(&lr,0,sizeof(lr));
+		if(DepressPacket(lr,GETJJRWRYLIST_PACKET,cTempBuf))
+		{
+			lPoint->push_back(lr);
+			iTotleCount = lr.totlePacket ;
+			if(lr.CurrentPacket == lr.totlePacket)
+				break;
+		}
+	}
+	if(lPoint->size() != iTotleCount)
+	{
+		return -2;
+	}
+	return 1;
 }
 ////////////////////////////////////////////////////
 template<typename T>

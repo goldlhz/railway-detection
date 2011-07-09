@@ -9,6 +9,7 @@
 #include "ModifyPassword.h"
 #include "DataService.h"
 #include "CmdDefine.h"
+#include "PermissionGroup.h"
 
 
 // CStaffList 对话框
@@ -32,7 +33,7 @@ void CStaffList::DoDataExchange(CDataExchange* pDX)
     DDX_Control(pDX, IDC_CHECK_LOGINPERMISSION, m_CheckLoginPermission);
     DDX_Control(pDX, IDC_BTN_SETPASSWORD, m_BtnSetPassword);
     DDX_Control(pDX, IDC_COMBO_DEVICE, m_ComboStaffDevice);
-    DDX_Control(pDX, IDC_COMBO_PERMISSION, m_ComboStaffPermission);
+    //DDX_Control(pDX, IDC_COMBO_PERMISSION, m_ComboStaffPermission);
 }
 
 
@@ -43,6 +44,7 @@ BEGIN_MESSAGE_MAP(CStaffList, CDialogEx)
     ON_BN_CLICKED(IDC_BTN_ADDSTAFF, &CStaffList::OnBnClickedBtnAddstaff)
     ON_BN_CLICKED(IDC_BTNMODIFYSTAFF, &CStaffList::OnBnClickedBtnmodifystaff)
     ON_BN_CLICKED(IDC_BTN_DELSTAFF, &CStaffList::OnBnClickedBtnDelstaff)
+    ON_BN_CLICKED(IDC_BTN_SETPERMISSION, &CStaffList::OnBnClickedBtnSetpermission)
 END_MESSAGE_MAP()
 
 
@@ -75,9 +77,9 @@ BOOL CStaffList::OnInitDialog()
         //str.Format(_T("%d"), staff->iArrangeLine.size());
         //m_ListCtrl.SetItemText(i, 2, str);
     }
-    m_ComboStaffPermission.AddString(_T("权限组1"));
-    m_ComboStaffPermission.AddString(_T("权限组2"));
-    m_ComboStaffPermission.AddString(_T("权限组3"));
+    //m_ComboStaffPermission.AddString(_T("权限组1"));
+    //m_ComboStaffPermission.AddString(_T("权限组2"));
+    //m_ComboStaffPermission.AddString(_T("权限组3"));
 
     int comboIndex = m_ComboStaffDevice.AddString(_T("未指定"));
     m_ComboStaffDevice.SetItemData(comboIndex, NULL);
@@ -136,7 +138,7 @@ void CStaffList::OnLvnItemchangedStafflist(NMHDR *pNMHDR, LRESULT *pResult)
 
     m_ComboStaffDevice.SetCurSel(comboIndex);
     
-    m_ComboStaffPermission.SetCurSel(m_SeletedStaff->iPermissionGroup);
+    //m_ComboStaffPermission.SetCurSel(m_SeletedStaff->iPermissionGroup);
     
     *pResult = 0;
 }
@@ -166,8 +168,8 @@ void CStaffList::OnBnClickedBtnSetpassword()
         m_SeletedStaff->iPassword = modifyPassword.GetPassword();
         m_SeletedStaff->iLoginPermission = TRUE;
 
-        SetOrgStaff(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_STAFF_MODIFY, m_SeletedStaff);
-        AfxMessageBox(_T("密码修改成功"));
+        //SetOrgStaff(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_STAFF_MODIFY, m_SeletedStaff);
+        //AfxMessageBox(_T("密码修改成功"));
     }
 }
 
@@ -201,12 +203,18 @@ void CStaffList::OnBnClickedBtnAddstaff()
     int mask = m_ListCtrl.GetItemCount();
     m_ListCtrl.InsertItem(mask, staff->iID);
     m_ListCtrl.SetItemText(mask, 1, staff->iName);
-    staff->iTakeDevice = (DeviceInfo*)m_ComboStaffDevice.GetItemData(m_ComboStaffDevice.GetCurSel());
-    staff->iPermissionGroup = m_ComboStaffPermission.GetCurSel();
+    staff->iTakeDevice = NULL;
+    if (m_ComboStaffDevice.GetCurSel() >= 0)
+    {
+        staff->iTakeDevice = (DeviceInfo*)m_ComboStaffDevice.GetItemData(m_ComboStaffDevice.GetCurSel());
+    }
+    
+    staff->iPermissionGroup = 0x0FFF;
+    //staff->iPermissionGroup = m_ComboStaffPermission.GetCurSel();
     //保存
     m_CRWDSClientView->m_CurrentOrg->iStaff.push_back(staff);
 
-    SetOrgStaff(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_STAFF_ADD, m_SeletedStaff);
+    SetOrgStaff(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_STAFF_ADD, staff);
 }
 
 
@@ -228,7 +236,7 @@ void CStaffList::OnBnClickedBtnmodifystaff()
     //为员工指定设备
     m_SeletedStaff->iTakeDevice = (DeviceInfo*)m_ComboStaffDevice.GetItemData(m_ComboStaffDevice.GetCurSel());
     //为员工指定权限
-    m_SeletedStaff->iPermissionGroup = m_ComboStaffPermission.GetCurSel();
+    //m_SeletedStaff->iPermissionGroup = m_ComboStaffPermission.GetCurSel();
 
     SetOrgStaff(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_STAFF_MODIFY, m_SeletedStaff);
     AfxMessageBox(_T("修改成功"), MB_OK);
@@ -288,4 +296,18 @@ void CStaffList::OnBnClickedBtnDelstaff()
 
     delete m_SeletedStaff;
     m_SeletedStaff = NULL;
+}
+
+
+void CStaffList::OnBnClickedBtnSetpermission()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    if(!m_SeletedStaff)
+        return;
+    CPermissionGroup permission;
+    permission.SetPermissionValue(m_SeletedStaff->iPermissionGroup);
+    if( permission.DoModal() == IDOK)
+    {
+        m_SeletedStaff->iPermissionGroup = permission.GetPermisstionValue();
+    }
 }

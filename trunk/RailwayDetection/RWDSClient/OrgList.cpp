@@ -6,6 +6,8 @@
 #include "OrgList.h"
 #include "afxdialogex.h"
 #include "ErrorDefine.h"
+#include "DataService.h"
+#include "CmdDefine.h"
 
 
 // COrgList 对话框
@@ -17,6 +19,8 @@ COrgList::COrgList(CWnd* pParent /*=NULL*/)
 {
     m_CRWDSClientView = static_cast<CRWDSClientView*>(pParent);
     m_SeletedOrg = NULL;
+    m_ComoParentEnable = FALSE;
+    m_AddNewOrg = FALSE;
 }
 
 COrgList::~COrgList()
@@ -38,6 +42,7 @@ BEGIN_MESSAGE_MAP(COrgList, CDialogEx)
     ON_BN_CLICKED(IDC_BTN_ADDORG, &COrgList::OnBnClickedBtnAddorg)
     ON_BN_CLICKED(IDC_BTN_MODIFYORG, &COrgList::OnBnClickedBtnModifyorg)
     ON_BN_CLICKED(IDC_BTN_DELETEORG, &COrgList::OnBnClickedBtnDeleteorg)
+    ON_BN_CLICKED(IDCANCEL, &COrgList::OnBnClickedCancel)
 END_MESSAGE_MAP()
 
 
@@ -125,12 +130,14 @@ BOOL COrgList::OnInitDialog()
     m_TreeOrg.InsertItem(_T(""), hRoot);//为了显示+号
 
     m_ComboOrgParent.ResetContent();
-    m_ComboOrgParent.AddString(_T("无"));
+    //添加上级机构
+    str.Format(_T("%d"), m_CRWDSClientView->m_Org[0]->iParentID);
+    m_ComboOrgParent.AddString(str);
     m_ComboOrgParent.SetItemData(0, NULL);
     OrgListVisitForAddComboOrgParent(m_CRWDSClientView->m_Org[0]);
-    for(int i=0; i<RailLineNameCount; i++)
+    for(int i=0; i<strRailLineNameCount; i++)
     {
-        m_ComboBoundaryLine.AddString(RailLineName[i]);
+        m_ComboBoundaryLine.AddString(strRailLineName[i]);
     }
     return TRUE;  // return TRUE unless you set the focus to a control
     // 异常: OCX 属性页应返回 FALSE
@@ -152,14 +159,13 @@ void COrgList::OnTvnSelchangedTreeOrglist(NMHDR *pNMHDR, LRESULT *pResult)
     str.Format(_T("%d"), curOrg->iOrgID);
     GetDlgItem(IDC_EDIT_ORGID)->SetWindowText(str);
     GetDlgItem(IDC_EDIT_ORGNAME)->SetWindowText(curOrg->iOrgName);
-    //int comboIndex = -1;
-    //if (curOrg->iParentOrg)
-    //{
-    //    CString parentID;
-    //    parentID.Format(_T("%d"), curOrg->iParentOrg->iOrgID);
-    //    comboIndex = m_ComboOrgParent.FindString(0, parentID);
-    //}
-    m_ComboOrgParent.SetCurSel(curOrg->iParentID);
+    //查找上级机构对应的combo值
+    int comboIndex = -1;
+    CString parentID;
+    parentID.Format(_T("%d"), curOrg->iParentID);
+    comboIndex = m_ComboOrgParent.FindString(0, parentID);
+    
+    m_ComboOrgParent.SetCurSel(comboIndex);
     m_ComboBoundaryLine.SetCurSel(curOrg->iBoundaryRail);
     //CString str;
     str.Format(_T("%d"), curOrg->iBoundaryStartKM);
@@ -203,10 +209,9 @@ void COrgList::OnTvnItemexpandedTreeOrglist(NMHDR *pNMHDR, LRESULT *pResult)
     *pResult = 0;
 }
 
-
-void COrgList::OnBnClickedBtnAddorg()
+void COrgList::AddNewOrg()
 {
-    // TODO: 在此添加控件通知处理程序代码
+
     CString orgID;
     CString orgName;
     int comboIndex;
@@ -223,11 +228,11 @@ void COrgList::OnBnClickedBtnAddorg()
     {
         parentOrg = (OrganizationInfo*)m_ComboOrgParent.GetItemData(comboIndex);
     }
-	if(parentOrg->iOrgLevel == 4)
-	{
-		AfxMessageBox(_T("该机构不能添加"));
-		return;
-	}
+    if(parentOrg->iOrgLevel == 4)
+    {
+        AfxMessageBox(_T("该机构不能拥有下属机构"));
+        return;
+    }
     int iOrgID = _ttoi(orgID);
     BOOL foundID = FALSE;
     for(size_t i=0; i<m_CRWDSClientView->m_Org.size(); i++)
@@ -246,7 +251,7 @@ void COrgList::OnBnClickedBtnAddorg()
 
     CString boxMessage;
     boxMessage.Format(_T("确认添加机构: \r机构号:%s\r机构名:%s\r上级机构号:%d"), 
-                      orgID, orgName, parentOrg->iOrgID);
+        orgID, orgName, parentOrg->iOrgID);
     if(AfxMessageBox(boxMessage, MB_OKCANCEL) == IDOK)
     {
         OrganizationInfo* newOrg = new OrganizationInfo;
@@ -254,27 +259,57 @@ void COrgList::OnBnClickedBtnAddorg()
         newOrg->iOrgName = orgName;
         newOrg->iParentOrg = parentOrg;
         newOrg->iParentID = parentOrg->iOrgID;
-		newOrg->iOrgLevel = parentOrg->iOrgLevel+1;
+        newOrg->iOrgLevel = parentOrg->iOrgLevel+1;
         parentOrg->iChildID.push_back(newOrg->iOrgID);
         parentOrg->iChildOrg.push_back(newOrg);
-        newOrg->iBoundaryRail = (RailLine)m_ComboBoundaryLine.GetCurSel();
+        newOrg->iBoundaryRail = m_ComboBoundaryLine.GetCurSel();
         CString str;
         GetDlgItem(IDC_EDIT_BOUNDARYSTARTKM)->GetWindowText(str);
         newOrg->iBoundaryStartKM = _ttoi(str);
         GetDlgItem(IDC_EDIT_BOUNDARYENDKM)->GetWindowText(str);
         newOrg->iBoundaryEndKM = _ttoi(str);
         AddOrgToTreeOrg(newOrg, parentOrg);
-        
+
         str.Format(_T("%d"), newOrg->iOrgID);
         m_ComboOrgParent.AddString(str);
         m_ComboOrgParent.SetItemData(m_ComboOrgParent.GetCount()-1, (DWORD_PTR)newOrg);
+        SetOrganization(CMD_ORG_ADD, newOrg);
     }
+    m_ComboOrgParent.EnableWindow(FALSE);
+    GetDlgItem(IDC_EDIT_ORGID)->EnableWindow(FALSE);
+    m_ComoParentEnable = FALSE;
+    m_AddNewOrg = FALSE;
+    GetDlgItem(IDC_BTN_ADDORG)->EnableWindow(TRUE);
+    GetDlgItem(IDC_BTN_DELETEORG)->EnableWindow(TRUE);
+}
+
+void COrgList::OnBnClickedBtnAddorg()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    m_ComboOrgParent.EnableWindow(TRUE);
+    GetDlgItem(IDC_EDIT_ORGID)->EnableWindow(TRUE);
+    m_ComoParentEnable = TRUE;
+    m_AddNewOrg = TRUE;
+    GetDlgItem(IDC_BTN_ADDORG)->EnableWindow(FALSE);
+    GetDlgItem(IDC_BTN_DELETEORG)->EnableWindow(FALSE);
+
+    GetDlgItem(IDC_EDIT_ORGID)->SetWindowText(_T(""));
+    GetDlgItem(IDC_EDIT_ORGNAME)->SetWindowText(_T(""));
+    GetDlgItem(IDC_EDIT_BOUNDARYSTARTKM)->SetWindowText(_T(""));
+    GetDlgItem(IDC_EDIT_BOUNDARYENDKM)->SetWindowText(_T(""));
+    //m_ComboOrgParent.SetCurSel(-1);
+    m_ComboBoundaryLine.SetCurSel(-1);
 }
 
 
 void COrgList::OnBnClickedBtnModifyorg()
 {
     // TODO: 在此添加控件通知处理程序代码
+    if (m_AddNewOrg)
+    {//如果是新添加机构点的修改
+        AddNewOrg();
+        return;
+    }
     if (!m_SeletedOrg)
     {
         return;
@@ -306,12 +341,13 @@ void COrgList::OnBnClickedBtnModifyorg()
         //m_SeletedOrg->iOrgID = iOrgID;
         m_SeletedOrg->iOrgName = orgName;
 
-        m_SeletedOrg->iBoundaryRail = (RailLine)m_ComboBoundaryLine.GetCurSel();
+        m_SeletedOrg->iBoundaryRail = m_ComboBoundaryLine.GetCurSel();
         CString str;
         GetDlgItem(IDC_EDIT_BOUNDARYSTARTKM)->GetWindowText(str);
         m_SeletedOrg->iBoundaryStartKM = _ttoi(str);
         GetDlgItem(IDC_EDIT_BOUNDARYENDKM)->GetWindowText(str);
         m_SeletedOrg->iBoundaryEndKM = _ttoi(str);
+        SetOrganization(CMD_ORG_MODIFY, m_SeletedOrg);
     }
 }
 
@@ -327,8 +363,25 @@ void COrgList::OnBnClickedBtnDeleteorg()
     if (AfxMessageBox(_T("确认删除？"), MB_OKCANCEL) == IDOK)
     {
         OrganizationInfo* org = (OrganizationInfo*)m_TreeOrg.GetItemData(curItem);
+        SetOrganization(CMD_ORG_DELETE, m_SeletedOrg);
         delete org;
         m_TreeOrg.DeleteItem(curItem);
     }
 }
 
+
+
+void COrgList::OnBnClickedCancel()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    if (m_AddNewOrg)
+    {
+        m_ComboOrgParent.EnableWindow(FALSE);
+        m_ComoParentEnable = FALSE;
+        m_AddNewOrg = FALSE;
+        GetDlgItem(IDC_BTN_ADDORG)->EnableWindow(TRUE);
+        GetDlgItem(IDC_BTN_DELETEORG)->EnableWindow(TRUE);
+        return;
+    }
+    CDialogEx::OnCancel();
+}

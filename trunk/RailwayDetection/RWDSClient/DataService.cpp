@@ -4,14 +4,14 @@
 #include "CmdDefine.h"
 #include "cData.h"
 
-#define TESTCODE
+//#define TESTCODE
 
 int VerifyLogin( CString& aLoginAccount, CString& aLoginPassword, int* orgID, PermissionGroup *pPower)
 {
     ///////////////////////////////////////////////////
 #ifdef TESTCODE
     *orgID = 1;
-    pPower->iBasical = 1;
+    pPower->iBasical = 0x0FFF;
     pPower->iOperate = 1;
     pPower->iReportForm = 1;
     return KErrNone;
@@ -29,6 +29,10 @@ int VerifyLogin( CString& aLoginAccount, CString& aLoginPassword, int* orgID, Pe
 		pPower->iBasical = p1;
 		pPower->iOperate = p2;
 		pPower->iReportForm = p3;
+        if (iOrgid <= 0)
+        {
+            iResult = KErrNotFound;
+        }
 	}
     aLoginAccount.ReleaseBuffer();
     aLoginPassword.ReleaseBuffer();
@@ -37,7 +41,7 @@ int VerifyLogin( CString& aLoginAccount, CString& aLoginPassword, int* orgID, Pe
 
 
 
-int GetOrgTree(const int& OrgId, vector<OrganizationInfo*>* a_OrgTree)
+int GetOrgTree(const int OrgId, vector<OrganizationInfo*>* a_OrgTree)
 {
     ///////////////////////////////////////////////////
     #ifdef TESTCODE
@@ -46,7 +50,7 @@ int GetOrgTree(const int& OrgId, vector<OrganizationInfo*>* a_OrgTree)
     org->iParentOrg = NULL;
     org->iParentID = 0;
     org->iOrgID = 1;
-    org->iBoundaryRail = Chengdu_Kunming;
+    org->iBoundaryRail = 1;
     org->iChildID.push_back(2);
     org->iChildID.push_back(3);
     a_OrgTree->push_back(org);
@@ -57,7 +61,7 @@ int GetOrgTree(const int& OrgId, vector<OrganizationInfo*>* a_OrgTree)
     org->iParentID = org->iParentOrg->iOrgID;
     (*a_OrgTree)[0]->iChildOrg.push_back(org);
     org->iOrgID = 2;
-    org->iBoundaryRail = Chengdu_Chongqing;
+    org->iBoundaryRail = 2;
     org->iChildID.push_back(4);
     a_OrgTree->push_back(org);
 
@@ -66,7 +70,7 @@ int GetOrgTree(const int& OrgId, vector<OrganizationInfo*>* a_OrgTree)
     org->iParentOrg = (*a_OrgTree)[0];
     org->iParentID = org->iParentOrg->iOrgID;
     (*a_OrgTree)[0]->iChildOrg.push_back(org);
-    org->iBoundaryRail = Baoji_Chengdu;
+    org->iBoundaryRail = 3;
     org->iOrgID = 3;
     org->iChildID.push_back(5);
     a_OrgTree->push_back(org);
@@ -90,7 +94,7 @@ int GetOrgTree(const int& OrgId, vector<OrganizationInfo*>* a_OrgTree)
 		org->iOrgLevel =    iter->iLevel;
 		org->iParentOrg =   NULL;
 		org->iOrgID =      iter->OrgId;
-		org->iBoundaryRail      = (RailLine)iter->LineId ;
+		org->iBoundaryRail      = iter->LineId ;
 		org->iBoundaryStartKM = iter->startid ;
 		a_OrgTree->push_back(org);
 	}
@@ -154,16 +158,9 @@ int SetOrganization(int aCmd, const OrganizationInfo* aOrganization )
 		p1 = (char*)cTEMP.GetBuffer(cTEMP.GetLength());
 		memcpy(&aOrg.OrgName,p1,cTEMP.GetLength());
 		cTEMP.ReleaseBuffer();
-		//char *pTemp = (LPSTR)(LPCTSTR)aOrganization->iOrgAddress;
-		//memcpy(&aOrg.Address,pTemp,sizeof(pTemp));
-		//aOrg.Address = aOrganization->iOrgAddress.GetBuffer();
-		////pTemp = (LPSTR)(LPCTSTR)aOrganization->iOrgName;
-		////memcpy(&aOrg.OrgName,pTemp,sizeof(pTemp));
-		//aOrg.OrgName = aOrganization->iOrgName.GetBuffer();
+
 		iResult = cd->AddOrgs(&aOrg);
-		//aOrganization->iOrgAddress.ReleaseBuffer();
-		//aOrganization->iOrgName.ReleaseBuffer();
-		//aOrganization->iOrgAddress.ReleaseBuffer();
+
 		cTEMP.ReleaseBuffer();
 		break;
 		}
@@ -171,12 +168,7 @@ int SetOrganization(int aCmd, const OrganizationInfo* aOrganization )
 		{
 			EditOrg eOrg;
 			memset(&eOrg,0,sizeof(EditOrg));
-			//char *pTemp = (LPSTR)(LPCTSTR)aOrganization->iOrgAddress;
-			//memcpy(&eOrg.Address,pTemp,sizeof(pTemp));
-			//eOrg.Address = aOrganization->iOrgAddress.GetBuffer();
-			////pTemp = (LPSTR)(LPCTSTR)aOrganization->iOrgName;
-			////memcpy(&eOrg.OrgName,pTemp,sizeof(pTemp));
-			//eOrg.OrgName = aOrganization->iOrgName.GetBuffer();
+
 			eOrg.UpOrg = aOrganization->iParentID ;
 			eOrg.iLevel = aOrganization->iOrgLevel ;
 			eOrg.LineId = aOrganization->iBoundaryRail;
@@ -195,9 +187,7 @@ int SetOrganization(int aCmd, const OrganizationInfo* aOrganization )
 			cTEMP.ReleaseBuffer();
 
 			iResult = cd->EditOrgs(&eOrg);
-			
-			//aOrganization->iOrgName.ReleaseBuffer();
-			//aOrganization->iOrgAddress.ReleaseBuffer();
+ 
 			break;
 		}
 	case CMD_ORG_DELETE:
@@ -217,7 +207,7 @@ int GetOrgPoint(int aOrgID, vector<MapPoint*>* aPointList)
     ///////////////////////////////////////////////////
     #ifdef TESTCODE
     MapPoint *pt = new MapPoint;
-    pt->iRailLine = Chengdu_Chongqing; 
+    pt->iRailLine = 1; 
     pt->iKM = 251;
     pt->iLon = 104.064531;
     pt->iLat = 30.699965;
@@ -225,7 +215,7 @@ int GetOrgPoint(int aOrgID, vector<MapPoint*>* aPointList)
     aPointList->push_back(pt);
 
     pt = new MapPoint;
-    pt->iRailLine = Chengdu_Chongqing; 
+    pt->iRailLine = 1; 
     pt->iKM = 252;
     pt->iLon = 104.075530;
     pt->iLat = 30.699484;
@@ -233,7 +223,7 @@ int GetOrgPoint(int aOrgID, vector<MapPoint*>* aPointList)
     aPointList->push_back(pt);
 
     pt = new MapPoint;
-    pt->iRailLine = Chengdu_Chongqing; 
+    pt->iRailLine = 1; 
     pt->iKM = 253;
     pt->iLon = 104.086526;
     pt->iLat = 30.699484;
@@ -241,7 +231,7 @@ int GetOrgPoint(int aOrgID, vector<MapPoint*>* aPointList)
     aPointList->push_back(pt);
 
     pt = new MapPoint;
-    pt->iRailLine = Chengdu_Chongqing; 
+    pt->iRailLine = 1; 
     pt->iKM = 254;
     pt->iLon = 104.097521;
     pt->iLat = 30.699484;
@@ -258,7 +248,7 @@ int GetOrgPoint(int aOrgID, vector<MapPoint*>* aPointList)
 		for(iterOrgLine iter = llist.begin() ; iter != llist.end() ; iter++)
 		{
 			MapPoint *pt = new MapPoint;
-			pt->iRailLine = (RailLine)iter->lineid;
+			pt->iRailLine = iter->lineid;
 			pt->iKM = iter->gls;
 			pt->iLat = iter->jdu;
 			pt->iLon = iter->wdu;
@@ -592,8 +582,6 @@ int GetOrgStaff(int aOrgID, const vector<DeviceInfo*>& aDeviceList, vector<Staff
                     break;
                 }
             }
-			//staff->Pda1 = iter->pda1;
-			//staff->Pda2 = iter->pda2;
 			staff->iPermissionGroup = iter->PowerGroup ;
 			aStaffList->push_back(staff);
 		}
@@ -643,7 +631,7 @@ int SetOrgStaff( int aOrgID, int aCmd, const StaffInfo* aStaff )
 			cTEMP.ReleaseBuffer();
 
 			aUser.orgid = aStaff->iOrgID;
-			aUser.pda1 = aStaff->iTakeDevice->iDevID;
+			aUser.pda1 = 0;//aStaff->iTakeDevice->iDevID;
 			//aUser.pda2 = aStaff->iTakeDevice->iDevID;
 			aUser.PowerGroup = aStaff->iPermissionGroup;
 			int iLogin = 1;
@@ -657,13 +645,6 @@ int SetOrgStaff( int aOrgID, int aCmd, const StaffInfo* aStaff )
 		{
 			EditUser eUser;
 			memset(&eUser,0,sizeof(EditUser));
-			/*		char *pTemp = (LPSTR)(LPCTSTR)aStaff->iName;
-			memcpy(&eUser.name,pTemp,sizeof(pTemp));
-
-			pTemp = (LPSTR)(LPCTSTR)aStaff->iID;
-			memcpy(&eUser.Oper,pTemp,sizeof(pTemp));*/
-			//eUser.name = aStaff->iName.GetBuffer();
-			//eUser.Oper = aStaff->iID.GetBuffer();
 			char *p1;
 			CString cTEMP = aStaff->iID;
 			p1 = (char*)cTEMP.GetBuffer(cTEMP.GetLength());
@@ -676,16 +657,15 @@ int SetOrgStaff( int aOrgID, int aCmd, const StaffInfo* aStaff )
 			cTEMP.ReleaseBuffer();
 
 			eUser.orgid = aStaff->iOrgID;
-			eUser.pda1 = aStaff->iTakeDevice->iDevID;
-			//eUser.pda2 = aStaff->Pda2;
+			eUser.pda1 = 0;
+            if(aStaff->iTakeDevice)
+                eUser.pda1 = aStaff->iTakeDevice->iDevID;
 			eUser.PowerGroup = aStaff->iPermissionGroup;
 			int iLogin = 1;
 			if(aStaff->iLoginPermission)iLogin = 1;
 			else iLogin = 0;
 			eUser.UserState = iLogin;
 			iResult = cd->EditUsers(&eUser);
-			//aStaff->iID.ReleaseBuffer();
-			//aStaff->iName.ReleaseBuffer();
 			break;
 		}
 	case CMD_STAFF_DELETE:
@@ -699,9 +679,6 @@ int SetOrgStaff( int aOrgID, int aCmd, const StaffInfo* aStaff )
 			memcpy(&dUser.Oper,p1,cTEMP.GetLength());
 			cTEMP.ReleaseBuffer();
 
-			//pTemp = (LPSTR)(LPCTSTR)aStaff->iID;
-			//memcpy(&dUser.Oper,pTemp,sizeof(pTemp));
-			//dUser.Oper = aStaff->iID.GetBuffer();
 			iResult = cd->DelUsers(&dUser);
 			//aStaff->iID.ReleaseBuffer();
 			break;
@@ -813,13 +790,139 @@ int SetCalendarSchedule(int aOrgID, const CalendarSchedule* aSchedule/*, const <
 
 int GetEmergencyTask( int aOrgID, vector<EmergencyTaskInfo*>* m_EmergencyList )
 {
-    return KErrNone;
+	ljjListresult lPoint;
+	cData *cs = new cData();
+	cs->GetJJRWList(aOrgID,&lPoint);
+	for(IterljjListresult iter = lPoint.begin();iter != lPoint.end(); iter++)
+	{
+		EmergencyTaskInfo  *eInfo = new EmergencyTaskInfo();
+		eInfo->iBeginKm = (int)iter->spoint;
+		eInfo->iEndKm = (int)iter->epoint;
+
+		eInfo->iBeginTime = Time2Strings2(iter->stime);
+		eInfo->iEndTime = Time2Strings2(iter->etime);
+
+		eInfo->iStatus = (EmergencyStatus)iter->state;
+		eInfo->iTaskID = iter->id;
+
+		eInfo->iLineName = iter->lineid;
+		eInfo->iTaskName = iter->rwName;
+		eInfo->iOrgId = aOrgID;
+		ljjryListresult lPoint;
+		cs->GetJJry(iter->id,&lPoint);
+		for(IterlljjryListresult iter = lPoint.begin(); iter != lPoint.end();iter++)
+		{
+			eInfo->iStaffID.push_back(iter->Jj_Pid);
+			eInfo->iStaffOrgID.push_back(iter->nJj_OrgID);
+			eInfo->iStaffName.push_back(iter->strJj_Name);
+		}
+		m_EmergencyList->push_back(eInfo);
+	}
+	return KErrNone;
 }
 
 int SetEmergencyTask( int aOrgID, int aCmd, const EmergencyTaskInfo* aEmergencyTask )
 {
    // aEmergencyTask->
-	return KErrNone;
+    int iResult = 0;
+	if( CMD_EMERGENCY_MODIFY== aCmd )//紧急任务休息
+	{
+		if(aEmergencyTask->iStatus == KFinished)
+		{
+			return 0;
+		}
+        cData *cd = new cData();
+        jjrw *sVAL= new jjrw();
+        memset(sVAL,0,sizeof(jjrw));
+        sVAL->type = 1;
+        CString timeTemp = Time2Strings(aEmergencyTask->iEndTime);
+        char *p1 = (char*)timeTemp.GetBuffer(timeTemp.GetLength());
+        memcpy(sVAL->endTime,p1,timeTemp.GetLength());
+        timeTemp.ReleaseBuffer();
+
+        CString timeTemp1 = Time2Strings(aEmergencyTask->iBeginTime);
+        p1 = (char*)timeTemp1.GetBuffer(timeTemp1.GetLength());
+        memcpy(sVAL->startTime,p1,timeTemp1.GetLength());
+        timeTemp1.ReleaseBuffer();
+
+        sVAL->endPointId = aEmergencyTask->iBeginKm;
+        sVAL->lineid = (int)aEmergencyTask->iLineName;
+
+        sVAL->orgid = aOrgID;
+        timeTemp = aEmergencyTask->iTaskName;
+        p1 = (char*)timeTemp.GetBuffer(timeTemp.GetLength());
+        memcpy(sVAL->rwName,p1,timeTemp.GetLength());
+        timeTemp.ReleaseBuffer();
+
+        sVAL->startPointId = aEmergencyTask->iBeginKm;
+        sVAL->endPointId = aEmergencyTask->iEndKm;
+        sVAL->state = 0;
+        sVAL->iTaskId = aEmergencyTask->iTaskID ;
+        iResult = cd->Setjjrw(*sVAL);
+        delete cd;
+	}
+
+	if( CMD_EMERGENCY_ADD == aCmd )//紧急任务天加
+	{
+		if(aEmergencyTask->iStatus == KFinished)
+		{
+			return 0;
+		}
+        cData *cd = new cData();
+        jjrw *sVAL= new jjrw();
+        memset(sVAL,0,sizeof(jjrw));
+        sVAL->type = 0;
+        CString timeTemp = Time2Strings(aEmergencyTask->iEndTime);
+        char *p1 = (char*)timeTemp.GetBuffer(timeTemp.GetLength());
+        memcpy(sVAL->endTime,p1,timeTemp.GetLength());
+        timeTemp.ReleaseBuffer();
+
+        timeTemp = Time2Strings(aEmergencyTask->iBeginTime);
+        p1 = (char*)timeTemp.GetBuffer(timeTemp.GetLength());
+        memcpy(sVAL->startTime,p1,timeTemp.GetLength());
+        timeTemp.ReleaseBuffer();
+
+        sVAL->endPointId = aEmergencyTask->iBeginKm;
+        sVAL->lineid = (int)aEmergencyTask->iLineName;
+
+        sVAL->orgid = aOrgID;
+        timeTemp = aEmergencyTask->iTaskName;
+        p1 = (char*)timeTemp.GetBuffer(timeTemp.GetLength());
+        memcpy(sVAL->rwName,p1,timeTemp.GetLength());
+        timeTemp.ReleaseBuffer();
+
+        sVAL->startPointId = aEmergencyTask->iBeginKm;
+        sVAL->endPointId = aEmergencyTask->iEndKm;
+        sVAL->state = 0;
+        iResult = cd->Setjjrw(*sVAL);
+        delete cd;
+	}
+
+
+	if(CMD_EMERGENCY_MODIFYSTAFF == aCmd)
+	{
+        //GetXjRymx
+        cData *cs = new cData();
+        jjDel jVal;
+        jVal.iTaskId = aEmergencyTask->iTaskID;
+        cs->DelXjRymx(jVal);
+        for(size_t i =0;i < aEmergencyTask->iStaffID.size(); i++)
+        {
+            jjry  sValue;
+            memset(&sValue,0,sizeof(jjry));
+            sValue.type = 0;
+            sValue.Jj_id = aEmergencyTask->iTaskID;
+
+            CString cTemp = aEmergencyTask->iStaffID[i];
+            char *p1 = (char*)cTemp.GetBuffer(cTemp.GetLength());
+            memcpy(&sValue.Jj_Pid,p1,cTemp.GetLength());
+            cTemp.ReleaseBuffer();
+            cs->Setjjry(sValue);
+
+        }
+		return 1;
+	}
+	return iResult;
 }
 
 int GetEmergencyLogs( int aTaskID, vector<EmergencyLogs*>* aEmergencyStaff )
@@ -831,11 +934,24 @@ int GetEmergencyLogs( int aTaskID, vector<EmergencyLogs*>* aEmergencyStaff )
     logs->iStaffID = _T("123123");
     logs->iStaffOrgID = 1;
     logs->iTotalKM = 10.25;
-    logs->iTotalTime = 10223;
+    logs->iTotalTime = _T("10223");
     aEmergencyStaff->push_back(logs);
     return KErrNone;
 #endif
     ///////////////////////////////////////////////////
+		ljjryListresult lPoint;
+	cData *cd = new cData();
+	cd->GetJJry(aTaskID,&lPoint);
+	for(IterlljjryListresult iter = lPoint.begin(); iter != lPoint.end();iter++)
+	{
+		EmergencyLogs *eNew = new EmergencyLogs();
+		eNew->iStaffID = iter->Jj_Pid;
+		eNew->iStaffOrgID = iter->nJj_OrgID;
+		eNew->iTaskID = aTaskID;
+		eNew->iTotalTime = iter->Jj_time;
+		eNew->iTotalKM = iter->Jj_long;
+		aEmergencyStaff->push_back(eNew);
+	}
     return KErrNone;
 }
 
@@ -948,23 +1064,6 @@ int SetOrgDevice( int aOrgID, int aCmd, const DeviceInfo* aDeviceList )
 	
 }
 
-//int GetStaffCurrentTrack(time_t aDate, RecordStaff* aStaff)
-//{
-//    //Get the data by aStaff->iStaff->iID
-//
-//    aStaff->iRecordLon.push_back(104.064631);
-//    aStaff->iRecordLat.push_back(30.698965);
-//
-//    aStaff->iRecordLon.push_back(104.075630);
-//    aStaff->iRecordLat.push_back(30.699584);
-//
-//    aStaff->iRecordLon.push_back(104.086426);
-//    aStaff->iRecordLat.push_back(30.699584);
-//
-//    return KErrNone;
-//}
-
-
 int GetOrgMonthPx(GetOrgPxEx const sValue,vector<getorgpxlistresultEx*> *Value)
 {
 	cData *cd = new cData();
@@ -1042,8 +1141,8 @@ int GetOrgXl()
 	//int cData::GetXjRymx(const ryxj1 value,lryxj1result *lPoint)
 	ryxj1 user;
 	memset(&user,0,sizeof(UserGps));
-	strcpy(user.oper,"1234");
-	strcpy(user.date,"2011-1-1");
+	strcpy_s(user.oper,_T("1234"));
+	strcpy_s(user.date,_T("2011-7-1"));
 	cData *cd = new cData();
 	lryxj1result lPoint;
 	cd->GetXjRymx(user,&lPoint);
@@ -1055,8 +1154,8 @@ int GetOrgMonthxl()
 	//int PGPSDayData(const UserGps value,lOrgLineResult *lPoint);
 	UserGps user;
 	memset(&user,0,sizeof(UserGps));
-	strcpy(user.oper,"jiaoxc");
-	strcpy(user.time,"2011-6-26");
+	strcpy_s(user.oper,_T("admin"));
+	strcpy_s(user.time,_T("2011-7-1"));
 	cData *cd = new cData();
 	lOrgLineResult lPoint;
 	cd->PGPSDayData(user,&lPoint);;
@@ -1065,35 +1164,113 @@ int GetOrgMonthxl()
 
 int SavePictureToDirect( int aOrgID, const PictureInfo* aPicture, CString aToDirect )
 {
-    //bool cData::getPic(const Getrealpic sValue,CString aToDirect)
     Getrealpic cs;
-
     memset(&cs,0,sizeof(Getrealpic));
- //   strcpy(cs.pname,"20110702170018677.jpg");
-    
+ 
     CString cTEMP1 = aPicture->iPicName;
     char *p2 = (char*)cTEMP1.GetBuffer(cTEMP1.GetLength());
     memcpy(&cs.pname,p2,cTEMP1.GetLength());
     cTEMP1.ReleaseBuffer();
 
-cData *cd = new cData();
-
-
-cd->getPic((const Getrealpic)cs,aToDirect);
-return KErrNone;
+	cData *cd = new cData();
+	if(cd->getPic((const Getrealpic)cs,aToDirect))
+		return ResultOk;
+	else
+		return KErrNone;
 
 }
 
 int GetStaffScheduleTrack(CString aStaffID, time_t aDate, RecordStaff* aRecord )
 {//流水
+    /////////////////////////////////////////////////////
+#ifdef TESTCODE
     aRecord->iStaffID = aStaffID;
-    //aRecord->
+    aRecord->iArrivedTime.push_back(_T("9:10"));
+    aRecord->iRecordLon.push_back(104.064631);
+    aRecord->iRecordLat.push_back(30.698965);
+    //
+    aRecord->iArrivedTime.push_back(_T("9:15"));
+    aRecord->iRecordLon.push_back(104.075630);
+    aRecord->iRecordLat.push_back(30.699584);
+    //
+    aRecord->iArrivedTime.push_back(_T("9:28"));
+    aRecord->iRecordLon.push_back(104.086426);
+    aRecord->iRecordLat.push_back(30.699584);
+    return KErrNone;
+#endif
+    /////////////////////////////////////////////////////
+
+    aRecord->iStaffID = aStaffID;
+	//int PGPSDayData(const UserGps value,lOrgLineResult *lPoint);
+	char UserName[20];
+	memset(UserName,0,20);
+	UserGps user;
+	memset(&user,0,sizeof(UserGps));
+    CString cTEMP1 = aStaffID;
+    char *p2 = (char*)cTEMP1.GetBuffer(cTEMP1.GetLength());
+    memcpy(UserName,p2,cTEMP1.GetLength());
+    cTEMP1.ReleaseBuffer();
+	memcpy(user.oper,UserName,20);
+
+	CString dates = Time2Strings(aDate);
+    char *p3 = (char*)dates.GetBuffer(dates.GetLength());
+    memcpy(user.time,p3,dates.GetLength());
+	dates.ReleaseBuffer();
+
+	cData *cd = new cData();
+	lOrgLineResult lPoint;
+	cd->PGPSDayData(user,&lPoint);
+////OrgLineResults;
+//typedef list <OrgLineResults> lOrgLineResult;
+//typedef lOrgLineResult::iterator IterOrgLineResult;
+	aRecord->iStaffID = aStaffID;
+	for(IterOrgLineResult iter = lPoint.begin() ;iter !=lPoint.end(); iter++ )
+	{
+		aRecord->iRecordLat.push_back(iter->wdu) ;
+		aRecord->iRecordLon.push_back(iter->jdu);
+		aRecord->iArrivedTime.push_back(iter->time);
+	}
     return KErrNone;
 }
 
-int GetReportDetail(CString aStaffID, time_t aTime, ReportDetail* aReportList)
+int GetReportDetail(CString aStaffID, CString aTime, ReportDetail* aReportList)
 {//明细
+    /////////////////////////////////////////////////////
+#ifdef TESTCODE
+    aReportList->iDay = aTime;
+    aReportList->iPlanArrivedTime.push_back(_T("9:00"));
+    aReportList->iActualArrivedTime.push_back(_T("9:05"));
+    aReportList->iState.push_back(KPointNormal);
+    aReportList->iPlanArrivedTime.push_back(_T("9:10"));
+    aReportList->iActualArrivedTime.push_back(_T("9:11"));
+    aReportList->iState.push_back(KPointUnArrived);
     return KErrNone;
+#endif
+    /////////////////////////////////////////////////////
+	ryxj1 user;
+	memset(&user,0,sizeof(ryxj1));
+
+    CString cTEMP1 = aStaffID;
+    char *p2 = (char*)cTEMP1.GetBuffer(cTEMP1.GetLength());
+    memcpy(user.oper,p2,cTEMP1.GetLength());
+    cTEMP1.ReleaseBuffer();
+
+	CString dates = aTime;
+    char *p3 = (char*)dates.GetBuffer(dates.GetLength());
+	memcpy(user.date,p3,dates.GetLength());
+
+	cData *cd = new cData();
+	lryxj1result lPoint;
+	cd->GetXjRymx(user,&lPoint);
+	for(Iterryxj1result iter = lPoint.begin();iter != lPoint.end();iter++)
+	{
+		aReportList->iActualArrivedTime.push_back(iter->realTime);
+		aReportList->iPlanArrivedTime.push_back(iter->sArrtime);
+		aReportList->iDay = iter->date;
+		aReportList->iState.push_back((PointState)iter->pointstate);
+	}
+
+	return KErrNone;
 }
 
 int GetReportInfoList( int aOrgID, int aYear, int aMonth, vector<ReportInfo*>* aReportList )
@@ -1103,7 +1280,7 @@ int GetReportInfoList( int aOrgID, int aYear, int aMonth, vector<ReportInfo*>* a
     ReportInfo* report = new ReportInfo;
     report->iOrgID = aOrgID;
     report->iStaffName = _T("Admin");
-    report->iReportDay = GetCurrentTime();
+    report->iReportDay = _T("2011-1-1");
     report->iPlanArrived = 50;
     report->iActualArrived = 40;
     report->iAbnormal = 10;
@@ -1112,7 +1289,7 @@ int GetReportInfoList( int aOrgID, int aYear, int aMonth, vector<ReportInfo*>* a
     report = new ReportInfo;
     report->iOrgID = aOrgID;
     report->iStaffName = _T("admin2");
-    report->iReportDay = GetCurrentTime();
+    report->iReportDay = _T("2011-1-1");
     report->iPlanArrived = 60;
     report->iActualArrived = 40;
     report->iAbnormal = 20;
@@ -1121,6 +1298,31 @@ int GetReportInfoList( int aOrgID, int aYear, int aMonth, vector<ReportInfo*>* a
     return KErrNone;
 #endif
     /////////////////////////////////////////////////////
+	cData *cd = new cData();
+	getorgpx sValues;
+	lOrgMonth llist;
+
+	sValues.months = aMonth;
+	sValues.orgid = aOrgID;
+	sValues.yesrs = aYear;
+	if(cd->GetOrgMonthPx(sValues,&llist) == 1)
+	{
+		for (iterOrgMonth iter = llist.begin() ; iter != llist.end();iter++)
+		{
+		ReportInfo* report = new ReportInfo;
+		report->iOrgID = aOrgID;
+		report->iStaffName = iter->userid;
+		report->iReportDay = iter->dates;
+		report->iWeekDay = iter->xj;
+		report->iPlanArrived = iter->sTotlePoint;
+		report->iActualArrived = iter->sGetPoint;
+		report->iAbnormal = iter->cPoint;
+		report->iUnArrived = iter->lPoint;
+		aReportList->push_back(report);
+
+		}
+	}	
+
     return KErrNone;
 }
 

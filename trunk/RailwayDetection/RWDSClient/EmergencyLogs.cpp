@@ -67,13 +67,13 @@ BOOL CEmergencyLogs::OnInitDialog()
                 CString totalKM;
                 taskID.Format(_T("%d"), logs->iTaskID);
                 orgID.Format(_T("%d"), logs->iStaffOrgID);
-                totalTime.Format(_T("%d"), logs->iTotalTime);
+                //totalTime.Format(_T("%d"), logs->iTotalTime);
                 totalKM.Format(_T("%f"), logs->iTotalKM);
 
                 m_ListCtrl.InsertItem(i, taskID);
                 m_ListCtrl.SetItemText(i, 1, logs->iStaffID);
                 m_ListCtrl.SetItemText(i, 2, orgID);
-                m_ListCtrl.SetItemText(i, 3, totalTime);
+                m_ListCtrl.SetItemText(i, 3, logs->iTotalTime);
                 m_ListCtrl.SetItemText(i, 4, totalKM);
             }
         }
