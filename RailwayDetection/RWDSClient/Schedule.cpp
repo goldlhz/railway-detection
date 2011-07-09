@@ -109,9 +109,9 @@ BOOL CSchedule::OnInitDialog()
 
 	//初始化日程信息
 	m_ComboStartDay.ResetContent();
-	for (int i=0; i<StrStartNoCount; i++)
+	for (int i=0; i<strStartNoCount; i++)
 	{
-		m_ComboStartDay.AddString(StrStartNo[i]);
+		m_ComboStartDay.AddString(strStartNo[i]);
 	}
 	CTime startTime(m_CRWDSClientView->m_CurrentOrg->iCalendar->iStartDay);
 	int i = startTime.GetMonth();
@@ -200,9 +200,9 @@ void CSchedule::OnLvnItemchangedSchedulelist(NMHDR *pNMHDR, LRESULT *pResult)
 	GetDlgItem(IDC_EDIT_PERIODS)->SetWindowText(str);
 	//按周期显示天数
 	m_ComboStartDay.ResetContent();
-	for (int i=0; i<m_CRWDSClientView->m_CurrentOrg->iCalendar->iPeriods && i<StrStartNoCount; i++)
+    for (int i=0; i<strStartNoCount; i++)
 	{
-		m_ComboStartDay.AddString(StrStartNo[i]);
+		m_ComboStartDay.AddString(strStartNo[i]);
 	}
 	int curSel = static_cast<int>(line->iStartNo);
 	if (line->iStartNo >= m_ComboStartDay.GetCount())
@@ -319,16 +319,16 @@ void CSchedule::OnBnClickedBtnModifycalender()
 	m_CRWDSClientView->m_CurrentOrg->iCalendar->iStartDay = startTime.GetTime();
 
 	m_SelectedLine->iStartNo = static_cast<LineStartNo>(m_ComboStartDay.GetCurSel());
-	m_ComboStartDay.ResetContent();
-	for (int i=0; i<m_CRWDSClientView->m_CurrentOrg->iCalendar->iPeriods && i<StrStartNoCount; i++)
-	{
-		m_ComboStartDay.AddString(StrStartNo[i]);
-	}
-	if (m_SelectedLine->iStartNo >= m_ComboStartDay.GetCount())
-	{
-		m_SelectedLine->iStartNo = KUndefine;
-	}
-	m_ComboStartDay.SetCurSel(m_SelectedLine->iStartNo);
+	//m_ComboStartDay.ResetContent();
+	//for (int i=0; i<m_CRWDSClientView->m_CurrentOrg->iCalendar->iPeriods && i<StrStartNoCount; i++)
+	//{
+	//	m_ComboStartDay.AddString(StrStartNo[i]);
+	//}
+	//if (m_SelectedLine->iStartNo >= m_ComboStartDay.GetCount())
+	//{
+	//	m_SelectedLine->iStartNo = KUndefine;
+	//}
+	//m_ComboStartDay.SetCurSel(m_SelectedLine->iStartNo);
 	GetDlgItem(IDC_EDIT_SCHEDULEREMARK)->GetWindowText(m_CRWDSClientView->m_CurrentOrg->iCalendar->iScheduleRemark);
 	//传排班表
     SetCalendarSchedule(m_CRWDSClientView->m_CurrentOrg->iOrgID, m_CRWDSClientView->m_CurrentOrg->iCalendar);

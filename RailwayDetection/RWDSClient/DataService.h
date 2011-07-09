@@ -8,7 +8,7 @@ int VerifyLogin( CString& aLoginAccount, CString& aLoginPassword, int* orgID, Pe
 int GetLoginerPermission(const CString& aLoginAccount);
 
 //获取/设置组织结构
-int GetOrgTree(const int& OrgId, vector<OrganizationInfo*>* a_OrgTree);
+int GetOrgTree(const int aOrgID, vector<OrganizationInfo*>* a_OrgTree);
 void CherkOrgType(vector<OrganizationInfo*>* a_OrgTree,OrganizationInfo* OrgInfo);
 int SetOrganization(int aCmd, const OrganizationInfo* aOrganization);
 
@@ -53,7 +53,7 @@ int GetStaffScheduleTrack(CString aStaffID, time_t aDate, RecordStaff* aRecord )
 //获取机构月报表
 int GetReportInfoList(int aOrgID, int aYear, int aMonth, vector<ReportInfo*>* aReportList);
 //获取日明细
-int GetReportDetail(CString aStaffID, time_t aTime, ReportDetail* aReportList);
+int GetReportDetail(CString aStaffID, CString aTime, ReportDetail* aReportList);
 
 
 int GetOrgMonthPx(GetOrgPxEx const sValue,vector<getorgpxlistresultEx*> *Value);

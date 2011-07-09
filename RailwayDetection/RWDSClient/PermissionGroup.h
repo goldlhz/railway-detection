@@ -14,6 +14,12 @@ public:
 
 // 对话框数据
 	enum { IDD = IDD_SETPEMISSIONGROUP };
+
+public:
+    void SetPermissionValue(unsigned int aPermissionValue);
+    unsigned int GetPermisstionValue();
+private:
+    unsigned int m_PermissionValue;
 public:
     CComboBox m_ComboPermissionGroup;
     vector<CButton*> m_CheckBoxGroup;

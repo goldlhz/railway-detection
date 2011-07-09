@@ -87,7 +87,7 @@ int CTCPClient::Read(char *lpReadBuf, int iBufLen)
 	if(iBufLen < 1)
 		return 0;
 	int rlen = 0;
-	rlen = WaitForData(2000);
+	rlen = WaitForData(1000);
 	if(rlen > 0)
 	{
 		rlen = recv(m_sSocket, lpReadBuf, iBufLen, 0);

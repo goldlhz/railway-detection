@@ -22,12 +22,15 @@ public:
     void OrgListVisitForAddComboOrgParent(OrganizationInfo* aOrg);
     HTREEITEM FindItemFromTreeOrg(HTREEITEM aTreeItem, DWORD_PTR aItemData);
     int AddOrgToTreeOrg(OrganizationInfo* aAddedOrg, OrganizationInfo* aParentOrg);
+    void AddNewOrg();
     //OrganizationInfo* GetOrgParent(int aParentID);
 private:
     CRWDSClientView* m_CRWDSClientView;
     CTreeCtrl m_TreeOrg;
     CComboBox m_ComboOrgParent;
     OrganizationInfo* m_SeletedOrg;
+    BOOL m_ComoParentEnable;
+    BOOL m_AddNewOrg;
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV Ö§³Ö
 
@@ -39,5 +42,7 @@ public:
     afx_msg void OnBnClickedBtnAddorg();
     afx_msg void OnBnClickedBtnModifyorg();
     afx_msg void OnBnClickedBtnDeleteorg();
+    
     CComboBox m_ComboBoundaryLine;
+    afx_msg void OnBnClickedCancel();
 };

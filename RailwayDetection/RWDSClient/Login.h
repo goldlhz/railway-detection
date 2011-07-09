@@ -33,4 +33,5 @@ protected:
 public:
     afx_msg void OnBnClickedOk();
     afx_msg void OnBnClickedCancel();
+    afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 };

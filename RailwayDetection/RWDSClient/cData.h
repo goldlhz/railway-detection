@@ -65,7 +65,11 @@ public:
 	//人员寻件人员明细
 	int GetXjRymx(const ryxj1 value,lryxj1result *lPoint);
 	//删除全部 解决任务下面的人员
-	int GetXjRymx(const jjDel value);
+	int DelXjRymx(const jjDel value);
+	//获取紧急任务列表
+	int GetJJRWList(const int orgid,ljjListresult *lPoint);
+	//获取紧急任务人员列表
+	int GetJJry(const int rwid,ljjryListresult *lPoint);
 private:
 	CTCPClient *cs;
 	void CreateConn();

@@ -113,6 +113,7 @@ void CLineList::OnBnClickedBtnLineadd()
 	// TODO: 在此添加控件通知处理程序代码
 	LineInfo* line = new LineInfo;
 	line->iLineID = 1;
+    line->iOrgID = m_CRWDSClientView->m_CurrentOrg->iOrgID;
 	line->iLineName = _T("线路");
 	line->iStartKm = m_CRWDSClientView->m_CurrentOrg->iMapPoint[0]->iKM;
 	line->iLineKmLonLat.push_back(m_CRWDSClientView->m_CurrentOrg->iMapPoint[0]);
@@ -129,8 +130,8 @@ void CLineList::OnBnClickedBtnLineadd()
 	int count = m_ListCtrl.GetItemCount();
 
 	id.Format(_T("%d"), line->iLineID);
-	startKm.Format(_T("%.0f"), line->iStartKm);
-	endKm.Format(_T("%.0f"), line->iLineKmLonLat[line->iLineKmLonLat.size()-1]->iKM);
+	startKm.Format(_T("%.2f"), line->iStartKm);
+	endKm.Format(_T("%.2f"), line->iLineKmLonLat[line->iLineKmLonLat.size()-1]->iKM);
 	name = line->iLineName;
 
 	m_ListCtrl.InsertItem(count, name);
@@ -302,7 +303,7 @@ void CLineList::OnBnClickedBtnAdd1()
 	LineInfo* line = m_CRWDSClientView->m_CurrentOrg->iLine[select];
 	line->iLineKmLonLat.push_back(point);
 	line->iLineKmTime.push_back(0);//为新加点设置时间
-    SetOrgLine(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_LINE_MODIFY, line);
+    //SetOrgLine(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_LINE_MODIFY, line);
 
 	CString str;
 	ENCODERAILWAYFULLNAME(str, point->iRailLine, point->iKM, point->iDirect);
@@ -337,7 +338,7 @@ void CLineList::OnBnClickedBtnRemove1()
 	line->iLineKmLonLat.erase(line->iLineKmLonLat.begin()+index);
 	line->iLineKmTime.erase(line->iLineKmTime.begin()+index);
 
-    SetOrgLine(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_LINE_MODIFY, line);
+    //SetOrgLine(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_LINE_MODIFY, line);
 
 	CString str;
 	if (line->iLineKmLonLat.size() != 0)

@@ -33,6 +33,7 @@ void CLogin::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CLogin, CDialogEx)
     ON_BN_CLICKED(IDOK, &CLogin::OnBnClickedOk)
     ON_BN_CLICKED(IDCANCEL, &CLogin::OnBnClickedCancel)
+    ON_WM_CTLCOLOR()
 END_MESSAGE_MAP()
 
 
@@ -49,10 +50,41 @@ void CLogin::OnBnClickedOk()
         AfxMessageBox(_T("请输入账户名"));
         return;
     }
-    GetDlgItem(IDC_STATIC_LOGININFO)->SetWindowText(_T("正在验证身份，请稍后"));
-    if(VerifyLogin(m_LoginAccount, m_LoginPassword, &m_LoginOrgID, &m_LoginPermission) != KErrNone)
+
+    //刷背景
+    CRect rtlbl; 
+    GetDlgItem(IDC_STATIC_LOGININFO)->GetWindowRect(&rtlbl); 
+    ScreenToClient(&rtlbl);
+    InvalidateRect(&rtlbl);//最后刷新对话框背景 
+
+    GetDlgItem(IDC_STATIC_LOGININFO)->SetWindowText(_T("正在验证身份，请稍后...."));
+
+    int err = VerifyLogin(m_LoginAccount, m_LoginPassword, &m_LoginOrgID, &m_LoginPermission);
+
+    //刷背景
+    CRect rtlbl1; 
+    GetDlgItem(IDC_STATIC_LOGININFO)->GetWindowRect(&rtlbl1); 
+    ScreenToClient(&rtlbl1);
+    InvalidateRect(&rtlbl1);//最后刷新对话框背景 
+
+    if (err == KErrNotFound)
+    {
+        GetDlgItem(IDC_STATIC_LOGININFO)->SetWindowText(_T("获取网络数据失败，请重新登录!"));
+        return;
+    }
+    else if (err == KErrUnknowLink)
+    {
+        GetDlgItem(IDC_STATIC_LOGININFO)->SetWindowText(_T("不能连接服务器!"));
+        return;
+    }
+    else if(err == 1)
     {
         GetDlgItem(IDC_STATIC_LOGININFO)->SetWindowText(_T("登录失败，用户名或密码错误"));
+        return;
+    }
+    else if(err != KErrNone)
+    {
+        GetDlgItem(IDC_STATIC_LOGININFO)->SetWindowText(_T("未知错误，请重新登录!"));
         return;
     }
     CDialogEx::OnOK();
@@ -93,4 +125,21 @@ int CLogin::GetLoginOrgID()
 PermissionGroup CLogin::GetLoginPermission()
 {
     return m_LoginPermission;
+}
+
+
+HBRUSH CLogin::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
+{
+    HBRUSH hbr = CDialogEx::OnCtlColor(pDC, pWnd, nCtlColor);
+
+    // TODO:  在此更改 DC 的任何特性
+    int nID = pWnd->GetDlgCtrlID();
+    if( nID == IDC_STATIC_LOGININFO) //对指定的控件设属性,你
+    {
+        pDC->SetTextColor(RGB(0,0,0) );
+        pDC->SetBkMode(TRANSPARENT);
+        return HBRUSH(GetStockObject(HOLLOW_BRUSH));
+    }
+    // TODO:  如果默认的不是所需画笔，则返回另一个画笔
+    return hbr;
 }

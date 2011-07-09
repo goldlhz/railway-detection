@@ -46,6 +46,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <GenerateManifest>true</GenerateManifest>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -96,7 +97,10 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="C:\Users\zhan\Desktop\background.bmp" />
     <None Include="ReadMe.txt" />
+    <None Include="res\background.bmp" />
+    <None Include="res\bitmap1.bmp" />
     <None Include="res\bmp00001.bmp" />
     <None Include="res\classview.bmp" />
     <None Include="res\classview_hc.bmp" />
@@ -123,6 +127,7 @@
     <None Include="res\sort.bmp" />
     <None Include="res\sort_hc.bmp" />
     <None Include="res\Toolbar.bmp" />
+    <None Include="res\toolbar1.bmp" />
     <None Include="res\Toolbar256.bmp" />
     <None Include="UserImages.bmp" />
   </ItemGroup>

@@ -15,6 +15,7 @@
 #include "CFont0.h"
 #include "CWorkbook.h"
 #include "CWorksheet.h"
+#include "StaffLogs.h"
 
 
 // CReport 对话框
@@ -35,7 +36,7 @@ void CReport::DoDataExchange(CDataExchange* pDX)
 {
     CDialogEx::DoDataExchange(pDX);
     DDX_Control(pDX, IDC_LIST_REPORT, m_ListCtrl);
-    DDX_Control(pDX, IDC_COMBO_REPORTMONTH, m_ComboReportMonth);
+   // DDX_Control(pDX, IDC_COMBO_REPORTMONTH, m_ComboReportMonth);
 }
 
 
@@ -66,20 +67,20 @@ BOOL CReport::OnInitDialog()
     m_ListCtrl.InsertColumn(3, _T("计划记录"), LVCFMT_LEFT, clientRect.Width()/7);
     m_ListCtrl.InsertColumn(4, _T("实际记录"), LVCFMT_LEFT, clientRect.Width()/7);
     m_ListCtrl.InsertColumn(5, _T("异常次数"), LVCFMT_LEFT, clientRect.Width()/7);
-    m_ListCtrl.InsertColumn(6, _T("异常次数"), LVCFMT_LEFT, clientRect.Width()/7);
+    m_ListCtrl.InsertColumn(6, _T("未到达次数"), LVCFMT_LEFT, clientRect.Width()/7);
 
-    m_ComboReportMonth.AddString(_T("1月"));
-    m_ComboReportMonth.AddString(_T("2月"));
-    m_ComboReportMonth.AddString(_T("3月"));
-    m_ComboReportMonth.AddString(_T("4月"));
-    m_ComboReportMonth.AddString(_T("5月"));
-    m_ComboReportMonth.AddString(_T("6月"));
-    m_ComboReportMonth.AddString(_T("7月"));
-    m_ComboReportMonth.AddString(_T("8月"));
-    m_ComboReportMonth.AddString(_T("9月"));
-    m_ComboReportMonth.AddString(_T("10月"));
-    m_ComboReportMonth.AddString(_T("11月"));
-    m_ComboReportMonth.AddString(_T("12月"));
+    //m_ComboReportMonth.AddString(_T("1月"));
+    //m_ComboReportMonth.AddString(_T("2月"));
+    //m_ComboReportMonth.AddString(_T("3月"));
+    //m_ComboReportMonth.AddString(_T("4月"));
+    //m_ComboReportMonth.AddString(_T("5月"));
+    //m_ComboReportMonth.AddString(_T("6月"));
+    //m_ComboReportMonth.AddString(_T("7月"));
+    //m_ComboReportMonth.AddString(_T("8月"));
+    //m_ComboReportMonth.AddString(_T("9月"));
+    //m_ComboReportMonth.AddString(_T("10月"));
+    //m_ComboReportMonth.AddString(_T("11月"));
+    //m_ComboReportMonth.AddString(_T("12月"));
     return TRUE;  // return TRUE unless you set the focus to a control
     // 异常: OCX 属性页应返回 FALSE
 }
@@ -88,43 +89,73 @@ BOOL CReport::OnInitDialog()
 void CReport::OnBnClickedBtnSearchreport()
 {
     // TODO: 在此添加控件通知处理程序代码
-    int month = m_ComboReportMonth.GetCurSel()+1;
-    if (month <=0)
+    //int month = m_ComboReportMonth.GetCurSel()+1;
+    //if (month <=0)
+    //{
+    //    AfxMessageBox(_T("请选择月份"));
+    //    return;
+    //}
+    CString date;
+    GetDlgItem(IDC_EDIT_REVIEWDAY)->GetWindowText(date);
+    if (date.GetLength() != 6)
     {
-        AfxMessageBox(_T("请选择月份"));
+        AfxMessageBox(_T("请正确输入查询时间"));
         return;
     }
     DeleteReportListElement(&m_RWDSClientView->m_CurrentOrg->iReportInfo);
+    int year = _ttoi(date.Left(4));
+    int month = _ttoi(date.Right(2));
+    
 
-    int err = GetReportInfoList(m_RWDSClientView->m_CurrentOrg->iOrgID, 2011, month, &m_RWDSClientView->m_CurrentOrg->iReportInfo);
+    int err = GetReportInfoList(m_RWDSClientView->m_CurrentOrg->iOrgID, year, month, &m_RWDSClientView->m_CurrentOrg->iReportInfo);
     if (err == KErrNone)
     {
+        CString str;
+        str.Format(_T("记录条数: %d"), m_RWDSClientView->m_CurrentOrg->iReportInfo.size());
+        GetDlgItem(IDC_STATIC_TOTAL)->SetWindowText(str);
         m_ListCtrl.DeleteAllItems();
         ReportInfo* report = NULL;
         CString strDate;
         CString strPlanArrived;
         CString strActualArrived;
         CString strAbnormal;
+        CString strUnArrived;
         for(size_t i=0; i<m_RWDSClientView->m_CurrentOrg->iReportInfo.size(); i++)
         {
             report = m_RWDSClientView->m_CurrentOrg->iReportInfo[i];
-            CTime rTime(report->iReportDay);
-            strDate.Format(_T("%02d月%02d日"), rTime.GetMonth(), rTime.GetDay());
+            //CTime rTime(report->iReportDay);
+            //strDate.Format(_T("%02d月%02d日"), rTime.GetMonth(), rTime.GetDay());
             strPlanArrived.Format(_T("%d"), report->iPlanArrived);
             strActualArrived.Format(_T("%d"), report->iActualArrived);
             strAbnormal.Format(_T("%d"), report->iAbnormal);
+            strUnArrived.Format(_T("%d"), report->iUnArrived);
 
             int count = m_ListCtrl.GetItemCount();
-            m_ListCtrl.InsertItem(count, strDate);
-            m_ListCtrl.SetItemText(count, 1, report->iStaffName);
-            m_ListCtrl.SetItemText(count, 2, strPlanArrived);
-            m_ListCtrl.SetItemText(count, 3, strActualArrived);
-            m_ListCtrl.SetItemText(count, 4, strAbnormal);
+            m_ListCtrl.InsertItem(count, report->iReportDay);
+            m_ListCtrl.SetItemText(count, 1, report->iWeekDay);
+            m_ListCtrl.SetItemText(count, 2, report->iStaffName);
+            m_ListCtrl.SetItemText(count, 3, strPlanArrived);
+            m_ListCtrl.SetItemText(count, 4, strActualArrived);
+            m_ListCtrl.SetItemText(count, 5, strAbnormal);
+            m_ListCtrl.SetItemText(count, 6, strUnArrived);
             m_ListCtrl.SetItemData(count, (DWORD_PTR)report);
         }
     }
+    else
+    {
+        GetDlgItem(IDC_STATIC_TOTAL)->SetWindowText(_T("获取数据失败"));
+    }
 }
 
+void CReport::ViewReportDetail(ReportInfo* aReport)
+{
+    if (aReport)
+    {
+        CStaffLogs logs;
+        logs.SetReportInfo(aReport);
+        logs.DoModal();
+    }
+}
 
 void CReport::OnNMDblclkListReport(NMHDR *pNMHDR, LRESULT *pResult)
 {
@@ -139,6 +170,7 @@ void CReport::OnNMDblclkListReport(NMHDR *pNMHDR, LRESULT *pResult)
         return;
     }
     ReportInfo* report = (ReportInfo*)m_ListCtrl.GetItemData(select);
+    ViewReportDetail(report);
     *pResult = 0;
 }
 
@@ -155,6 +187,7 @@ void CReport::OnBnClickedBtnViewdetail()
         return;
     }
     ReportInfo* report = (ReportInfo*)m_ListCtrl.GetItemData(select);
+    ViewReportDetail(report);
 }
 
 
@@ -181,7 +214,11 @@ void   CReport::GetCellName(int nRow, int nCol, CString &strName)
 void CReport::OnBnClickedBtnExportreport()
 {
     // TODO: 在此添加控件通知处理程序代码
-    CString strFile = _T("E:\\Test.xlsx");
+    if (m_ListCtrl.GetItemCount() == 0)
+    {
+        return;
+    }
+    CString strFile = _T("C:\\Test.xlsx");
     COleVariant covTrue((short)TRUE), covFalse((short)FALSE), covOptional((long)DISP_E_PARAMNOTFOUND,   VT_ERROR); 
     CApplication   app; 
     CWorkbooks   books; 
@@ -244,13 +281,13 @@ void CReport::OnBnClickedBtnExportreport()
     range   =   range.get_Resize(COleVariant((short)m_rows),COleVariant((short)m_cols)); 
     for   (   iRow   =   1;   iRow   <=   m_rows;   iRow++)//将列表内容写入EXCEL 
     { 
-        for   (   iCol   =   1;   iCol   <=   m_cols;   iCol++)   
+        for(iCol = 1; iCol <= m_cols; iCol++)   
         { 
             index[0]=iRow-1; 
             index[1]=iCol-1; 
             CString   szTemp; 
             szTemp=m_ListCtrl.GetItemText(iRow-1,iCol-1); 
-            BSTR   bstr   =   szTemp.AllocSysString(); 
+            BSTR bstr = szTemp.AllocSysString(); 
             saRet.PutElement(index,bstr); 
             SysFreeString(bstr); 
         } 

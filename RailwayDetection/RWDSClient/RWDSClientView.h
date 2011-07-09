@@ -145,6 +145,10 @@ public:
 	afx_msg void OnReviewVoice();
     afx_msg void OnReportMonth();
     afx_msg void OnSetPermissiongroup();
+    afx_msg void OnUpdateReviewPicture(CCmdUI *pCmdUI);
+    afx_msg void OnUpdateReviewVoice(CCmdUI *pCmdUI);
+    afx_msg void OnUpdateReportMonth(CCmdUI *pCmdUI);
+    afx_msg void OnUpdateReviewRecordstaff(CCmdUI *pCmdUI);
 };
 extern CRWDSClientView* gClientView;
 
