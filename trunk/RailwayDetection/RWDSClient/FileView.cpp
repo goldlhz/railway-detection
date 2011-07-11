@@ -126,6 +126,7 @@ void CFileView::TreeVisitForDeleteItemData(HTREEITEM aItem)
         }
 		//刷新机构后需要重新加载
         curOrg->iDataSet = FALSE;
+        curOrg->iEmergencyDataSet = FALSE;
         delete curOrg;
     }
 }

@@ -250,8 +250,8 @@ int GetOrgPoint(int aOrgID, vector<MapPoint*>* aPointList)
 			MapPoint *pt = new MapPoint;
 			pt->iRailLine = iter->lineid;
 			pt->iKM = iter->gls;
-			pt->iLat = iter->jdu;
-			pt->iLon = iter->wdu;
+			pt->iLat = iter->wdu;
+			pt->iLon = iter->jdu;
 			pt->iPointId = iter->iPoint;
 	
 			if(iter->iState == 1)
@@ -291,6 +291,7 @@ int SetOrgPoint( int aOrgID, int aCmd, const MapPoint* aPoint )
 			pPoint.iLon = aPoint->iLon;
 			pPoint.iRailLine = aPoint->iRailLine;
 			pPoint.itype = 0;//tianjia
+            pPoint.PointId = aPoint->iPointId;
 			iResult=cd->setPoint(pPoint);
 			break;
 		}
@@ -317,11 +318,7 @@ int SetOrgPoint( int aOrgID, int aCmd, const MapPoint* aPoint )
         break;
     }
 	delete cd;
-	if(iResult==1)
-	{
-		return KErrNone;
-	}else
-		return ResultOk;
+    return iResult;//设置正常，返回点ID
 }
 
 int GetOrgLine(int aOrgID, const vector<MapPoint*>& aPointList, vector<LineInfo*>* aLineList)
@@ -795,7 +792,7 @@ int GetEmergencyTask( int aOrgID, vector<EmergencyTaskInfo*>* m_EmergencyList )
 	cs->GetJJRWList(aOrgID,&lPoint);
 	for(IterljjListresult iter = lPoint.begin();iter != lPoint.end(); iter++)
 	{
-		EmergencyTaskInfo  *eInfo = new EmergencyTaskInfo();
+		EmergencyTaskInfo  *eInfo = new EmergencyTaskInfo;
 		eInfo->iBeginKm = (int)iter->spoint;
 		eInfo->iEndKm = (int)iter->epoint;
 
@@ -1341,7 +1338,7 @@ time_t Time2Strings2(CString sec)
 		return 0;
 	int i1,i2,i3;
 	sscanf_s((const char*)sec.GetBuffer(),"%d-%d-%d",&i1,&i2,&i3);
-	CTime time(i1,i2,i3,0,0,0); 
+	CTime time(i1,i2,i3,0,0,1); 
 	time_t time2=time.GetTime();
 	sec.ReleaseBuffer();
 	return time2;

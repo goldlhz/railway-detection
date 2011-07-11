@@ -39,6 +39,8 @@ void CEmergencyTask::DoDataExchange(CDataExchange* pDX)
     //DDX_Control(pDX, IDC_LIST_EMSELETED, m_ListEmSeletedStaff);
     //DDX_Control(pDX, IDC_LIST_EMUNSELETED, m_ListEmUnseletedStaff);
     DDX_Control(pDX, IDC_COMBO_RAILLINE, m_ComboRailLine);
+    DDX_Control(pDX, IDC_DATETIMEPICKER_STARTDATE, m_PickStartDay);
+    DDX_Control(pDX, IDC_DATETIMEPICKER_ENDDATE, m_PickEndDay);
 }
 
 
@@ -98,7 +100,7 @@ BOOL CEmergencyTask::OnInitDialog()
         }
         else
         {
-            startKm = _T("");
+            startKm = _T("0");
         }
         if (task->iEndKm)
         {
@@ -106,7 +108,7 @@ BOOL CEmergencyTask::OnInitDialog()
         }
         else
         {
-            endKm = _T("");
+            endKm = _T("0");
         }
 
         m_ListCtrl.InsertItem(i, name);
@@ -150,26 +152,38 @@ void CEmergencyTask::OnLvnItemchangedEmergencylist(NMHDR *pNMHDR, LRESULT *pResu
     GetDlgItem(IDC_EDIT_EMERGENCYID)->SetWindowText(str);
     m_ComboEmergencyStatus.SetCurSel(task->iStatus);
 
-    CString strBeginHour;
-    CString strBeginMin;
-    CString strEndHour;
-    CString strEndMin;
-    struct tm beginTime;
-    localtime_s(&beginTime, &task->iBeginTime);
-    strBeginHour.Format(_T("%02d"), beginTime.tm_hour);
-    strBeginMin.Format(_T("%02d"), beginTime.tm_min);
-
-    struct tm endTime;
-    localtime_s(&endTime, &task->iEndTime);
-    strEndHour.Format(_T("%02d"), endTime.tm_hour);
-    strEndMin.Format(_T("%02d"), endTime.tm_min);
-
-    GetDlgItem(IDC_EDIT_STARTHOUR)->SetWindowText(strBeginHour);
-    GetDlgItem(IDC_EDIT_STARTMINUTE)->SetWindowText(strBeginMin);
-    GetDlgItem(IDC_EDIT_ENDHOUR)->SetWindowText(strEndHour);
-    GetDlgItem(IDC_EDIT_ENDMINUTE)->SetWindowText(strEndMin);
-
     m_ComboRailLine.SetCurSel(task->iLineName);
+
+    CString startKM;
+    CString endKM;
+    startKM.Format(_T("%d"), task->iBeginKm);
+    endKM.Format(_T("%d"), task->iEndKm);
+    GetDlgItem(IDC_EDIT_EMERGENCYSTARTKM)->SetWindowText(startKM);
+    GetDlgItem(IDC_EDIT_EMERGENCYENDKM)->SetWindowText(endKM);
+
+    m_PickStartDay.SetTime(task->iBeginTime);
+    m_PickEndDay.SetTime(task->iEndTime);
+
+    //CString strBeginHour;
+    //CString strBeginMin;
+    //CString strEndHour;
+    //CString strEndMin;
+    //struct tm beginTime;
+    //localtime_s(&beginTime, &task->iBeginTime);
+    //strBeginHour.Format(_T("%02d"), beginTime.tm_hour);
+    //strBeginMin.Format(_T("%02d"), beginTime.tm_min);
+
+    //struct tm endTime;
+    //localtime_s(&endTime, &task->iEndTime);
+    //strEndHour.Format(_T("%02d"), endTime.tm_hour);
+    //strEndMin.Format(_T("%02d"), endTime.tm_min);
+
+    //GetDlgItem(IDC_EDIT_STARTHOUR)->SetWindowText(strBeginHour);
+    //GetDlgItem(IDC_EDIT_STARTMINUTE)->SetWindowText(strBeginMin);
+    //GetDlgItem(IDC_EDIT_ENDHOUR)->SetWindowText(strEndHour);
+    //GetDlgItem(IDC_EDIT_ENDMINUTE)->SetWindowText(strEndMin);
+
+    
 
     *pResult = 0;
 }
@@ -196,10 +210,13 @@ void CEmergencyTask::OnBnClickedBtnEmergencyadd()
     //task->iTaskID = CreateEmergencyTaskID();
     task->iTaskName = _T("紧急任务");
     task->iStatus = KNormal;
-    task->iBeginKm = NULL;
-    task->iEndKm = NULL;
-    task->iBeginTime = 10;
-    task->iEndTime = 10;
+    task->iBeginKm = m_CRWDSClientView->m_CurrentOrg->iBoundaryStartKM;
+    task->iEndKm = m_CRWDSClientView->m_CurrentOrg->iBoundaryEndKM;;
+    task->iLineName = m_CRWDSClientView->m_CurrentOrg->iBoundaryRail;
+    time_t now; // 获取当前时间
+    time(&now);
+    task->iBeginTime = now;
+    task->iEndTime = now;
     task->iEmergencyRemark = _T("");
     //由服务器返回id
     task->iTaskID = SetEmergencyTask(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_EMERGENCY_ADD, task);
@@ -215,8 +232,8 @@ void CEmergencyTask::OnBnClickedBtnEmergencyadd()
 	int count = m_ListCtrl.GetItemCount();
 
 	id.Format(_T("%d"), task->iTaskID);
-	startKm.Format(_T("0"));
-	endKm.Format(_T("0"));
+	startKm.Format(_T("%d"), task->iBeginKm);
+	endKm.Format(_T("%d"), task->iEndKm);
 	name = task->iTaskName;
     flag = _T("正常");
 
@@ -256,27 +273,33 @@ void CEmergencyTask::OnBnClickedBtnEmergencymodify()
 
     GetDlgItem(IDC_EDIT_EMERGENCYREMARK)->GetWindowText(task->iEmergencyRemark);
 
-    CString strBeginHour;
-    CString strBeginMin;
-    CString strEndHour;
-    CString strEndMin;
+    CTime startTime;
+    CTime endTime;
+    m_PickStartDay.GetTime(startTime);
+    m_PickEndDay.GetTime(endTime);
+    task->iBeginTime = startTime.GetTime();
+    task->iEndTime = endTime.GetTime();
+    //CString strBeginHour;
+    //CString strBeginMin;
+    //CString strEndHour;
+    //CString strEndMin;
 
-    GetDlgItem(IDC_EDIT_STARTHOUR)->GetWindowText(strBeginHour);
-    GetDlgItem(IDC_EDIT_STARTMINUTE)->GetWindowText(strBeginMin);
-    GetDlgItem(IDC_EDIT_ENDHOUR)->GetWindowText(strEndHour);
-    GetDlgItem(IDC_EDIT_ENDMINUTE)->GetWindowText(strEndMin);
+    //GetDlgItem(IDC_EDIT_STARTHOUR)->GetWindowText(strBeginHour);
+    //GetDlgItem(IDC_EDIT_STARTMINUTE)->GetWindowText(strBeginMin);
+    //GetDlgItem(IDC_EDIT_ENDHOUR)->GetWindowText(strEndHour);
+    //GetDlgItem(IDC_EDIT_ENDMINUTE)->GetWindowText(strEndMin);
 
-    struct tm beginTime;
-    localtime_s(&beginTime, &task->iBeginTime);
-    beginTime.tm_hour = _ttoi(strBeginHour);
-    beginTime.tm_min = _ttoi(strBeginMin);
-    task->iBeginTime = mktime(&beginTime);
+    //struct tm beginTime;
+    //localtime_s(&beginTime, &task->iBeginTime);
+    //beginTime.tm_hour = _ttoi(strBeginHour);
+    //beginTime.tm_min = _ttoi(strBeginMin);
+    //task->iBeginTime = mktime(&beginTime);
 
-    struct tm endTime;
-    localtime_s(&endTime, &task->iEndTime);
-    endTime.tm_hour = _ttoi(strEndHour);
-    endTime.tm_min = _ttoi(strEndMin);
-    task->iEndTime = mktime(&endTime);
+    //struct tm endTime;
+    //localtime_s(&endTime, &task->iEndTime);
+    //endTime.tm_hour = _ttoi(strEndHour);
+    //endTime.tm_min = _ttoi(strEndMin);
+    //task->iEndTime = mktime(&endTime);
 
     SetEmergencyTask(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_EMERGENCY_MODIFY, task);
     AfxMessageBox(_T("修改成功"), MB_OK);

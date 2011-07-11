@@ -3,6 +3,7 @@
 #include "RWDSClientView.h"
 #include "afxcmn.h"
 #include "afxwin.h"
+#include "afxdtctl.h"
 
 
 // CEmergencyTask ¶Ô»°¿ò
@@ -49,4 +50,6 @@ public:
     afx_msg void OnBnClickedBtnSetemstaff();
     afx_msg void OnNMDblclkEmergencylist(NMHDR *pNMHDR, LRESULT *pResult);
     
+    CDateTimeCtrl m_PickStartDay;
+    CDateTimeCtrl m_PickEndDay;
 };

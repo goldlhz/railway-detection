@@ -291,6 +291,7 @@ typedef struct _OrgObj	//机构
         iOrgAddress = _T("");
         iParentOrg = NULL;
         iDataSet = FALSE;
+        iEmergencyDataSet = FALSE;
         iBoundaryStartKM = 0;
         iBoundaryEndKM = 0;
         iCalendar = new CalendarSchedule;
@@ -308,6 +309,7 @@ typedef struct _OrgObj	//机构
     unsigned int iBoundaryStartKM;
     unsigned int iBoundaryEndKM;
     BOOL iDataSet;//机构基本信息是否已经获取
+    BOOL iEmergencyDataSet;//紧急任务数据是否已经获取 
 
     //机构附属信息
     vector<MapPoint*> iMapPoint;

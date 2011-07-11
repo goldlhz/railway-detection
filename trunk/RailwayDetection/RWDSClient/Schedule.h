@@ -37,6 +37,7 @@ protected:
     vector<StaffInfo*> m_StaffUnseleted;//选择的线有哪些员工可以走
 	BOOL m_ModifyArrvieTime;
 	vector<LineInfo*> m_ModifyLineArrvieTime;
+    BOOL m_StaffChanged;
 public:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnLvnItemchangedSchedulelist(NMHDR *pNMHDR, LRESULT *pResult);
