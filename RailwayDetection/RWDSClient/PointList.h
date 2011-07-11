@@ -26,6 +26,7 @@ protected:
 
 public:
 	void SetDefaltPoint(double aLon, double aLat);
+    void GetPointListFromServer();
 protected:
 	bool m_Modifying;
 	CRWDSClientView* m_CRWDSClientView;
@@ -45,4 +46,5 @@ public:
 	afx_msg void OnBnClickedBtnPointdelete();
 	afx_msg void OnBnClickedBtnPointok();
 	afx_msg void OnLvnItemchangedPointlist(NMHDR *pNMHDR, LRESULT *pResult);
+   
 };

@@ -1026,6 +1026,11 @@ void CRWDSClientView::OnSetEmergencytask()
         AfxMessageBox(_T("请选择机构"));
             return;
     }
+    if(!m_CurrentOrg->iEmergencyDataSet)
+    {
+        GetEmergencyTask(m_CurrentOrg->iOrgID, &m_CurrentOrg->iEmergency);
+        m_CurrentOrg->iEmergencyDataSet = TRUE;
+    }
     CEmergencyTask task(this);
     task.DoModal();
 }
@@ -1165,16 +1170,31 @@ void CRWDSClientView::OnUpdateReviewRecordstaff(CCmdUI *pCmdUI)
 void CRWDSClientView::OnResetOrg()
 {
     // TODO: 在此添加命令处理程序代码
-    CMainFrame* pMain=static_cast<CMainFrame*>(AfxGetApp()->m_pMainWnd);
-    pMain->m_wndFileView.TreeVisitForDeleteItemData(pMain->m_wndFileView.m_wndFileView.GetRootItem());
-    //清空树形结构
-    pMain->m_wndFileView.CleanFileView();
-    //重新获取机构
-    m_Org.clear();
-    DeleteOrgListElement(&m_Org);
-    GetOrgTree(theApp.m_LoginOrgID, &m_Org);
-    pMain->m_wndFileView.FillFileView();
-    m_CurrentOrg = NULL;
+    vector<OrganizationInfo*> orgList;
+    GetOrgTree(theApp.m_LoginOrgID, &orgList);
+    if (orgList.size() > 0)
+    {
+        CMainFrame* pMain=static_cast<CMainFrame*>(AfxGetApp()->m_pMainWnd);
+        pMain->m_wndFileView.TreeVisitForDeleteItemData(pMain->m_wndFileView.m_wndFileView.GetRootItem());
+        //清空树形结构
+        pMain->m_wndFileView.CleanFileView();
+        //重新获取机构
+        m_Org.clear();
+        DeleteOrgListElement(&m_Org);
+        for (size_t i=0; i<orgList.size(); i++)
+        {
+            m_Org.push_back(orgList[i]);
+        }
+        //GetOrgTree(theApp.m_LoginOrgID, &m_Org);
+        pMain->m_wndFileView.FillFileView();
+        m_CurrentOrg = NULL;
+        AfxMessageBox(_T("刷新成功！"));
+    }
+    else
+    {
+        AfxMessageBox(_T("刷新失败！"));
+    }
+    orgList.clear();
 }
 
 void CRWDSClientView::OnReviewPicture()

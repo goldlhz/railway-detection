@@ -75,7 +75,7 @@ BOOL CPointList::OnInitDialog()
 
 	for (int i=0; i<count; i++)
 	{
-		km.Format(_T("%3f"), m_CRWDSClientView->m_CurrentOrg->iMapPoint[i]->iKM);
+		km.Format(_T("%.3f"), m_CRWDSClientView->m_CurrentOrg->iMapPoint[i]->iKM);
 		lon.Format(_T("%f"), m_CRWDSClientView->m_CurrentOrg->iMapPoint[i]->iLon);
 		lat.Format(_T("%f"), m_CRWDSClientView->m_CurrentOrg->iMapPoint[i]->iLat);
 		if (m_CRWDSClientView->m_CurrentOrg->iMapPoint[i]->iDirect == KUpLine)
@@ -96,14 +96,14 @@ void CPointList::OnBnClickedBtnPointadd()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	MapPoint* point = new MapPoint;
-	point->iRailLine = 0;
-	point->iKM = 0;
+	point->iRailLine = m_CRWDSClientView->m_CurrentOrg->iBoundaryRail;
+	point->iKM = m_CRWDSClientView->m_CurrentOrg->iBoundaryStartKM;
 	point->iLon = 0;
 	point->iLat = 0;
 	point->iDirect = KDownLine;
-	m_CRWDSClientView->m_CurrentOrg->iMapPoint.push_back(point);
-    SetOrgPoint(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_POINT_ADD, point);
-
+    //设置，并从数据库获取点ID
+    point->iPointId = SetOrgPoint(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_POINT_ADD, point);
+    m_CRWDSClientView->m_CurrentOrg->iMapPoint.push_back(point);
 	CString km;
 	CString lon;
 	CString lat;
@@ -122,8 +122,6 @@ void CPointList::OnBnClickedBtnPointadd()
 	m_ListCtrl.SetItemText(itemCount, 2, lon);
 	m_ListCtrl.SetItemText(itemCount, 3, lat);
 	m_ListCtrl.SetItemText(itemCount, 4, direct);
-
-
 }
 
 void CPointList::OnBnClickedBtnPointmodify()

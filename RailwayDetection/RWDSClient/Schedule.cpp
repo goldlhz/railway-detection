@@ -17,6 +17,7 @@ CSchedule::CSchedule(CWnd* pParent)
 	: CDialogEx(CSchedule::IDD, pParent)
 {
 	m_CRWDSClientView = static_cast<CRWDSClientView*>(pParent);
+    m_StaffChanged = FALSE;
 }
 
 CSchedule::~CSchedule()
@@ -314,11 +315,13 @@ void CSchedule::OnBnClickedBtnModifycalender()
 		return;
 	}
     //排班开始时间
-	m_CRWDSClientView->m_CurrentOrg->iCalendar->iPeriods = _ttoi(str);
-	((CDateTimeCtrl*)GetDlgItem(IDC_DATETIMEPICKER_STARTDAY))->GetTime(startTime);
-	m_CRWDSClientView->m_CurrentOrg->iCalendar->iStartDay = startTime.GetTime();
+    CalendarSchedule schedule;
 
-	m_SelectedLine->iStartNo = static_cast<LineStartNo>(m_ComboStartDay.GetCurSel());
+	schedule.iPeriods = _ttoi(str);
+	((CDateTimeCtrl*)GetDlgItem(IDC_DATETIMEPICKER_STARTDAY))->GetTime(startTime);
+	schedule.iStartDay = startTime.GetTime();
+
+
 	//m_ComboStartDay.ResetContent();
 	//for (int i=0; i<m_CRWDSClientView->m_CurrentOrg->iCalendar->iPeriods && i<StrStartNoCount; i++)
 	//{
@@ -329,10 +332,31 @@ void CSchedule::OnBnClickedBtnModifycalender()
 	//	m_SelectedLine->iStartNo = KUndefine;
 	//}
 	//m_ComboStartDay.SetCurSel(m_SelectedLine->iStartNo);
-	GetDlgItem(IDC_EDIT_SCHEDULEREMARK)->GetWindowText(m_CRWDSClientView->m_CurrentOrg->iCalendar->iScheduleRemark);
-	//传排班表
-    SetCalendarSchedule(m_CRWDSClientView->m_CurrentOrg->iOrgID, m_CRWDSClientView->m_CurrentOrg->iCalendar);
+	GetDlgItem(IDC_EDIT_SCHEDULEREMARK)->GetWindowText(schedule.iScheduleRemark);
+    if (schedule.iPeriods != m_CRWDSClientView->m_CurrentOrg->iCalendar->iPeriods
+        || schedule.iStartDay != m_CRWDSClientView->m_CurrentOrg->iCalendar->iStartDay
+        || schedule.iScheduleRemark != m_CRWDSClientView->m_CurrentOrg->iCalendar->iScheduleRemark)
+    {//传排班表
+        m_CRWDSClientView->m_CurrentOrg->iCalendar->iPeriods = schedule.iPeriods;
+        m_CRWDSClientView->m_CurrentOrg->iCalendar->iStartDay = schedule.iStartDay;
+        m_CRWDSClientView->m_CurrentOrg->iCalendar->iScheduleRemark = schedule.iScheduleRemark;
+        SetCalendarSchedule(m_CRWDSClientView->m_CurrentOrg->iOrgID, m_CRWDSClientView->m_CurrentOrg->iCalendar);
+        m_StaffChanged = FALSE;//数据已经上传，无需再次上次人员信息 
+    }
+	if (m_StaffChanged)
+	{
+        SetCalendarSchedule(m_CRWDSClientView->m_CurrentOrg->iOrgID, m_CRWDSClientView->m_CurrentOrg->iCalendar);
+        m_StaffChanged = FALSE;
+	}
 	
+    LineStartNo preNo = m_SelectedLine->iStartNo;
+    LineStartNo startNo = static_cast<LineStartNo>(m_ComboStartDay.GetCurSel());
+    if (preNo != startNo)
+    {//修改线路的开始时间
+        m_SelectedLine->iStartNo = startNo;
+        SetOrgLine(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_LINE_MODIFY, m_SelectedLine);
+    }
+
     AfxMessageBox(_T("修改成功"));
 }
 
@@ -355,6 +379,7 @@ void CSchedule::OnBnClickedBtnAddliststaff()
     m_ListStaffSelected.AddString(curStaff->iName);
     m_StaffUnseleted.erase(m_StaffUnseleted.begin()+curStaffIndex);
     m_StaffSeleted.push_back(curStaff);
+    m_StaffChanged = TRUE;
     //curStaff->iArrangeLine.push_back(m_SelectedLine);
 }
 
@@ -376,6 +401,7 @@ void CSchedule::OnBnClickedBtnRemoveliststaff()
     m_ListStaffUnselected.AddString(curStaff->iName);
     m_StaffSeleted.erase(m_StaffSeleted.begin()+curStaffIndex);
     m_StaffUnseleted.push_back(curStaff);
+    m_StaffChanged = TRUE;
     //for (size_t i=0; i<curStaff->iArrangeLine.size(); i++)
     //{
     //    if (m_SelectedLine == curStaff->iArrangeLine[i])
