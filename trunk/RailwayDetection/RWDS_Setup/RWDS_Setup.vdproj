@@ -418,6 +418,17 @@
             "Property" = "8:TARGETDIR"
                 "Folders"
                 {
+                    "{9EF0B969-E518-4E46-987F-47570745A589}:_CAA2A29F83DA420E828529DB28EA08E0"
+                    {
+                    "Name" = "8:pic"
+                    "AlwaysCreate" = "11:FALSE"
+                    "Condition" = "8:"
+                    "Transitive" = "11:FALSE"
+                    "Property" = "8:_C563165AAFE24E43B5A22E3CD948E13E"
+                        "Folders"
+                        {
+                        }
+                    }
                 }
             }
             "{1525181F-901A-416C-8A58-119130FE478E}:_A1AE983E094844DEA4673779776B7C0E"
@@ -470,7 +481,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:RWDS_Setup"
         "ProductCode" = "8:{5A5EC301-F04D-49FF-AA11-14DA24FE1B51}"
-        "PackageCode" = "8:{9A6FCB0A-652E-4125-A1FD-B742422BBC49}"
+        "PackageCode" = "8:{7FC67A89-6376-4E8B-A50D-024D89A152D4}"
         "UpgradeCode" = "8:{D07EF505-7C69-4C9B-92F7-C3B188F59ECC}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"

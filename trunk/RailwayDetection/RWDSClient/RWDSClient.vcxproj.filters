@@ -94,19 +94,7 @@
     <None Include="res\Toolbar256.bmp">
       <Filter>资源文件</Filter>
     </None>
-    <None Include="res\bmp00001.bmp">
-      <Filter>资源文件</Filter>
-    </None>
     <None Include="res\mapx.bmp">
-      <Filter>资源文件</Filter>
-    </None>
-    <None Include="res\toolbar1.bmp">
-      <Filter>资源文件</Filter>
-    </None>
-    <None Include="res\bitmap1.bmp">
-      <Filter>资源文件</Filter>
-    </None>
-    <None Include="C:\Users\zhan\Desktop\background.bmp">
       <Filter>资源文件</Filter>
     </None>
     <None Include="res\background.bmp">
