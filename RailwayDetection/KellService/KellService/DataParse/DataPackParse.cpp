@@ -1460,7 +1460,7 @@ void CDataPackParse::FillGetPicDataFilePack(GetPicData_Download_Pack& getPicData
 {
 	getPicDataDownLoadPack.nBeginIdentify = PACK_IDENTIFY;
 	getPicDataDownLoadPack.nMsgNumber = GETPICDATA_PACK;
-	getPicDataDownLoadPack.nBodyLength = 1024*3+12;
+	getPicDataDownLoadPack.nBodyLength = 1024+12;
 
 	getPicDataDownLoadPack.gDataBodyPack.nTtlePacket = 0;
 	getPicDataDownLoadPack.gDataBodyPack.nCurrentPacket = 0;
@@ -2960,7 +2960,7 @@ bool CDataPackParse::BuildGetPicDataPackData(char* pDataBuffer, const GetPicData
 		*((unsigned int*)(pDataBuffer + 4)) = getPicDataDownLoadPack.gDataBodyPack.nCurrentPacket;
 		*((unsigned int*)(pDataBuffer + 8)) = getPicDataDownLoadPack.gDataBodyPack.nPagesize;
 
-		memcpy(pDataBuffer + 12, getPicDataDownLoadPack.gDataBodyPack.picBuffer, 1024*3);
+		memcpy(pDataBuffer + 12, getPicDataDownLoadPack.gDataBodyPack.picBuffer, 1024);
 
 		return true;
 	}

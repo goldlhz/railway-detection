@@ -38,8 +38,10 @@ private:
 
 	bool PostRevcMSG(SOCKET scOptSocket, LPOverKeyPire pKeyOverPire, OptType optType = CT_REVC);
 	bool PostSendMSG(SOCKET scOptSocket, LPOverKeyPire pKeyOverPire);
+	static int IsCanSend(SOCKET sScoket);
 
 	string FormatConnectString(CGobalConfig* pGobalConfig);
+
 
 	bool   m_bIsInitWorkThread;
 	HANDLE m_hCompletionPort;
