@@ -95,7 +95,8 @@ CString CPitureReview::GetModulePath()
 void CPitureReview::ShowPictureInWindows(PictureInfo* aPicture)
 {
     CString picturePath;
-    picturePath = GetModulePath() + _T("\\pic\\");
+    //picturePath = GetModulePath() + _T("\\pic\\");
+    picturePath = _T("C:\\");
     CString pictureDirect = picturePath + aPicture->iPicName;
     BOOL fileExist = PathFileExists(pictureDirect);
     if(!fileExist)

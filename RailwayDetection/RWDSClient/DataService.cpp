@@ -78,37 +78,33 @@ int GetOrgTree(const int OrgId, vector<OrganizationInfo*>* a_OrgTree)
 #endif
     ///////////////////////////////////////////////////
 	
-	cData *cd = new cData();
-	lOrg pOrg;
-	int iResult = cd->GetOrgList(OrgId,&pOrg);
-	if(iResult < 1)
-	{
-		return -1;
-	}
-	for(iterOrg iter = pOrg.begin() ; iter !=pOrg.end() ;iter++)
-	{
-		OrganizationInfo* org = new OrganizationInfo;
-		org->iOrgName=      iter->OrgName;
-		org->iOrgAddress =  iter->Address;
-		org->iParentID = iter->UpOrg ;
-		org->iOrgLevel =    iter->iLevel;
-		org->iParentOrg =   NULL;
-		org->iOrgID =      iter->OrgId;
-		org->iBoundaryRail      = iter->LineId ;
-		org->iBoundaryStartKM = iter->startid ;
-		a_OrgTree->push_back(org);
-	}
+    cData *cd = new cData();
+    lOrg pOrg;
+    int iResult = cd->GetOrgList(OrgId,&pOrg);
+    if(iResult < 1)
+    {
+        return -1;
+    }
+    for(iterOrg iter = pOrg.begin() ; iter !=pOrg.end() ;iter++)
+    {
+        OrganizationInfo* org = new OrganizationInfo;
+        org->iOrgName=      iter->OrgName;
+        org->iOrgAddress =  iter->Address;
+        org->iParentID = iter->UpOrg ;
+        org->iOrgLevel =    iter->iLevel;
+        org->iParentOrg =   NULL;
+        org->iOrgID =      iter->OrgId;
+        org->iBoundaryRail      = iter->LineId ;
+        org->iBoundaryStartKM = iter->startid ;
+        org->iBoundaryEndKM = iter->EndID;
+        a_OrgTree->push_back(org);
+    }
 
-    //for (int i=0; i<a_OrgTree->size(); i++)
-    //{
-    //    CherkOrgType(a_OrgTree,a_OrgTree[i]);
-    //}
-
-	for(vector<OrganizationInfo*>::iterator iterOrg = a_OrgTree->begin() ; iterOrg != a_OrgTree->end() ; iterOrg++)
-	{
-		CherkOrgType(a_OrgTree,*iterOrg);
-	}
-	delete cd;
+    for(vector<OrganizationInfo*>::iterator iterOrg = a_OrgTree->begin() ; iterOrg != a_OrgTree->end() ; iterOrg++)
+    {
+        CherkOrgType(a_OrgTree,*iterOrg);
+    }
+    delete cd;
 
     return KErrNone;
 }
@@ -1094,6 +1090,12 @@ int GetPictureInfo( int aOrgID, time_t aStartDate, time_t aEndDate, vector<Pictu
 {
     ///////////////////////////////////////////////////
 #ifdef TESTCODE
+    PictureInfo *pInfo = new PictureInfo;
+    //pInfo.iPicID = iter->
+    pInfo->iPicName = _T("516823.jpg");
+    pInfo->iShootingTime = _T("2011-7-1");
+    pInfo->iErrorType =	1;
+    aPictureList->push_back(pInfo);
     return KErrNone;
 #endif
     ///////////////////////////////////////////////////
@@ -1123,7 +1125,6 @@ int GetPictureInfo( int aOrgID, time_t aStartDate, time_t aEndDate, vector<Pictu
 	{
 		PictureInfo *pInfo = new PictureInfo;
 		//memset(pInfo,0,sizeof(PictureInfo));
-		pInfo->iErrorType = iter->itype ;
 		//pInfo.iPicID = iter->
 		pInfo->iPicName = iter->name;
 		pInfo->iShootingTime = iter->time;

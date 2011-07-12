@@ -330,7 +330,7 @@ int CRWDSClientView::OnCreate(LPCREATESTRUCT lpCreateStruct)
     if (m_Org.size() == 0)
     {
         AfxMessageBox(_T("机构获取失败，请重新登录"));
-        return -1;
+        exit(0);
     }
     //OrganizationInfo* org = m_Org[0];
 	MapxCleanAllFeature(m_SymbolLayer);
