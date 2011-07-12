@@ -1529,12 +1529,10 @@ int  CLogicManager::DealGetPicDataPack(DWORD dNumberOfBytes,
 	{
 		if(m_AccessBaseData.InitAccesser(pDatabase))
 		{
-			if(m_AccessBaseData.UpLoadGetPicDataPack(m_getPicDataUpPack, gpsPicPack));
+			if(m_AccessBaseData.UpLoadGetPicDataPack(m_getPicDataUpPack, gpsPicPack))
 			{
 				FILE * fPic = NULL;
 				string strPicnName;
-
-				//strPicnName = pGobalConfig->GetPicFilePath() + "\\" + m_getPicDataUpPack.gDataBodyPack.strPicName.substr(0, 8) + "\\" + m_getPicDataUpPack.gDataBodyPack.strPicName;
 
 				strPicnName = pGobalConfig->GetPicFilePath() + "\\" + gpsPicPack.strPicName.substr(0, 8) + "\\" + gpsPicPack.strPicName;
 				fPic = fopen(strPicnName.c_str(), "rb");

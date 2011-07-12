@@ -214,6 +214,10 @@ int CWorkThread::DealSendData(LPOverKeyPire pKeyOverPire, void* parameter)
 
 		while(1)
 		{
+			nTemp = IsCanSend(pKeyOverPire->pireOverLappedex.wsaClientSocket);
+			if(nTemp != 0)
+				return 1;
+
 			nTemp = send(pKeyOverPire->pireOverLappedex.wsaClientSocket, 
 				pKeyOverPire->pireOverLappedex.wsaBuffer,
 				pKeyOverPire->pireOverLappedex.wsaWSABUF.len,
@@ -223,13 +227,13 @@ int CWorkThread::DealSendData(LPOverKeyPire pKeyOverPire, void* parameter)
 				nErrorCode = WSAGetLastError();
 				if(WSAEWOULDBLOCK == nErrorCode)
 				{
-					Sleep(0);
 					continue;
 				}
 				return 1;
 			}
 			break;
 		}
+
 		return 0;
 	}
 	return -1;
@@ -526,6 +530,34 @@ bool CWorkThread::PostSendMSG(SOCKET scOptSocket, LPOverKeyPire pKeyOverPire)
 		}
 	}
 	return true;
+}
+
+int  CWorkThread::IsCanSend(SOCKET sScoket)
+{
+	int nFlag;
+	fd_set f_set;
+	timeval out_time;
+
+	FD_ZERO(&f_set);
+	FD_SET(sScoket, &f_set);
+
+	out_time.tv_sec = 10;
+	out_time.tv_usec = 0;
+
+	nFlag = select(sScoket, NULL, &f_set, NULL, &out_time);
+	if(nFlag > 0)
+	{
+		if(FD_ISSET(sScoket, &f_set))
+		{
+			return 0;
+		}
+	}
+	else if(nFlag == SOCKET_ERROR)
+	{
+		return -1;
+	}
+
+	return 1;
 }
 
 string CWorkThread::FormatConnectString(CGobalConfig* pGobalConfig)
