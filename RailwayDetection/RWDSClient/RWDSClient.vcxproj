@@ -74,7 +74,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Disabled</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -97,11 +97,8 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="C:\Users\zhan\Desktop\background.bmp" />
     <None Include="ReadMe.txt" />
     <None Include="res\background.bmp" />
-    <None Include="res\bitmap1.bmp" />
-    <None Include="res\bmp00001.bmp" />
     <None Include="res\classview.bmp" />
     <None Include="res\classview_hc.bmp" />
     <None Include="res\class_view.ico" />
@@ -127,7 +124,6 @@
     <None Include="res\sort.bmp" />
     <None Include="res\sort_hc.bmp" />
     <None Include="res\Toolbar.bmp" />
-    <None Include="res\toolbar1.bmp" />
     <None Include="res\Toolbar256.bmp" />
     <None Include="UserImages.bmp" />
   </ItemGroup>

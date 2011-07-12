@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RWDSClient", "RWDSClient\RWDSClient.vcxproj", "{70CEB717-2153-443C-8921-5D95810BBCCB}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "RWDS_Setup", "RWDS_Setup\RWDS_Setup.vdproj", "{79AAF962-DD95-4F42-A070-9895400D7286}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -15,10 +13,6 @@ Global
 		{70CEB717-2153-443C-8921-5D95810BBCCB}.Debug|Win32.Build.0 = Debug|Win32
 		{70CEB717-2153-443C-8921-5D95810BBCCB}.Release|Win32.ActiveCfg = Release|Win32
 		{70CEB717-2153-443C-8921-5D95810BBCCB}.Release|Win32.Build.0 = Release|Win32
-		{79AAF962-DD95-4F42-A070-9895400D7286}.Debug|Win32.ActiveCfg = Debug
-		{79AAF962-DD95-4F42-A070-9895400D7286}.Debug|Win32.Build.0 = Debug
-		{79AAF962-DD95-4F42-A070-9895400D7286}.Release|Win32.ActiveCfg = Release
-		{79AAF962-DD95-4F42-A070-9895400D7286}.Release|Win32.Build.0 = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
