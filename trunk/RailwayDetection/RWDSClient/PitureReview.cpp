@@ -101,7 +101,7 @@ void CPitureReview::ShowPictureInWindows(PictureInfo* aPicture)
     if(!fileExist)
     {//文件不存在，下载文件
         int retValue = SavePictureToDirect(m_CRWDSClientView->m_CurrentOrg->iOrgID, aPicture, pictureDirect);
-        if (retValue == 0)
+        if (retValue == 1)
         {
             fileExist = TRUE;
         }

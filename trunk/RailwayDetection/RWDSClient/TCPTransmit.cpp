@@ -27,7 +27,7 @@ int CSocketServer::WaitForData(DWORD dwWaitTimeOut)
 	struct fd_set fds;
 	FD_ZERO(&fds);
 	FD_SET(m_sSocket, &fds);
-	int ret = select(0, &fds, NULL, NULL, &tm);
+	int ret = select(m_sSocket, &fds, NULL, NULL, &tm);
 	if(ret > 0)
 	{
 		if(!FD_ISSET(m_sSocket, &fds))
@@ -87,7 +87,7 @@ int CTCPClient::Read(char *lpReadBuf, int iBufLen)
 	if(iBufLen < 1)
 		return 0;
 	int rlen = 0;
-	rlen = WaitForData(1000);
+	rlen = WaitForData(4000);
 	if(rlen > 0)
 	{
 		rlen = recv(m_sSocket, lpReadBuf, iBufLen, 0);

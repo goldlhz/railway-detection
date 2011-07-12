@@ -1278,7 +1278,7 @@ int cData::getPic(const Getrealpic sValue, CString aToDirect)
 	bool bResult = false;
 	while(1)
 	{
-		Sleep(5);
+		//Sleep(5);
 		string sTemp;
 		int it = 11 + sizeof(realpiclist);
 		char cTempBuf[11 + sizeof(realpiclist)];

@@ -323,7 +323,7 @@ typedef struct
 	unsigned  int totlePacket;
 	unsigned  int CurrentPacket;
 	unsigned  int Pagesize;
-	char param [1024*3];
+	char param [1024];
 }realpiclist;
 //»ñÈ¡Ä³ÌìÑ²¼ì
 typedef struct
