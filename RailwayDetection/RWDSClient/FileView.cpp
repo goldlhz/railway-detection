@@ -70,7 +70,7 @@ int CFileView::OnCreate(LPCREATESTRUCT lpCreateStruct)
     m_wndFileView.SetImageList(&m_FileViewImages, TVSIL_NORMAL);
 
 	m_wndToolBar.Create(this, AFX_DEFAULT_TOOLBAR_STYLE, IDR_EXPLORER);
-	m_wndToolBar.LoadToolBar(IDR_EXPLORER, 0, 0, TRUE /* 已锁定*/);
+	//m_wndToolBar.LoadToolBar(IDR_EXPLORER, 0, 0, TRUE /* 已锁定*/);
 
 	OnChangeVisualStyle();
 
@@ -99,9 +99,9 @@ void CFileView::OnSize(UINT nType, int cx, int cy)
 void CFileView::FillFileView()
 {
     OrganizationInfo* org = m_RWDSClientView->m_Org[0];
-    HTREEITEM hRoot = m_wndFileView.InsertItem(org->iOrgName, 8, 8);
+    HTREEITEM hRoot = m_wndFileView.InsertItem(org->iOrgName, 0, 0);
     m_wndFileView.SetItemData(hRoot, (DWORD_PTR)org);
-    m_wndFileView.InsertItem(_T(""), 8, 8, hRoot);//为了显示+号
+    m_wndFileView.InsertItem(_T(""), 0, 0, hRoot);//为了显示+号
 }
 
 void CFileView::CleanFileView()
@@ -237,27 +237,40 @@ void CFileView::OnChangeVisualStyle()
 
 	m_FileViewImages.DeleteImageList();
 
-	UINT uiBmpId = theApp.m_bHiColorIcons ? IDB_FILE_VIEW_24 : IDB_FILE_VIEW;
 
-	CBitmap bmp;
-	if (!bmp.LoadBitmap(uiBmpId))
+	//////////////////////////////////////////////////////////////////////////
+	m_FileViewImages.Create(18, 18, ILC_COLOR24, 0, 0);
+
+	CBitmap bitmap;
+
+	if(bitmap.LoadBitmap(IDB_BITTREE))
 	{
-		TRACE(_T("无法加载位图: %x\n"), uiBmpId);
-		ASSERT(FALSE);
-		return;
+		m_FileViewImages.Add(&bitmap, RGB(0, 0, 0));
+		m_wndFileView.SetImageList(&m_FileViewImages, TVSIL_NORMAL);
 	}
+	//////////////////////////////////////////////////////////////////////////
 
-	BITMAP bmpObj;
-	bmp.GetBitmap(&bmpObj);
+	//UINT uiBmpId = theApp.m_bHiColorIcons ? IDB_FILE_VIEW_24 : IDB_FILE_VIEW;
 
-	UINT nFlags = ILC_MASK;
+	//CBitmap bmp;
+	//if (!bmp.LoadBitmap(uiBmpId))
+	//{
+	//	TRACE(_T("无法加载位图: %x\n"), uiBmpId);
+	//	ASSERT(FALSE);
+	//	return;
+	//}
 
-	nFlags |= (theApp.m_bHiColorIcons) ? ILC_COLOR24 : ILC_COLOR4;
+	//BITMAP bmpObj;
+	//bmp.GetBitmap(&bmpObj);
 
-	m_FileViewImages.Create(16, bmpObj.bmHeight, nFlags, 0, 0);
-	m_FileViewImages.Add(&bmp, RGB(255, 0, 255));
+	//UINT nFlags = ILC_MASK;
 
-	m_wndFileView.SetImageList(&m_FileViewImages, TVSIL_NORMAL);
+	//nFlags |= (theApp.m_bHiColorIcons) ? ILC_COLOR24 : ILC_COLOR4;
+
+	//m_FileViewImages.Create(16, bmpObj.bmHeight, nFlags, 0, 0);
+	//m_FileViewImages.Add(&bmp, RGB(255, 0, 255));
+
+	//m_wndFileView.SetImageList(&m_FileViewImages, TVSIL_NORMAL);
 }
 
 
@@ -424,9 +437,9 @@ void CFileView::OnTvnItemexpandedFileView(NMHDR *pNMHDR, LRESULT *pResult)
 			for(size_t i=0; i<curOrg->iChildOrg.size(); i++)
 			{
 				org = curOrg->iChildOrg[i];
-				tmpChild = m_wndFileView.InsertItem(org->iOrgName, 8, 8, curItem);
+				tmpChild = m_wndFileView.InsertItem(org->iOrgName, 0, 0, curItem);
 				m_wndFileView.SetItemData(tmpChild, (DWORD_PTR)org);
-				m_wndFileView.InsertItem(_T(""), 8, 8, tmpChild);//为了显示+号
+				m_wndFileView.InsertItem(_T(""), 0, 0, tmpChild);//为了显示+号
 			}
 		}
 		else if (curOrg->iLine.size() > 0)
@@ -436,7 +449,7 @@ void CFileView::OnTvnItemexpandedFileView(NMHDR *pNMHDR, LRESULT *pResult)
 			for(size_t i=0; i<curOrg->iLine.size(); i++)
 			{
 				line = curOrg->iLine[i];
-				tmpChild = m_wndFileView.InsertItem(line->iLineName, 8, 8, curItem);
+				tmpChild = m_wndFileView.InsertItem(line->iLineName, 0, 0, curItem);
 				m_wndFileView.SetItemData(tmpChild, (DWORD_PTR)line);
 			}
 		}
