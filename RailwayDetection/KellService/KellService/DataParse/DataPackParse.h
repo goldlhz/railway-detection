@@ -182,6 +182,27 @@ public:
 	bool PackWorkerPollUpPack(const char* pDataBuffer, WorkerPoll_Upload_Pack& workerPollUpLoadPack);
 	bool PackWorkerPollDownBuild(char* pDataBuffer, WorkerPoll_Download_Pack& workerPollDownLoadPack);
 	void FillWorkerPollFailPack(WorkerPoll_Download_Pack& workerPollDownLoadPack);
+
+	bool PackSysSettingUpPack(const char* pDataBuffer, SysSetting_Upload_Pack& sysSettingUpLoadPack);
+	bool PackSysSettingDownBuild(char* pDataBuffer, SysSetting_Download_Pack& sysSettingDownLoadPack);
+	void FillSysSettingFailPack(SysSetting_Download_Pack& sysSettingDownLoadPack);
+
+	bool PackSysSettingGetUpPack(const char* pDataBuffer, SysSettingGet_Upload_Pack& sysSettingGetUpLoadPack);
+	bool PackSysSettingGetDownBuild(char* pDataBuffer, SysSettingGet_Download_Pack& sysSettingGetDownLoadPack);
+	void FillSysSettingGetFailPack(SysSettingGet_Download_Pack& sysSettingGetDownLoadPack);
+
+	bool PackModifyPassUpPack(const char* pDataBuffer, ModifyPassword_Upload_Pack& modifyPasswordUpLoadPack);
+	bool PackModifyPassDownBuild(char* pDataBuffer, ModifyPassword_Download_Pack& modifyPasswordDownLoadPack);
+	void FillModifyPassFailPack(ModifyPassword_Download_Pack& modifyPasswordDownLoadPack);
+
+	bool PackWorkerWramPointUpPack(const char* pDataBuffer, WorkWramPoint_Upload_Pack& workWramPointUpLoadPack);
+	bool PackWorkerWramPointDownBuild(char* pDataBuffer, WorkWramPoint_Download_Pack& workWramPointDownLoadPack);
+	void FillWorkerWramPointFailPack(WorkWramPoint_Download_Pack& workWramPointDownLoadPack);
+	
+	bool PackOpteLineUpPack(const char* pDataBuffer, OpteLine_Upload_Pack& opteLineUpLoadPack);
+	bool PackOpteLineDownBuild(char* pDataBuffer, OpteLine_Download_Pack& opteLineDownLoadPack);
+	void FillOpteLineFailPack(OpteLine_Download_Pack& opteLineDownLoadPack);
+
 private:
 	int ParseGPSPackHttpShell(const char* pDataBuffer, char* outBuffer, 
 		string& strGPSContext, DWORD& nPackLength, string& strTel);
@@ -314,6 +335,21 @@ private:
 
 	bool ParseWorkerPollPackData(const char* pDataBuffer, WorkerPoll_Upload_Pack& workerPollUpLoadPack);
 	bool BuildWorkerPollPackData(char* pDataBuffer, const WorkerPoll_Download_Pack& workerPollDownLoadPack);
+
+	bool ParseSysSettingPackData(const char* pDataBuffer, SysSetting_Upload_Pack& sysSettingUpLoadPack);
+	bool BuildSysSettingPackData(char* pDataBuffer, const SysSetting_Download_Pack& sysSettingDownLoadPack);
+
+	bool ParseSysSettingGetPackData(const char* pDataBuffer, SysSettingGet_Upload_Pack& sysSettingGetUpLoadPack);
+	bool BuildSysSettingGetPackData(char* pDataBuffer, const SysSettingGet_Download_Pack& sysSettingGetDownLoadPack);
+
+	bool ParseModifyPassPackData(const char* pDataBuffer, ModifyPassword_Upload_Pack& modifyPassUpLoadPack);
+	bool BuildModifyPassPackData(char* pDataBuffer, const ModifyPassword_Download_Pack& modifyPassDownLoadPack);
+
+	bool ParseWorkerWramPointPackData(const char* pDataBuffer, WorkWramPoint_Upload_Pack& workWramPointUpLoadPack);
+	bool BuildWorkerWramPointPackData(char* pDataBuffer, const WorkWramPoint_Download_Pack& workWramPointDownLoadPack);
+
+	bool ParseOpteLinePackData(const char* pDataBuffer, OpteLine_Upload_Pack& opteLineUpLoadPack);
+	bool BuildOpteLinePackData(char* pDataBuffer, const OpteLine_Download_Pack& opteLineDownLoadPack);
 private: 
 	unsigned int GetContextLength(vector<string>& vecGPSLine);
 	string		 GetContextTel(vector<string>& vecGPSLine);

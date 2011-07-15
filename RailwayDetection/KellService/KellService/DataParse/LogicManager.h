@@ -224,6 +224,28 @@ private:
 		CADODatabase* pDatabase,
 		void* pWorkThread,
 		void* pFunDealSendData);
+
+	int  DealSysSettingPack(DWORD dNumberOfBytes, 
+		char  * pBuffer, 
+		CADODatabase* pDatabase);
+
+	int  DealSysSettingGetPack(DWORD dNumberOfBytes, 
+		char  * pBuffer, 
+		CADODatabase* pDatabase);
+
+	int  DealModifyPassPack(DWORD dNumberOfBytes, 
+		char  * pBuffer, 
+		CADODatabase* pDatabase);
+
+	int  DealWorkWramPointPack(DWORD dNumberOfBytes, 
+		LPOverKeyPire pKeyOverPire, 
+		CADODatabase* pDatabase,
+		void* pWorkThread,
+		void* pFunDealSendData);
+
+	int  DealOpteLinePack(DWORD dNumberOfBytes, 
+		char  * pBuffer, 
+		CADODatabase* pDatabase);
 private:
 	void FillPicStoreStruct(GPSPIC_Pack& gpsPicUpLoadPack, string strTel, int nType);
 	bool BuildPicDir(string strDir);
@@ -354,5 +376,20 @@ private:
 
 	WorkerPoll_Upload_Pack				m_workerPollUpPack;
 	WorkerPoll_Download_Pack			m_workerPollDownPack;
+	
+	SysSetting_Upload_Pack				m_sysSettingUpPack;
+	SysSetting_Download_Pack			m_sysSettingDownPack;
+
+	SysSettingGet_Upload_Pack			m_sysSettingGetUpPack;
+	SysSettingGet_Download_Pack			m_sysSettingGetDownPack;
+
+	ModifyPassword_Upload_Pack			m_sysModifyPasswordUpPack;
+	ModifyPassword_Download_Pack		m_sysModifyPasswordDownPack;
+
+	WorkWramPoint_Upload_Pack			m_workWramPointUpPack;
+	WorkWramPoint_Download_Pack			m_workWramPointDownPack;
+	
+	OpteLine_Upload_Pack				m_opteLineUpPack;
+	OpteLine_Download_Pack				m_opteLineDownPack;
 };
 

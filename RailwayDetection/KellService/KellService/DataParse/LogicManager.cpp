@@ -279,6 +279,35 @@ int CLogicManager::SetLogicData(DWORD dNumberOfBytes,
 				pFunSendData);
 			pKeyOverPire->pireOverLappedex.wsaWSABUF.len = nBackCode;
 			break;
+
+		case SYSSETTING_PACK:
+			nBackCode = DealSysSettingPack(dNumberOfBytes, pcBuffer, pDatabase);
+			pKeyOverPire->pireOverLappedex.wsaWSABUF.len = nBackCode;
+			break;
+
+		case SYSSETTINGGET_PACK:
+			nBackCode = DealSysSettingGetPack(dNumberOfBytes, pcBuffer, pDatabase);
+			pKeyOverPire->pireOverLappedex.wsaWSABUF.len = nBackCode;
+			break;
+
+		case MODIFYPASS_PACK:
+			nBackCode = DealModifyPassPack(dNumberOfBytes, pcBuffer, pDatabase);
+			pKeyOverPire->pireOverLappedex.wsaWSABUF.len = nBackCode;
+			break;
+
+		case WORKERWARNPOINT_PACK:
+			nBackCode = DealWorkWramPointPack(dNumberOfBytes, 
+				pKeyOverPire, 
+				pDatabase,
+				pWorkThread,
+				pFunSendData);
+			pKeyOverPire->pireOverLappedex.wsaWSABUF.len = nBackCode;
+			break;
+
+		case OPTELINE_PACK:
+			nBackCode = DealOpteLinePack(dNumberOfBytes, pcBuffer, pDatabase);
+			pKeyOverPire->pireOverLappedex.wsaWSABUF.len = nBackCode;
+			break;
 		}
 	}
 	return nBackCode;
@@ -2083,6 +2112,168 @@ int  CLogicManager::DealWorkerPollPack(DWORD dNumberOfBytes,
 
 	DealSendData(pKeyOverPire, pWorkThread);
 	return 0;
+}
+
+int  CLogicManager::DealSysSettingPack(DWORD dNumberOfBytes, 
+	char  * pBuffer, 
+	CADODatabase* pDatabase)
+{
+	if(m_DataPackPares.PackSysSettingUpPack(pBuffer, m_sysSettingUpPack))
+	{
+		if(m_AccessBaseData.InitAccesser(pDatabase))
+		{
+			m_AccessBaseData.UpLoadSysSettingPack(m_sysSettingUpPack, m_sysSettingDownPack);
+			m_DataPackPares.PackSysSettingDownBuild(pBuffer, m_sysSettingDownPack);
+
+			return m_sysSettingDownPack.nBodyLength + 11;
+		}
+	}
+
+	m_DataPackPares.FillSysSettingFailPack(m_sysSettingDownPack);
+	m_DataPackPares.PackSysSettingDownBuild(pBuffer, m_sysSettingDownPack);
+
+	return m_sysSettingDownPack.nBodyLength + 11;
+}
+
+int  CLogicManager::DealSysSettingGetPack(DWORD dNumberOfBytes, 
+	char  * pBuffer, 
+	CADODatabase* pDatabase)
+{
+	if(m_DataPackPares.PackSysSettingGetUpPack(pBuffer, m_sysSettingGetUpPack))
+	{
+		if(m_AccessBaseData.InitAccesser(pDatabase))
+		{
+			m_AccessBaseData.UpLoadSysSettingGetPack(m_sysSettingGetUpPack, m_sysSettingGetDownPack);
+			m_DataPackPares.PackSysSettingGetDownBuild(pBuffer, m_sysSettingGetDownPack);
+
+			return m_sysSettingGetDownPack.nBodyLength + 11;
+		}
+	}
+
+	m_DataPackPares.FillSysSettingGetFailPack(m_sysSettingGetDownPack);
+	m_DataPackPares.PackSysSettingGetDownBuild(pBuffer, m_sysSettingGetDownPack);
+
+	return m_sysSettingGetDownPack.nBodyLength + 11;
+}
+
+int  CLogicManager::DealModifyPassPack(DWORD dNumberOfBytes, 
+	char  * pBuffer, 
+	CADODatabase* pDatabase)
+{
+	if(m_DataPackPares.PackModifyPassUpPack(pBuffer, m_sysModifyPasswordUpPack))
+	{
+		if(m_AccessBaseData.InitAccesser(pDatabase))
+		{
+			m_AccessBaseData.UpLoadModifyPassPack(m_sysModifyPasswordUpPack, m_sysModifyPasswordDownPack);
+			m_DataPackPares.PackModifyPassDownBuild(pBuffer, m_sysModifyPasswordDownPack);
+
+			return m_sysModifyPasswordDownPack.nBodyLength + 11;
+		}
+	}
+
+	m_DataPackPares.FillModifyPassFailPack(m_sysModifyPasswordDownPack);
+	m_DataPackPares.PackModifyPassDownBuild(pBuffer, m_sysModifyPasswordDownPack);
+
+	return m_sysModifyPasswordDownPack.nBodyLength + 11;
+}
+
+int  CLogicManager::DealWorkWramPointPack(DWORD dNumberOfBytes, 
+	LPOverKeyPire pKeyOverPire, 
+	CADODatabase* pDatabase,
+	void* pWorkThread,
+	void* pFunDealSendData)
+{
+	FPDealSendData DealSendData = (FPDealSendData)pFunDealSendData;
+	char * pBuffer = pKeyOverPire->pireOverLappedex.wsaBuffer;
+
+	if(m_DataPackPares.PackWorkerWramPointUpPack(pBuffer, m_workWramPointUpPack))
+	{
+		if(m_AccessBaseData.InitAccesser(pDatabase))
+		{
+			auto_ptr<CADORecordset> pRecordset(m_AccessBaseData.UpLoadWorkWramPointPack(m_workWramPointUpPack));
+			if(pRecordset.get())
+			{
+				DWORD nHadSendRecord;
+				DWORD nTitleRecord = pRecordset->GetRecordCount();
+
+				if(nTitleRecord > 0)
+				{
+					CString strTemp;
+					int     nTemp;
+					double  dTemp;
+
+					pRecordset->MoveFirst();
+					for (nHadSendRecord = 1; !pRecordset->IsEOF(); ++nHadSendRecord, pRecordset->MoveNext())
+					{
+						m_workWramPointDownPack.gDataBodyPack.nTotlePacket = nTitleRecord;
+						m_workWramPointDownPack.gDataBodyPack.nCurrentPacket = nHadSendRecord;
+
+						pRecordset->GetFieldValue("tl_name", strTemp);
+						m_workWramPointDownPack.gDataBodyPack.strLineName = strTemp.GetBuffer();
+						strTemp.LockBuffer();
+
+						pRecordset->GetFieldValue("pit_dis", dTemp);
+						m_workWramPointDownPack.gDataBodyPack.fDirect = (float)dTemp;
+
+						pRecordset->GetFieldValue("r_userid", strTemp);
+						m_workWramPointDownPack.gDataBodyPack.strUserId = strTemp.GetBuffer();
+						strTemp.LockBuffer();
+
+						pRecordset->GetFieldValue("r_arrtime", strTemp);
+						m_workWramPointDownPack.gDataBodyPack.strSTime = strTemp.GetBuffer();
+						strTemp.LockBuffer();
+
+						pRecordset->GetFieldValue("r_realtime", strTemp);
+						m_workWramPointDownPack.gDataBodyPack.strRealTime = strTemp.GetBuffer();
+						strTemp.LockBuffer();
+
+						pRecordset->GetFieldValue("r_pxdate", strTemp);
+						m_workWramPointDownPack.gDataBodyPack.strData = strTemp.GetBuffer();
+						strTemp.LockBuffer();
+
+						pRecordset->GetFieldValue("p_state", nTemp);
+						m_workWramPointDownPack.gDataBodyPack.nPointState = nTemp;
+
+						m_workWramPointDownPack.nBodyLength = 186;
+						m_DataPackPares.PackWorkerWramPointDownBuild(pBuffer, m_workWramPointDownPack);
+						pKeyOverPire->pireOverLappedex.wsaWSABUF.len = m_workWramPointDownPack.nBodyLength + 11;
+
+						nTemp = DealSendData(pKeyOverPire, pWorkThread);
+						if(0 != nTemp)
+							return -2;
+					}
+					return 0;
+				}
+			}
+		}
+	}
+	m_DataPackPares.FillWorkerWramPointFailPack(m_workWramPointDownPack);
+	m_DataPackPares.PackWorkerWramPointDownBuild(pBuffer, m_workWramPointDownPack);
+	pKeyOverPire->pireOverLappedex.wsaWSABUF.len = m_workWramPointDownPack.nBodyLength + 11;
+
+	DealSendData(pKeyOverPire, pWorkThread);
+	return 0;
+}
+
+int  CLogicManager::DealOpteLinePack(DWORD dNumberOfBytes, 
+	char  * pBuffer, 
+	CADODatabase* pDatabase)
+{
+	if(m_DataPackPares.PackOpteLineUpPack(pBuffer, m_opteLineUpPack))
+	{
+		if(m_AccessBaseData.InitAccesser(pDatabase))
+		{
+			m_AccessBaseData.UpLoadOpteLinePack(m_opteLineUpPack, m_opteLineDownPack);
+			m_DataPackPares.PackOpteLineDownBuild(pBuffer, m_opteLineDownPack);
+
+			return m_opteLineDownPack.nBodyLength + 11;
+		}
+	}
+
+	m_DataPackPares.FillOpteLineFailPack(m_opteLineDownPack);
+	m_DataPackPares.PackOpteLineDownBuild(pBuffer, m_opteLineDownPack);
+
+	return m_opteLineDownPack.nBodyLength + 11;
 }
 
 void CLogicManager::FillPicStoreStruct(GPSPIC_Pack& gpsPicUpLoadPack, string strTel, int nType)

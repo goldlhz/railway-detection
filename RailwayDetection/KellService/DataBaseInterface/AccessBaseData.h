@@ -123,6 +123,19 @@ public:
 
 	CADORecordset* UploadWorkerPollPack(const WorkerPoll_Upload_Pack& workerPollUpPack);
 
+	bool UpLoadSysSettingPack(const SysSetting_Upload_Pack& sysSettingUpPack,
+		SysSetting_Download_Pack& sysSettingDownPack);
+
+	bool UpLoadSysSettingGetPack(const SysSettingGet_Upload_Pack& sysSettingGetUpPack,
+		SysSettingGet_Download_Pack& sysSettingGetDownPack);
+
+	bool UpLoadModifyPassPack(const ModifyPassword_Upload_Pack& modifyPassUpPack,
+		ModifyPassword_Download_Pack& modifyPassDownPack);
+
+	CADORecordset* UpLoadWorkWramPointPack(const WorkWramPoint_Upload_Pack& workWramPointUpPack);
+	
+	bool UpLoadOpteLinePack(const OpteLine_Upload_Pack& opteLineUpPack,
+		OpteLine_Download_Pack& opteLineDownPack);
 private:
 	string GetCurrentTimeByFormat();
 
