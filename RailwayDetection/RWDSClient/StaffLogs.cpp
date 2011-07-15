@@ -30,6 +30,7 @@ void CStaffLogs::DoDataExchange(CDataExchange* pDX)
 
 
 BEGIN_MESSAGE_MAP(CStaffLogs, CDialogEx)
+    ON_BN_CLICKED(IDCANCEL, &CStaffLogs::OnBnClickedCancel)
 END_MESSAGE_MAP()
 
 
@@ -54,9 +55,11 @@ BOOL CStaffLogs::OnInitDialog()
     CRect clientRect;
     m_ListCtrl.GetClientRect(&clientRect);
     //m_ListCtrl.InsertColumn(0, _T("地点"), LVCFMT_LEFT, clientRect.Width()/4);
-    m_ListCtrl.InsertColumn(0, _T("应到时间"), LVCFMT_LEFT, clientRect.Width()/3);
-    m_ListCtrl.InsertColumn(1, _T("实到时间"), LVCFMT_LEFT, clientRect.Width()/3);
-    m_ListCtrl.InsertColumn(2, _T("状态"), LVCFMT_LEFT, clientRect.Width()/3);
+    m_ListCtrl.InsertColumn(0, _T("线路名"), LVCFMT_LEFT, clientRect.Width()/5);
+    m_ListCtrl.InsertColumn(1, _T("公里处"), LVCFMT_LEFT, clientRect.Width()/5);
+    m_ListCtrl.InsertColumn(2, _T("应到时间"), LVCFMT_LEFT, clientRect.Width()/5);
+    m_ListCtrl.InsertColumn(3, _T("实到时间"), LVCFMT_LEFT, clientRect.Width()/5);
+    m_ListCtrl.InsertColumn(4, _T("状态"), LVCFMT_LEFT, clientRect.Width()/5);
     CString textShow;
     textShow.Format(_T("员工:%s, 计划到达: %d, 实际到达: %d, 异常: %d, 未到达: %d"),
         m_Report->iStaffName, m_Report->iPlanArrived, m_Report->iActualArrived, 
@@ -78,4 +81,11 @@ BOOL CStaffLogs::OnInitDialog()
 
     return TRUE;  // return TRUE unless you set the focus to a control
     // 异常: OCX 属性页应返回 FALSE
+}
+
+
+void CStaffLogs::OnBnClickedCancel()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    CDialogEx::OnCancel();
 }

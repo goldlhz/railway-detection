@@ -281,7 +281,7 @@ void CFileView::GetOrgData(OrganizationInfo* aOrg)
     messageBox->CenterWindow();
     messageBox->ShowWindow(SW_NORMAL);
     Sleep(10);
-    GetOrgPoint(aOrg->iOrgID, &aOrg->iMapPoint);
+    GetOrgPoint(aOrg->iOrgID, RailLineList, &aOrg->iMapPoint);
     GetOrgLine(aOrg->iOrgID, aOrg->iMapPoint, &aOrg->iLine);
     if (aOrg->iDevice.size() == 0)
     {

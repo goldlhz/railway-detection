@@ -27,4 +27,5 @@ protected:
 public:
     CListCtrl m_ListCtrl;
     virtual BOOL OnInitDialog();
+    afx_msg void OnBnClickedCancel();
 };

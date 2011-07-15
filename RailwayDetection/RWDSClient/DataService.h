@@ -7,13 +7,21 @@ int VerifyLogin( CString& aLoginAccount, CString& aLoginPassword, int* orgID, Pe
 //获取登录者权限
 int GetLoginerPermission(const CString& aLoginAccount);
 
+//获取/设置铁路线名称
+int GetRailLine(vector<RailLine*>* aRailLineList);
+int SetRailLine(int aCmd, const RailLine* aRailLine);
+
+//铁路线操作
+RailLine* GetRailLineByID(vector<RailLine*>& aRailLineList, int aRailID);
+RailLine* GetRailLineByName(vector<RailLine*>& aRailLineList, CString aRailName);
+
 //获取/设置组织结构
 int GetOrgTree(const int aOrgID, vector<OrganizationInfo*>* a_OrgTree);
 void CherkOrgType(vector<OrganizationInfo*>* a_OrgTree,OrganizationInfo* OrgInfo);
 int SetOrganization(int aCmd, const OrganizationInfo* aOrganization);
 
 //获取/设置机构路线所有点
-int GetOrgPoint(int aOrgID, vector<MapPoint*>* aPointList);
+int GetOrgPoint(int aOrgID, vector<RailLine*>& aRailLineList, vector<MapPoint*>* aPointList);
 int SetOrgPoint(int aOrgID, int aCmd, const MapPoint* aPoint);
 
 //获取/设置机构路线
@@ -23,6 +31,7 @@ int SetOrgLine(int aOrgID, int aCmd, const LineInfo* aLine);
 //获取/设置员工信息
 int GetOrgStaff(int aOrgID, const vector<DeviceInfo*>& aDeviceList, vector<StaffInfo*>* aStaffList);
 int SetOrgStaff(int aOrgID, int aCmd, const StaffInfo* aStaff);
+int SetStaffPassword(int aOrgID, CString aStaffID, CString aPassword);
 
 //获取/设置排班表
 int GetCalendarSchedule(int aOrgID, const vector<StaffInfo*>* ListStaff, CalendarSchedule* aSchedule);

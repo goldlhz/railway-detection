@@ -3,8 +3,8 @@
 
 #include "Datadef.h"
 
-vector<CString> strRailLineName;
-int strRailLineNameCount = 0;
+vector<_RailLine*> RailLineList;
+//int strRailLineNameCount = 0;
 
 const CString strDirectName[] = {
 							  _T("иообпп"),

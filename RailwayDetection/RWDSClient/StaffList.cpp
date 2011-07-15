@@ -45,6 +45,7 @@ BEGIN_MESSAGE_MAP(CStaffList, CDialogEx)
     ON_BN_CLICKED(IDC_BTNMODIFYSTAFF, &CStaffList::OnBnClickedBtnmodifystaff)
     ON_BN_CLICKED(IDC_BTN_DELSTAFF, &CStaffList::OnBnClickedBtnDelstaff)
     ON_BN_CLICKED(IDC_BTN_SETPERMISSION, &CStaffList::OnBnClickedBtnSetpermission)
+    ON_BN_CLICKED(IDC_BTN_INITIALPASSWORD, &CStaffList::OnBnClickedBtnInitialpassword)
 END_MESSAGE_MAP()
 
 
@@ -90,6 +91,11 @@ BOOL CStaffList::OnInitDialog()
         comboIndex = m_ComboStaffDevice.AddString(device->iPhoneNum);
         m_ComboStaffDevice.SetItemData(comboIndex, (DWORD_PTR)device);
     }
+
+    if (m_CRWDSClientView->m_CurrentPermission.iBasical & PERMISSIONINITIALPASSWORD)
+    {
+        GetDlgItem(IDC_BTN_INITIALPASSWORD)->ShowWindow(SW_SHOW);
+    }
     return TRUE;  // return TRUE unless you set the focus to a control
     // 异常: OCX 属性页应返回 FALSE
 }
@@ -111,16 +117,16 @@ void CStaffList::OnLvnItemchangedStafflist(NMHDR *pNMHDR, LRESULT *pResult)
     //str.Format(_T("%d"), m_SeletedStaff->iID);
     GetDlgItem(IDC_EDIT_STAFFID)->SetWindowText(m_SeletedStaff->iID);
     GetDlgItem(IDC_EDIT_STAFFNAME)->SetWindowText(m_SeletedStaff->iName);
-    if (m_SeletedStaff->iLoginPermission)
-    {
-        m_CheckLoginPermission.SetCheck(TRUE);
-        m_BtnSetPassword.ShowWindow(SW_SHOW);
-    }
-    else
-    {
-        m_CheckLoginPermission.SetCheck(FALSE);
-        m_BtnSetPassword.ShowWindow(SW_HIDE);
-    }
+    //if (m_SeletedStaff->iLoginPermission)
+    //{
+    //    m_CheckLoginPermission.SetCheck(TRUE);
+    //    m_BtnSetPassword.ShowWindow(SW_SHOW);
+    //}
+    //else
+    //{
+    //    m_CheckLoginPermission.SetCheck(FALSE);
+    //    m_BtnSetPassword.ShowWindow(SW_HIDE);
+    //}
     //m_ArrangeLine.ResetContent();
     //for(size_t i=0; i<m_SeletedStaff->iArrangeLine.size(); i++)
     //{
@@ -146,14 +152,14 @@ void CStaffList::OnLvnItemchangedStafflist(NMHDR *pNMHDR, LRESULT *pResult)
 void CStaffList::OnBnClickedCheckLoginpermission()
 {
     // TODO: 在此添加控件通知处理程序代码
-    if (m_CheckLoginPermission.GetCheck() == BST_CHECKED)
-    {
-        m_BtnSetPassword.ShowWindow(SW_SHOW);
-    }
-    else
-    {
-        m_BtnSetPassword.ShowWindow(SW_HIDE);
-    }
+    //if (m_CheckLoginPermission.GetCheck() == BST_CHECKED)
+    //{
+    //    m_BtnSetPassword.ShowWindow(SW_SHOW);
+    //}
+    //else
+    //{
+    //    m_BtnSetPassword.ShowWindow(SW_HIDE);
+    //}
 }
 
 void CStaffList::OnBnClickedBtnSetpassword()
@@ -166,8 +172,10 @@ void CStaffList::OnBnClickedBtnSetpassword()
     if(modifyPassword.DoModal() == IDOK)
     {
         m_SeletedStaff->iPassword = modifyPassword.GetPassword();
-        m_SeletedStaff->iLoginPermission = TRUE;
+        //m_SeletedStaff->iLoginPermission = TRUE;
 
+        SetStaffPassword(m_CRWDSClientView->m_CurrentOrg->iOrgID, m_SeletedStaff->iID, m_SeletedStaff->iPassword);
+        AfxMessageBox(_T("密码修改成功!"));
         //SetOrgStaff(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_STAFF_MODIFY, m_SeletedStaff);
         //AfxMessageBox(_T("密码修改成功"));
     }
@@ -309,5 +317,18 @@ void CStaffList::OnBnClickedBtnSetpermission()
     if( permission.DoModal() == IDOK)
     {
         m_SeletedStaff->iPermissionGroup = permission.GetPermisstionValue();
+    }
+}
+
+
+void CStaffList::OnBnClickedBtnInitialpassword()
+{
+    // TODO: 在此添加控件通知处理程序代码
+    if (AfxMessageBox(_T("确定要初始化密码？")))
+    {
+        m_SeletedStaff->iPassword = _T("1111");
+        //设置密码 
+        SetStaffPassword(m_CRWDSClientView->m_CurrentOrg->iOrgID, m_SeletedStaff->iID, m_SeletedStaff->iPassword);
+        AfxMessageBox(_T("密码修改成功!"));
     }
 }
