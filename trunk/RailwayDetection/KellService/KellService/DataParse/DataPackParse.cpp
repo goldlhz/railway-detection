@@ -1803,6 +1803,175 @@ void CDataPackParse::FillWorkerPollFailPack(WorkerPoll_Download_Pack& workerPoll
 	workerPollDownLoadPack.gDataBodyPack.nPointState = 0;
 }
 
+bool CDataPackParse::PackSysSettingUpPack(const char* pDataBuffer, SysSetting_Upload_Pack& sysSettingUpLoadPack)
+{
+	if(ParseDataPackShell(pDataBuffer, sysSettingUpLoadPack))
+	{
+		if(SYSSETTING_PACK == sysSettingUpLoadPack.nMsgNumber)
+		{
+			if(ParseSysSettingPackData(pDataBuffer + 7, sysSettingUpLoadPack))
+				return true;
+		}
+	}
+	return false;
+}
+bool CDataPackParse::PackSysSettingDownBuild(char* pDataBuffer, SysSetting_Download_Pack& sysSettingDownLoadPack)
+{
+	memset(pDataBuffer, 0x00, BUFFER_SIZE_TO_CLIENT);
+	if(BuildDataPackShell(pDataBuffer, sysSettingDownLoadPack, SYSSETTING_PACK))
+	{
+		if(BuildSysSettingPackData(pDataBuffer + 7, sysSettingDownLoadPack))
+			return true;
+	}
+	return false;
+}
+void CDataPackParse::FillSysSettingFailPack(SysSetting_Download_Pack& sysSettingDownLoadPack)
+{
+	sysSettingDownLoadPack.nBeginIdentify = PACK_IDENTIFY;
+	sysSettingDownLoadPack.nMsgNumber = WORKERPOLL_PACK;
+	sysSettingDownLoadPack.nBodyLength = 96;
+
+	sysSettingDownLoadPack.gDataBodyPack.nResult = 1;
+}
+
+bool CDataPackParse::PackSysSettingGetUpPack(const char* pDataBuffer, SysSettingGet_Upload_Pack& sysSettingGetUpLoadPack)
+{
+	if(ParseDataPackShell(pDataBuffer, sysSettingGetUpLoadPack))
+	{
+		if(SYSSETTINGGET_PACK == sysSettingGetUpLoadPack.nMsgNumber)
+		{
+			if(ParseSysSettingGetPackData(pDataBuffer + 7, sysSettingGetUpLoadPack))
+				return true;
+		}
+	}
+	return false;
+}
+bool CDataPackParse::PackSysSettingGetDownBuild(char* pDataBuffer, SysSettingGet_Download_Pack& sysSettingGetDownLoadPack)
+{
+	memset(pDataBuffer, 0x00, BUFFER_SIZE_TO_CLIENT);
+	if(BuildDataPackShell(pDataBuffer, sysSettingGetDownLoadPack, SYSSETTINGGET_PACK))
+	{
+		if(BuildSysSettingGetPackData(pDataBuffer + 7, sysSettingGetDownLoadPack))
+			return true;
+	}
+	return false;
+}
+void CDataPackParse::FillSysSettingGetFailPack(SysSettingGet_Download_Pack& sysSettingGetDownLoadPack)
+{
+	sysSettingGetDownLoadPack.nBeginIdentify = PACK_IDENTIFY;
+	sysSettingGetDownLoadPack.nMsgNumber = SYSSETTINGGET_PACK;
+	sysSettingGetDownLoadPack.nBodyLength = 120;
+
+	sysSettingGetDownLoadPack.gDataBodyPack.nDataBak = 0;
+	sysSettingGetDownLoadPack.gDataBodyPack.nBak = 0;
+	sysSettingGetDownLoadPack.gDataBodyPack.nBak1 = 0;
+	sysSettingGetDownLoadPack.gDataBodyPack.fWarnTime = 0;
+	sysSettingGetDownLoadPack.gDataBodyPack.fBak = 0;
+	sysSettingGetDownLoadPack.gDataBodyPack.strData = "";
+	sysSettingGetDownLoadPack.gDataBodyPack.strData1 = "";
+}
+
+bool CDataPackParse::PackModifyPassUpPack(const char* pDataBuffer, ModifyPassword_Upload_Pack& modifyPasswordUpLoadPack)
+{
+	if(ParseDataPackShell(pDataBuffer, modifyPasswordUpLoadPack))
+	{
+		if(MODIFYPASS_PACK == modifyPasswordUpLoadPack.nMsgNumber)
+		{
+			if(ParseModifyPassPackData(pDataBuffer + 7, modifyPasswordUpLoadPack))
+				return true;
+		}
+	}
+	return false;
+}
+bool CDataPackParse::PackModifyPassDownBuild(char* pDataBuffer, ModifyPassword_Download_Pack& modifyPasswordDownLoadPack)
+{
+	memset(pDataBuffer, 0x00, BUFFER_SIZE_TO_CLIENT);
+	if(BuildDataPackShell(pDataBuffer, modifyPasswordDownLoadPack, MODIFYPASS_PACK))
+	{
+		if(BuildModifyPassPackData(pDataBuffer + 7, modifyPasswordDownLoadPack))
+			return true;
+	}
+	return false;
+}
+void CDataPackParse::FillModifyPassFailPack(ModifyPassword_Download_Pack& modifyPasswordDownLoadPack)
+{
+	modifyPasswordDownLoadPack.nBeginIdentify = PACK_IDENTIFY;
+	modifyPasswordDownLoadPack.nMsgNumber = MODIFYPASS_PACK;
+	modifyPasswordDownLoadPack.nBodyLength = 4;
+
+	modifyPasswordDownLoadPack.gDataBodyPack.nResult = 1;
+}
+
+bool CDataPackParse::PackWorkerWramPointUpPack(const char* pDataBuffer, WorkWramPoint_Upload_Pack& workWramPointUpLoadPack)
+{
+	if(ParseDataPackShell(pDataBuffer, workWramPointUpLoadPack))
+	{
+		if(WORKERWARNPOINT_PACK == workWramPointUpLoadPack.nMsgNumber)
+		{
+			if(ParseWorkerWramPointPackData(pDataBuffer + 7, workWramPointUpLoadPack))
+				return true;
+		}
+	}
+	return false;
+}
+bool CDataPackParse::PackWorkerWramPointDownBuild(char* pDataBuffer, WorkWramPoint_Download_Pack& workWramPointDownLoadPack)
+{
+	memset(pDataBuffer, 0x00, BUFFER_SIZE_TO_CLIENT);
+	if(BuildDataPackShell(pDataBuffer, workWramPointDownLoadPack, WORKERWARNPOINT_PACK))
+	{
+		if(BuildWorkerWramPointPackData(pDataBuffer + 7, workWramPointDownLoadPack))
+			return true;
+	}
+	return false;
+}
+void CDataPackParse::FillWorkerWramPointFailPack(WorkWramPoint_Download_Pack& workWramPointDownLoadPack)
+{
+	workWramPointDownLoadPack.nBeginIdentify = PACK_IDENTIFY;
+	workWramPointDownLoadPack.nMsgNumber = WORKERWARNPOINT_PACK;
+	workWramPointDownLoadPack.nBodyLength = 186;
+	
+	workWramPointDownLoadPack.gDataBodyPack.nTotlePacket = 0;
+	workWramPointDownLoadPack.gDataBodyPack.nCurrentPacket = 0;
+	workWramPointDownLoadPack.gDataBodyPack.strLineName = "";
+	workWramPointDownLoadPack.gDataBodyPack.fDirect = 0;
+	workWramPointDownLoadPack.gDataBodyPack.strUserId = "";
+	workWramPointDownLoadPack.gDataBodyPack.strSTime = "";
+	workWramPointDownLoadPack.gDataBodyPack.strRealTime = "";
+	workWramPointDownLoadPack.gDataBodyPack.strData = "";;
+	workWramPointDownLoadPack.gDataBodyPack.nPointState = 0;
+}
+
+bool CDataPackParse::PackOpteLineUpPack(const char* pDataBuffer, OpteLine_Upload_Pack& opteLineUpLoadPack)
+{
+	if(ParseDataPackShell(pDataBuffer, opteLineUpLoadPack))
+	{
+		if(OPTELINE_PACK == opteLineUpLoadPack.nMsgNumber)
+		{
+			if(ParseOpteLinePackData(pDataBuffer + 7, opteLineUpLoadPack))
+				return true;
+		}
+	}
+	return false;
+}
+bool CDataPackParse::PackOpteLineDownBuild(char* pDataBuffer, OpteLine_Download_Pack& opteLineDownLoadPack)
+{
+	memset(pDataBuffer, 0x00, BUFFER_SIZE_TO_CLIENT);
+	if(BuildDataPackShell(pDataBuffer, opteLineDownLoadPack, OPTELINE_PACK))
+	{
+		if(BuildOpteLinePackData(pDataBuffer + 7, opteLineDownLoadPack))
+			return true;
+	}
+	return false;
+}
+void CDataPackParse::FillOpteLineFailPack(OpteLine_Download_Pack& opteLineDownLoadPack)
+{
+	opteLineDownLoadPack.nBeginIdentify = PACK_IDENTIFY;
+	opteLineDownLoadPack.nMsgNumber = OPTELINE_PACK;
+	opteLineDownLoadPack.nBodyLength = 4;
+
+	opteLineDownLoadPack.gDataBodyPack.nResult = 0;
+}
+
 int CDataPackParse::ParseGPSPackHttpShell(const char* pDataBuffer, char* outBuffer, 
 	string& strGPSContext, DWORD& nPackLength, string& strTel)
 {
@@ -3240,6 +3409,157 @@ bool CDataPackParse::BuildWorkerPollPackData(char* pDataBuffer, const WorkerPoll
 		memcpy(pDataBuffer + 72, workerPollDownLoadPack.gDataBodyPack.strPID.c_str(), workerPollDownLoadPack.gDataBodyPack.strPID.length());
 		*((unsigned int*)(pDataBuffer + 92)) = workerPollDownLoadPack.gDataBodyPack.nPointState;
 
+		return true;
+	}
+	return false;
+}
+
+bool CDataPackParse::ParseSysSettingPackData(const char* pDataBuffer, SysSetting_Upload_Pack& sysSettingUpLoadPack)
+{
+	ASSERT(pDataBuffer);
+	if(pDataBuffer)
+	{
+		memset(m_tempBuffer1, 0x00, TEMP_BUFFER_SIZE);
+		memset(m_tempBuffer2, 0x00, TEMP_BUFFER_SIZE);
+
+		memcpy(m_tempBuffer1, pDataBuffer + 20, 50);
+		memcpy(m_tempBuffer2, pDataBuffer + 70, 50);
+
+		sysSettingUpLoadPack.gDataBodyPack.nDataBak = *((unsigned int*)(pDataBuffer));
+		sysSettingUpLoadPack.gDataBodyPack.nBak = *((unsigned int*)(pDataBuffer + 4));
+		sysSettingUpLoadPack.gDataBodyPack.nBak1 = *((unsigned int*)(pDataBuffer + 8));
+		sysSettingUpLoadPack.gDataBodyPack.fWarnTime = *((float*)(pDataBuffer + 12));
+		sysSettingUpLoadPack.gDataBodyPack.fBak = *((float*)(pDataBuffer + 16));
+
+		sysSettingUpLoadPack.gDataBodyPack.strData = m_tempBuffer1;
+		sysSettingUpLoadPack.gDataBodyPack.strData1 = m_tempBuffer2;
+
+		return true;
+	}
+	return false;
+}
+bool CDataPackParse::BuildSysSettingPackData(char* pDataBuffer, const SysSetting_Download_Pack& sysSettingDownLoadPack)
+{
+	ASSERT(pDataBuffer);
+	if(pDataBuffer)
+	{
+		*((unsigned int*)(pDataBuffer)) = sysSettingDownLoadPack.gDataBodyPack.nResult;
+		return true;
+	}
+	return false;
+}
+
+bool CDataPackParse::ParseSysSettingGetPackData(const char* pDataBuffer, SysSettingGet_Upload_Pack& sysSettingGetUpLoadPack)
+{
+	return true;
+}
+bool CDataPackParse::BuildSysSettingGetPackData(char* pDataBuffer, const SysSettingGet_Download_Pack& sysSettingGetDownLoadPack)
+{
+	ASSERT(pDataBuffer);
+	if(pDataBuffer)
+	{
+		*((unsigned int*)(pDataBuffer)) = sysSettingGetDownLoadPack.gDataBodyPack.nDataBak;
+		*((unsigned int*)(pDataBuffer + 4)) = sysSettingGetDownLoadPack.gDataBodyPack.nBak;
+		*((unsigned int*)(pDataBuffer + 8)) = sysSettingGetDownLoadPack.gDataBodyPack.nBak1;
+		*((float*)(pDataBuffer + 12)) = sysSettingGetDownLoadPack.gDataBodyPack.fWarnTime;
+		*((float*)(pDataBuffer + 16)) = sysSettingGetDownLoadPack.gDataBodyPack.fBak;
+		
+		memcpy(pDataBuffer + 20, sysSettingGetDownLoadPack.gDataBodyPack.strData.c_str(), sysSettingGetDownLoadPack.gDataBodyPack.strData.length());
+		memcpy(pDataBuffer + 70, sysSettingGetDownLoadPack.gDataBodyPack.strData1.c_str(), sysSettingGetDownLoadPack.gDataBodyPack.strData1.length());
+
+		return true;
+	}
+	return false;
+}
+
+bool CDataPackParse::ParseModifyPassPackData(const char* pDataBuffer, ModifyPassword_Upload_Pack& modifyPassUpLoadPack)
+{
+	ASSERT(pDataBuffer);
+	if(pDataBuffer)
+	{
+		memset(m_tempBuffer1, 0x00, TEMP_BUFFER_SIZE);
+		memset(m_tempBuffer2, 0x00, TEMP_BUFFER_SIZE);
+
+		memcpy(m_tempBuffer1, pDataBuffer, 20);
+		memcpy(m_tempBuffer2, pDataBuffer + 20, 20);
+
+		modifyPassUpLoadPack.gDataBodyPack.strOper = m_tempBuffer1;
+		modifyPassUpLoadPack.gDataBodyPack.strPassword = m_tempBuffer2;
+
+		return true;
+	}
+	return false;
+}
+bool CDataPackParse::BuildModifyPassPackData(char* pDataBuffer, const ModifyPassword_Download_Pack& modifyPassDownLoadPack)
+{
+	ASSERT(pDataBuffer);
+	if(pDataBuffer)
+	{
+		*((unsigned int*)(pDataBuffer)) = modifyPassDownLoadPack.gDataBodyPack.nResult;
+		return true;
+	}
+	return false;
+}
+
+bool CDataPackParse::ParseWorkerWramPointPackData(const char* pDataBuffer, WorkWramPoint_Upload_Pack& workWramPointUpLoadPack)
+{
+	ASSERT(pDataBuffer);
+	if(pDataBuffer)
+	{
+		workWramPointUpLoadPack.gDataBodyPack.nOrgID = *((unsigned int*)(pDataBuffer));
+		workWramPointUpLoadPack.gDataBodyPack.nYear = *((unsigned int*)(pDataBuffer + 4));
+		workWramPointUpLoadPack.gDataBodyPack.nMonth = *((unsigned int*)(pDataBuffer + 8));
+
+		return true;
+	}
+	return false;
+}
+bool CDataPackParse::BuildWorkerWramPointPackData(char* pDataBuffer, const WorkWramPoint_Download_Pack& workWramPointDownLoadPack)
+{
+	ASSERT(pDataBuffer);
+	if(pDataBuffer)
+	{
+		*((unsigned int*)(pDataBuffer)) = workWramPointDownLoadPack.gDataBodyPack.nTotlePacket;
+		*((unsigned int*)(pDataBuffer + 4)) = workWramPointDownLoadPack.gDataBodyPack.nCurrentPacket;
+
+		*((float*)(pDataBuffer + 58)) = workWramPointDownLoadPack.gDataBodyPack.fDirect;
+		*((unsigned int*)(pDataBuffer + 182)) = workWramPointDownLoadPack.gDataBodyPack.nPointState;
+
+		memcpy(pDataBuffer + 8, workWramPointDownLoadPack.gDataBodyPack.strLineName.c_str(), workWramPointDownLoadPack.gDataBodyPack.strLineName.length());
+		memcpy(pDataBuffer + 62, workWramPointDownLoadPack.gDataBodyPack.strUserId.c_str(), workWramPointDownLoadPack.gDataBodyPack.strUserId.length());
+		memcpy(pDataBuffer + 92, workWramPointDownLoadPack.gDataBodyPack.strSTime.c_str(), workWramPointDownLoadPack.gDataBodyPack.strSTime.length());
+		memcpy(pDataBuffer + 122, workWramPointDownLoadPack.gDataBodyPack.strRealTime.c_str(), workWramPointDownLoadPack.gDataBodyPack.strRealTime.length());
+		memcpy(pDataBuffer + 152, workWramPointDownLoadPack.gDataBodyPack.strData.c_str(), workWramPointDownLoadPack.gDataBodyPack.strData.length());
+
+		return true;
+	}
+	return false;
+}
+
+
+bool CDataPackParse::ParseOpteLinePackData(const char* pDataBuffer, OpteLine_Upload_Pack& opteLineUpLoadPack)
+{
+	ASSERT(pDataBuffer);
+	if(pDataBuffer)
+	{
+		memset(m_tempBuffer1, 0x00, TEMP_BUFFER_SIZE);
+
+		memcpy(m_tempBuffer1, pDataBuffer + 8, 20);
+
+		opteLineUpLoadPack.gDataBodyPack.nType = *((unsigned int*)(pDataBuffer));
+		opteLineUpLoadPack.gDataBodyPack.nID = *((unsigned int*)(pDataBuffer + 4));
+		opteLineUpLoadPack.gDataBodyPack.strName = m_tempBuffer1;
+
+		return true;
+	}
+	return false;
+}
+bool CDataPackParse::BuildOpteLinePackData(char* pDataBuffer, const OpteLine_Download_Pack& opteLineDownLoadPack)
+{
+	ASSERT(pDataBuffer);
+	if(pDataBuffer)
+	{
+		*((unsigned int*)(pDataBuffer)) = opteLineDownLoadPack.gDataBodyPack.nResult;
 		return true;
 	}
 	return false;

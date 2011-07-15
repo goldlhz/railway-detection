@@ -2051,6 +2051,272 @@ CADORecordset* CAccessBaseData::UploadWorkerPollPack(const WorkerPoll_Upload_Pac
 	return NULL;
 }
 
+
+bool CAccessBaseData::UpLoadSysSettingPack(const SysSetting_Upload_Pack& sysSettingUpPack,
+	SysSetting_Download_Pack& sysSettingDownPack)
+{
+	if(m_pDatabase)
+	{
+		int nErrorCode = 1;
+
+		memset(m_strBuffer, 0x00, INPUTSQLBUFFERS);
+		sprintf_s(m_strBuffer, INPUTSQLBUFFERS, "update t_sys set dataBak=%d, bak=%d, bak1=%d, WarnTime=%f, FBak=%f, cData='%s', cData1='%s' where id=1",
+			sysSettingUpPack.gDataBodyPack.nDataBak,
+			sysSettingUpPack.gDataBodyPack.nBak,
+			sysSettingUpPack.gDataBodyPack.nBak1,
+			sysSettingUpPack.gDataBodyPack.fWarnTime,
+			sysSettingUpPack.gDataBodyPack.fBak, 
+			sysSettingUpPack.gDataBodyPack.strData.c_str(),
+			sysSettingUpPack.gDataBodyPack.strData1.c_str());
+
+		if(!m_pDatabase->IsOpen())
+		{
+			if(!m_pDatabase->Open())
+			{
+				nErrorCode = 1;
+				goto ErrorDeal;
+			}
+		}
+
+		if(!m_pDatabase->Execute(m_strBuffer))
+		{
+			nErrorCode = 1;
+			goto ErrorDeal;
+		}
+		if(m_pDatabase->GetRecordsAffected() > 0)
+			nErrorCode = 0;
+		else
+			nErrorCode = 1;
+
+ErrorDeal:
+		sysSettingDownPack.nBeginIdentify = sysSettingUpPack.nBeginIdentify;
+		sysSettingDownPack.nMsgNumber = sysSettingUpPack.nMsgNumber;
+		sysSettingDownPack.gDataBodyPack.nResult = nErrorCode;
+
+		sysSettingDownPack.nBodyLength = 4;
+		return true;
+	}
+	return false;
+}
+
+bool CAccessBaseData::UpLoadSysSettingGetPack(const SysSettingGet_Upload_Pack& sysSettingGetUpPack,
+	SysSettingGet_Download_Pack& sysSettingGetDownPack)
+{
+	if(m_pDatabase)
+	{
+		int nErrorCode = 1;
+
+		memset(m_strBuffer, 0x00, INPUTSQLBUFFERS);
+		sprintf_s(m_strBuffer, INPUTSQLBUFFERS, "select * from t_sys");
+
+		if(!m_pDatabase->IsOpen())
+		{
+			if(!m_pDatabase->Open())
+			{
+				nErrorCode = 1;
+				goto ErrorDeal;
+			}
+		}
+
+		if(m_adoRecordSet.Open(m_pDatabase->GetActiveConnection(), m_strBuffer))
+		{
+			if(m_adoRecordSet.GetRecordCount() <= 0)
+			{
+				nErrorCode = 1;
+				goto ErrorDeal;
+			}
+
+			int     nTemp;
+			double  dTemp;
+			CString strTemp;//dataBak, bak, bak1, WarnTime, FBak, cData, cData1
+
+			m_adoRecordSet.MoveFirst();
+
+			m_adoRecordSet.GetFieldValue("dataBak", nTemp);
+			sysSettingGetDownPack.gDataBodyPack.nDataBak = nTemp;
+
+			m_adoRecordSet.GetFieldValue("bak", nTemp);
+			sysSettingGetDownPack.gDataBodyPack.nBak = nTemp;
+
+			m_adoRecordSet.GetFieldValue("bak1", nTemp);
+			sysSettingGetDownPack.gDataBodyPack.nBak1 = nTemp;
+
+			m_adoRecordSet.GetFieldValue("WarnTime", dTemp);
+			sysSettingGetDownPack.gDataBodyPack.fWarnTime = (float)dTemp;
+
+			m_adoRecordSet.GetFieldValue("FBak", dTemp);
+			sysSettingGetDownPack.gDataBodyPack.fBak = (float)dTemp;
+
+			m_adoRecordSet.GetFieldValue("cData", strTemp);
+			sysSettingGetDownPack.gDataBodyPack.strData = strTemp.GetBuffer();
+			strTemp.LockBuffer();
+
+			m_adoRecordSet.GetFieldValue("cData1", strTemp);
+			sysSettingGetDownPack.gDataBodyPack.strData1 = strTemp.GetBuffer();
+			strTemp.LockBuffer();
+
+			sysSettingGetDownPack.nBodyLength = 120;
+			return true;
+		}
+
+ErrorDeal:
+		sysSettingGetDownPack.nBeginIdentify = sysSettingGetUpPack.nBeginIdentify;
+		sysSettingGetDownPack.nMsgNumber = sysSettingGetUpPack.nMsgNumber;
+
+		sysSettingGetDownPack.gDataBodyPack.nDataBak = 0;
+		sysSettingGetDownPack.gDataBodyPack.nBak = 0;
+		sysSettingGetDownPack.gDataBodyPack.nBak1 = 0;
+		sysSettingGetDownPack.gDataBodyPack.fWarnTime = 0;
+		sysSettingGetDownPack.gDataBodyPack.fBak = 0;
+		sysSettingGetDownPack.gDataBodyPack.strData = "";
+		sysSettingGetDownPack.gDataBodyPack.strData1 = "";
+
+		sysSettingGetDownPack.nBodyLength = 120;
+		return true;
+	}
+	return false;
+}
+
+bool CAccessBaseData::UpLoadModifyPassPack(const ModifyPassword_Upload_Pack& modifyPassUpPack,
+	ModifyPassword_Download_Pack& modifyPassDownPack)
+{
+	if(m_pDatabase)
+	{
+		int nErrorCode = 1;
+
+		memset(m_strBuffer, 0x00, INPUTSQLBUFFERS);
+		sprintf_s(m_strBuffer, INPUTSQLBUFFERS, "update t_user set User_Pawd='%s' where User_Oper='%s'",
+			modifyPassUpPack.gDataBodyPack.strPassword.c_str(),
+			modifyPassUpPack.gDataBodyPack.strOper.c_str());
+
+		if(!m_pDatabase->IsOpen())
+		{
+			if(!m_pDatabase->Open())
+			{
+				nErrorCode = 1;
+				goto ErrorDeal;
+			}
+		}
+
+		if(!m_pDatabase->Execute(m_strBuffer))
+		{
+			nErrorCode = 1;
+			goto ErrorDeal;
+		}
+
+		if(m_pDatabase->GetRecordsAffected() > 0)
+			nErrorCode = 0;
+		else
+			nErrorCode = 1;
+
+ErrorDeal:
+		modifyPassDownPack.nBeginIdentify = modifyPassUpPack.nBeginIdentify;
+		modifyPassDownPack.nMsgNumber = modifyPassUpPack.nMsgNumber;
+		modifyPassDownPack.gDataBodyPack.nResult = nErrorCode;
+
+		modifyPassDownPack.nBodyLength = 4;
+		return true;
+	}
+	return false;
+}
+
+CADORecordset* CAccessBaseData::UpLoadWorkWramPointPack(const WorkWramPoint_Upload_Pack& workWramPointUpPack)
+{
+	if(m_pDatabase)
+	{
+		int nErrorCode = 1;
+
+		memset(m_strBuffer, 0x00, INPUTSQLBUFFERS);
+		sprintf_s(m_strBuffer, INPUTSQLBUFFERS, "select tl_name,pit_dis,r_userid,r_arrtime,r_realtime,r_pxdate,p_state from v_userPointLine where r_orgid = %d and year(r_pxdate) = %d and month(r_pxdate)=%d",
+			workWramPointUpPack.gDataBodyPack.nOrgID,
+			workWramPointUpPack.gDataBodyPack.nYear,
+			workWramPointUpPack.gDataBodyPack.nMonth);
+
+		if(!m_pDatabase->IsOpen())
+		{
+			if(!m_pDatabase->Open())
+			{
+				return NULL;
+			}
+		}
+
+		CADORecordset* pRecordset = new CADORecordset(m_pDatabase);
+		if(pRecordset->Open(m_strBuffer))
+		{
+			return pRecordset;
+		}
+	}
+	return NULL;
+}
+
+
+bool CAccessBaseData::UpLoadOpteLinePack(const OpteLine_Upload_Pack& opteLineUpPack,
+	OpteLine_Download_Pack& opteLineDownPack)
+{
+	if(m_pDatabase)
+	{
+		int nErrorCode = 1;
+		memset(m_strBuffer, 0x00, INPUTSQLBUFFERS);
+		switch(opteLineUpPack.gDataBodyPack.nType)
+		{
+		case 0:
+			{
+				sprintf_s(m_strBuffer, INPUTSQLBUFFERS, "insert into t_tlname(TL_Name) values('%s')",
+					opteLineUpPack.gDataBodyPack.strName.c_str());
+			}
+			break;
+		case 1:
+			{
+				sprintf_s(m_strBuffer, INPUTSQLBUFFERS, "update t_tlname set TL_Name='%s' where TL_id=%d",
+					opteLineUpPack.gDataBodyPack.strName.c_str(),
+					opteLineUpPack.gDataBodyPack.nID);
+			}
+			break;
+		case 2:
+			{
+				sprintf_s(m_strBuffer, INPUTSQLBUFFERS, "delete t_tlname where TL_id=%d",
+					opteLineUpPack.gDataBodyPack.nID);
+			}
+			break;
+		default:
+			{
+				nErrorCode = 1;
+				goto ErrorDeal;
+			}
+			break;
+		}
+
+		if(!m_pDatabase->IsOpen())
+		{
+			if(!m_pDatabase->Open())
+			{
+				nErrorCode = 1;
+				goto ErrorDeal;
+			}
+		}
+
+		if(!m_pDatabase->Execute(m_strBuffer))
+		{
+			nErrorCode = 1;
+			goto ErrorDeal;
+		}
+		if(m_pDatabase->GetRecordsAffected() > 0)
+			nErrorCode = 0;
+		else
+			nErrorCode = 1;
+
+ErrorDeal:
+		opteLineDownPack.nBeginIdentify = opteLineUpPack.nBeginIdentify;
+		opteLineDownPack.nMsgNumber = opteLineUpPack.nMsgNumber;
+		opteLineDownPack.gDataBodyPack.nResult = nErrorCode;
+
+		opteLineDownPack.nBodyLength = 4;
+		return true;
+	}
+	return false;
+}
+
+
 string CAccessBaseData::GetCurrentTimeByFormat()
 {
 #define  TIMEBUFFER	32
