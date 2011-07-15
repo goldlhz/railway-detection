@@ -63,7 +63,7 @@ int cData::UserLog(char * UserName,char *UserPwd,int *Orgid,int *p1,int *p2,int 
 	}
 	memset(cTempBuf,0,sizeof(cTempBuf));
 	int it = 11 + sizeof(LoginRerquestResult);
-	Sleep(10);
+	Sleep(5);
 	LoginRerquestResult lr;
 	memset(&lr,0,sizeof(lr));
 	iResult = cs->Read(cTempBuf,it);
@@ -570,7 +570,7 @@ int cData::GetOrgList(int Orgid,lOrg *plOrg)
 		int it = 11 + sizeof(RequestOrgResult);
 		char cTempBuf[11 + sizeof(RequestOrgResult)];
 		memset(cTempBuf,0,it);
-		Sleep(2);
+		Sleep(5);
 		iResult = cs->Read(cTempBuf,it);
 
 	    if(iResult < 1)
@@ -628,7 +628,7 @@ int cData::GetUserList(int Orgid, int iType,lUser *lPoint)
 		int it = 11 + sizeof(RequestUserListResult);
 		char cTempBuf[11 + sizeof(RequestUserListResult)];
 		memset(cTempBuf,0,it);
-		Sleep(50);
+		Sleep(5);
 		iResult = cs->Read(cTempBuf,it);
 
 		if(iResult < 1)

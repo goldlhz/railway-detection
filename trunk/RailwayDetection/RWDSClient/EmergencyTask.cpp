@@ -79,9 +79,11 @@ BOOL CEmergencyTask::OnInitDialog()
     m_ComboEmergencyStatus.AddString(_T("正常"));
     m_ComboEmergencyStatus.AddString(_T("结束"));
 
-    for(size_t i=0; i<strRailLineName.size(); i++)
-        m_ComboRailLine.AddString(strRailLineName[i]);
-
+    for(size_t i=0; i<RailLineList.size(); i++)
+    {
+        m_ComboRailLine.AddString(RailLineList[i]->iRailName);
+        m_ComboRailLine.SetItemData(i, (DWORD_PTR)RailLineList[i]);
+    }
     int count = m_CRWDSClientView->m_CurrentOrg->iEmergency.size();
     CString id;
     CString name;
@@ -152,7 +154,15 @@ void CEmergencyTask::OnLvnItemchangedEmergencylist(NMHDR *pNMHDR, LRESULT *pResu
     GetDlgItem(IDC_EDIT_EMERGENCYID)->SetWindowText(str);
     m_ComboEmergencyStatus.SetCurSel(task->iStatus);
 
-    m_ComboRailLine.SetCurSel(task->iLineName);
+    RailLine* rail = GetRailLineByID(RailLineList, task->iRailLine);
+    for (int i=0; i<m_ComboRailLine.GetCount(); i++)
+    {
+        if ((DWORD_PTR)rail == m_ComboRailLine.GetItemData(i))
+        {
+            m_ComboRailLine.SetCurSel(i);
+            break;
+        }
+    }
 
     CString startKM;
     CString endKM;
@@ -212,7 +222,7 @@ void CEmergencyTask::OnBnClickedBtnEmergencyadd()
     task->iStatus = KNormal;
     task->iBeginKm = m_CRWDSClientView->m_CurrentOrg->iBoundaryStartKM;
     task->iEndKm = m_CRWDSClientView->m_CurrentOrg->iBoundaryEndKM;;
-    task->iLineName = m_CRWDSClientView->m_CurrentOrg->iBoundaryRail;
+    task->iRailLine = m_CRWDSClientView->m_CurrentOrg->iBoundaryRail;
     time_t now; // 获取当前时间
     time(&now);
     task->iBeginTime = now;
@@ -262,7 +272,7 @@ void CEmergencyTask::OnBnClickedBtnEmergencymodify()
     GetDlgItem(IDC_EDIT_EMERGENCYNAME)->GetWindowText(task->iTaskName);
     
     task->iStatus = static_cast<EmergencyStatus>(m_ComboEmergencyStatus.GetCurSel());
-    task->iLineName = m_ComboRailLine.GetCurSel();
+    task->iRailLine = ((RailLine*)m_ComboRailLine.GetItemData(m_ComboRailLine.GetCurSel()))->iRailID;
 
     CString strBegin;
     CString strEnd;

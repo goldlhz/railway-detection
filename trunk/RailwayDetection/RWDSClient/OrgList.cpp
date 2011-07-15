@@ -135,9 +135,10 @@ BOOL COrgList::OnInitDialog()
     m_ComboOrgParent.AddString(str);
     m_ComboOrgParent.SetItemData(0, NULL);
     OrgListVisitForAddComboOrgParent(m_CRWDSClientView->m_Org[0]);
-    for(int i=0; i<strRailLineNameCount; i++)
+    for(size_t i=0; i<RailLineList.size(); i++)
     {
-        m_ComboBoundaryLine.AddString(strRailLineName[i]);
+        m_ComboBoundaryLine.AddString(RailLineList[i]->iRailName);
+        m_ComboBoundaryLine.SetItemData(i, (DWORD_PTR)RailLineList[i]);
     }
     return TRUE;  // return TRUE unless you set the focus to a control
     // 异常: OCX 属性页应返回 FALSE
@@ -166,7 +167,17 @@ void COrgList::OnTvnSelchangedTreeOrglist(NMHDR *pNMHDR, LRESULT *pResult)
     comboIndex = m_ComboOrgParent.FindString(0, parentID);
     
     m_ComboOrgParent.SetCurSel(comboIndex);
-    m_ComboBoundaryLine.SetCurSel(curOrg->iBoundaryRail);
+    RailLine* rail = GetRailLineByID(RailLineList, curOrg->iBoundaryRail);
+    m_ComboBoundaryLine.SetCurSel(0);
+    for (int i=0; i<m_ComboBoundaryLine.GetCount(); i++)
+    {
+        if ((DWORD_PTR)rail == m_ComboBoundaryLine.GetItemData(i))
+        {
+            m_ComboBoundaryLine.SetCurSel(i);
+            break;
+        }
+    }
+
     //CString str;
     str.Format(_T("%d"), curOrg->iBoundaryStartKM);
     GetDlgItem(IDC_EDIT_BOUNDARYSTARTKM)->SetWindowText(str);
@@ -262,7 +273,7 @@ void COrgList::AddNewOrg()
         newOrg->iOrgLevel = parentOrg->iOrgLevel+1;
         parentOrg->iChildID.push_back(newOrg->iOrgID);
         parentOrg->iChildOrg.push_back(newOrg);
-        newOrg->iBoundaryRail = m_ComboBoundaryLine.GetCurSel();
+        newOrg->iBoundaryRail = ((RailLine*)m_ComboBoundaryLine.GetItemData(m_ComboBoundaryLine.GetCurSel()))->iRailID;
         CString str;
         GetDlgItem(IDC_EDIT_BOUNDARYSTARTKM)->GetWindowText(str);
         newOrg->iBoundaryStartKM = _ttoi(str);
@@ -341,7 +352,7 @@ void COrgList::OnBnClickedBtnModifyorg()
         //m_SeletedOrg->iOrgID = iOrgID;
         m_SeletedOrg->iOrgName = orgName;
 
-        m_SeletedOrg->iBoundaryRail = m_ComboBoundaryLine.GetCurSel();
+        m_SeletedOrg->iBoundaryRail = ((RailLine*)m_ComboBoundaryLine.GetItemData(m_ComboBoundaryLine.GetCurSel()))->iRailID;
         CString str;
         GetDlgItem(IDC_EDIT_BOUNDARYSTARTKM)->GetWindowText(str);
         m_SeletedOrg->iBoundaryStartKM = _ttoi(str);

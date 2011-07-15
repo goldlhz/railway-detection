@@ -41,11 +41,19 @@ void CModifyPassword::OnBnClickedOk()
     CString newPassword;
     CString confirmPassword;
     CString originalPassword;
+
     GetDlgItem(IDC_EDIT_NEWPASSWORD)->GetWindowText(newPassword);
     GetDlgItem(IDC_EDIT_CONFIRMPASSWORD)->GetWindowText(confirmPassword);
     if (newPassword.Compare(confirmPassword) != 0)
     {
-        AfxMessageBox(_T("新密码不一致，请重新输入"));
+        AfxMessageBox(_T("新密码不一致，请重新输入!"));
+        return;
+    }
+
+    GetDlgItem(IDC_EDIT_ORIGINALPASSWORD)->GetWindowText(originalPassword);
+    if (m_Password.Compare(originalPassword) != 0)
+    {
+        AfxMessageBox(_T("原始密码错误!"));
         return;
     }
     m_Password = newPassword;

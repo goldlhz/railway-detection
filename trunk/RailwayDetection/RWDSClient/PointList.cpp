@@ -62,9 +62,10 @@ BOOL CPointList::OnInitDialog()
 	m_ComboUpDown.AddString(_T("下行"));
 
 	m_ComboRailLine.ResetContent();
-	for (int i=0; i<strRailLineNameCount; i++)
+	for (size_t i=0; i<RailLineList.size(); i++)
 	{
-		m_ComboRailLine.AddString(strRailLineName[i]);
+		m_ComboRailLine.AddString(RailLineList[i]->iRailName);
+        m_ComboRailLine.SetItemData(i, (DWORD_PTR)RailLineList[i]);
 	}
 
 	int count = m_CRWDSClientView->m_CurrentOrg->iMapPoint.size();
@@ -83,7 +84,7 @@ BOOL CPointList::OnInitDialog()
 		else
 			direct = _T("下行");
 
-		m_ListCtrl.InsertItem(i, strRailLineName[m_CRWDSClientView->m_CurrentOrg->iMapPoint[i]->iRailLine]);
+		m_ListCtrl.InsertItem(i, m_CRWDSClientView->m_CurrentOrg->iMapPoint[i]->iRailLine->iRailName);
 		m_ListCtrl.SetItemText(i, 1, km);
 		m_ListCtrl.SetItemText(i, 2, lon);
 		m_ListCtrl.SetItemText(i, 3, lat);
@@ -96,7 +97,7 @@ void CPointList::OnBnClickedBtnPointadd()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	MapPoint* point = new MapPoint;
-	point->iRailLine = m_CRWDSClientView->m_CurrentOrg->iBoundaryRail;
+	point->iRailLine = GetRailLineByID(RailLineList, m_CRWDSClientView->m_CurrentOrg->iBoundaryRail);
 	point->iKM = m_CRWDSClientView->m_CurrentOrg->iBoundaryStartKM;
 	point->iLon = 0;
 	point->iLat = 0;
@@ -117,7 +118,7 @@ void CPointList::OnBnClickedBtnPointadd()
 	else
 		direct = _T("下行");
 
-	m_ListCtrl.InsertItem(itemCount, strRailLineName[point->iRailLine]);
+	m_ListCtrl.InsertItem(itemCount, point->iRailLine->iRailName);
 	m_ListCtrl.SetItemText(itemCount, 1, km);
 	m_ListCtrl.SetItemText(itemCount, 2, lon);
 	m_ListCtrl.SetItemText(itemCount, 3, lat);
@@ -143,9 +144,9 @@ void CPointList::OnBnClickedBtnPointmodify()
 	m_Modifying = TRUE;
 	MapPoint* point = m_CRWDSClientView->m_CurrentOrg->iMapPoint[select];
 	CString str;
-	m_ListCtrl.SetItemText(select, 0, strRailLineName[m_ComboRailLine.GetCurSel()]);
-	point->iRailLine = m_ComboRailLine.GetCurSel();
-
+	
+	point->iRailLine = (RailLine*)m_ComboRailLine.GetItemData(m_ComboRailLine.GetCurSel());
+    m_ListCtrl.SetItemText(select, 0, point->iRailLine->iRailName);
 	GetDlgItem(IDC_EDIT_KM)->GetWindowText(str);
 	m_ListCtrl.SetItemText(select, 1, str);
 	point->iKM = _ttoi(str);
@@ -246,7 +247,15 @@ void CPointList::OnLvnItemchangedPointlist(NMHDR *pNMHDR, LRESULT *pResult)
 	{
 		return;
 	}
-	m_ComboRailLine.SetCurSel(m_CRWDSClientView->m_CurrentOrg->iMapPoint[select]->iRailLine);
+    for (size_t i=0; i<RailLineList.size(); i++)
+    {
+        if (m_CRWDSClientView->m_CurrentOrg->iMapPoint[select]->iRailLine == RailLineList[i])
+        {
+            m_ComboRailLine.SetCurSel(i);
+            break;
+        }
+    }
+	
 	GetDlgItem(IDC_EDIT_KM)->SetWindowText(m_ListCtrl.GetItemText(select, 1));
 	GetDlgItem(IDC_EDIT_LON)->SetWindowText(m_ListCtrl.GetItemText(select, 2));
 	GetDlgItem(IDC_EDIT_LAT)->SetWindowText(m_ListCtrl.GetItemText(select, 3));

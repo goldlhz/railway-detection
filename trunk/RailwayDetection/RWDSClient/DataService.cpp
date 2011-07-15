@@ -4,14 +4,15 @@
 #include "CmdDefine.h"
 #include "cData.h"
 
-//#define TESTCODE
+#define TESTCODE
 
 int VerifyLogin( CString& aLoginAccount, CString& aLoginPassword, int* orgID, PermissionGroup *pPower)
 {
     ///////////////////////////////////////////////////
 #ifdef TESTCODE
     *orgID = 1;
-    pPower->iBasical = 0x0FFF;
+    //pPower->iBasical = 0x0FFF;
+    pPower->iBasical = 3967;
     pPower->iOperate = 1;
     pPower->iReportForm = 1;
     return KErrNone;
@@ -39,7 +40,85 @@ int VerifyLogin( CString& aLoginAccount, CString& aLoginPassword, int* orgID, Pe
 	return iResult;
 }
 
+int GetRailLine( vector<RailLine*>* aRailLineList )
+{
+    RailLine* root = new RailLine;
+    root->iRailID = 0;
+    root->iRailName = _T("未知线路");
+    aRailLineList->push_back(root);
+    ///////////////////////////////////////////////////
+#ifdef TESTCODE
+    RailLine* rail = new RailLine;
+    rail->iRailID = 1;
+    rail->iRailName = _T("宝成线");
+    aRailLineList->push_back(rail);
 
+    rail = new RailLine;
+    rail->iRailID = 2;
+    rail->iRailName = _T("成昆线");
+    aRailLineList->push_back(rail);
+
+    rail = new RailLine;
+    rail->iRailID = 3;
+    rail->iRailName = _T("成渝线");
+    aRailLineList->push_back(rail);
+
+    rail = new RailLine;
+    rail->iRailID = 4;
+    rail->iRailName = _T("成东线");
+    aRailLineList->push_back(rail);
+
+    rail = new RailLine;
+    rail->iRailID = 5;
+    rail->iRailName = _T("成西线");
+    aRailLineList->push_back(rail);
+    
+#endif
+    ///////////////////////////////////////////////////
+    return KErrNone;
+}
+
+int SetRailLine( int aCmd, const RailLine* aRailLine )
+{
+    ///////////////////////////////////////////////////
+#ifdef TESTCODE
+    return KErrNone;
+#endif
+    ///////////////////////////////////////////////////
+    return KErrNone;
+
+//#define CMD_RAIL_ADD 0x43
+//#define CMD_RAIL_MODIFY 0x44
+//#define CMD_RAIL_DELETE 0x45
+}
+
+RailLine* GetRailLineByID(vector<RailLine*>& aRailLineList, int aRailID )
+{
+    RailLine* retValue = aRailLineList[0];
+    for (size_t i=0; i<aRailLineList.size(); i++)
+    {
+        if (aRailID == aRailLineList[i]->iRailID)
+        {
+            retValue = aRailLineList[i];
+            break;
+        }
+    }
+    return retValue;
+}
+
+RailLine* GetRailLineByName(vector<RailLine*>& aRailLineList, CString aRailName )
+{
+    RailLine* retValue = aRailLineList[0];
+    for (size_t i=0; i<aRailLineList.size(); i++)
+    {
+        if (aRailName == aRailLineList[i]->iRailName)
+        {
+            retValue = aRailLineList[i];
+            break;
+        }
+    }
+    return retValue;
+}
 
 int GetOrgTree(const int OrgId, vector<OrganizationInfo*>* a_OrgTree)
 {
@@ -198,12 +277,12 @@ int SetOrganization(int aCmd, const OrganizationInfo* aOrganization )
 }
 
 //获取机构有效巡检范围 比如 成昆铁路 1- 8K出
-int GetOrgPoint(int aOrgID, vector<MapPoint*>* aPointList)
+int GetOrgPoint(int aOrgID, vector<RailLine*>& aRailLineList, vector<MapPoint*>* aPointList)
 {
     ///////////////////////////////////////////////////
     #ifdef TESTCODE
     MapPoint *pt = new MapPoint;
-    pt->iRailLine = 1; 
+    pt->iRailLine = aRailLineList[1]; 
     pt->iKM = 251;
     pt->iLon = 104.064531;
     pt->iLat = 30.699965;
@@ -211,7 +290,7 @@ int GetOrgPoint(int aOrgID, vector<MapPoint*>* aPointList)
     aPointList->push_back(pt);
 
     pt = new MapPoint;
-    pt->iRailLine = 1; 
+    pt->iRailLine = aRailLineList[1]; 
     pt->iKM = 252;
     pt->iLon = 104.075530;
     pt->iLat = 30.699484;
@@ -219,7 +298,7 @@ int GetOrgPoint(int aOrgID, vector<MapPoint*>* aPointList)
     aPointList->push_back(pt);
 
     pt = new MapPoint;
-    pt->iRailLine = 1; 
+    pt->iRailLine = aRailLineList[1]; 
     pt->iKM = 253;
     pt->iLon = 104.086526;
     pt->iLat = 30.699484;
@@ -227,7 +306,7 @@ int GetOrgPoint(int aOrgID, vector<MapPoint*>* aPointList)
     aPointList->push_back(pt);
 
     pt = new MapPoint;
-    pt->iRailLine = 1; 
+    pt->iRailLine = aRailLineList[1]; 
     pt->iKM = 254;
     pt->iLon = 104.097521;
     pt->iLat = 30.699484;
@@ -241,10 +320,11 @@ int GetOrgPoint(int aOrgID, vector<MapPoint*>* aPointList)
 	lOrgLine llist;
 	if(cd->GetOrgPoint(aOrgID,&llist) > 0)
 	{
+        
 		for(iterOrgLine iter = llist.begin() ; iter != llist.end() ; iter++)
 		{
 			MapPoint *pt = new MapPoint;
-			pt->iRailLine = iter->lineid;
+			pt->iRailLine = GetRailLineByID(aRailLineList, iter->lineid);
 			pt->iKM = iter->gls;
 			pt->iLat = iter->wdu;
 			pt->iLon = iter->jdu;
@@ -285,7 +365,7 @@ int SetOrgPoint( int aOrgID, int aCmd, const MapPoint* aPoint )
 			pPoint.iKM = aPoint->iKM;
 			pPoint.iLat = aPoint->iLat;
 			pPoint.iLon = aPoint->iLon;
-			pPoint.iRailLine = aPoint->iRailLine;
+			pPoint.iRailLine = aPoint->iRailLine->iRailID;
 			pPoint.itype = 0;//tianjia
             pPoint.PointId = aPoint->iPointId;
 			iResult=cd->setPoint(pPoint);
@@ -297,7 +377,7 @@ int SetOrgPoint( int aOrgID, int aCmd, const MapPoint* aPoint )
 			pPoint.iKM = aPoint->iKM;
 			pPoint.iLat = aPoint->iLat;
 			pPoint.iLon = aPoint->iLon;
-			pPoint.iRailLine = aPoint->iRailLine;
+			pPoint.iRailLine = aPoint->iRailLine->iRailID;
 			pPoint.itype = 1;//tianjia
 			pPoint.PointId = aPoint->iPointId;
 			iResult=cd->setPoint(pPoint);
@@ -679,6 +759,17 @@ int SetOrgStaff( int aOrgID, int aCmd, const StaffInfo* aStaff )
 	}
 	return iResult;
 }
+
+int SetStaffPassword(int aOrgID, CString aStaffID, CString aPassword)
+{
+    ///////////////////////////////////////////////////
+#ifdef TESTCODE
+    return KErrNone;
+#endif
+    ///////////////////////////////////////////////////
+}
+
+
 //获取排版下 实际线路ID 
 int GetCalendarSchedule(int aOrgID, const vector<StaffInfo*>* ListStaff, CalendarSchedule* aSchedule)
 {
@@ -798,7 +889,7 @@ int GetEmergencyTask( int aOrgID, vector<EmergencyTaskInfo*>* m_EmergencyList )
 		eInfo->iStatus = (EmergencyStatus)iter->state;
 		eInfo->iTaskID = iter->id;
 
-		eInfo->iLineName = iter->lineid;
+		eInfo->iRailLine = iter->lineid;
 		eInfo->iTaskName = iter->rwName;
 		eInfo->iOrgId = aOrgID;
 		ljjryListresult lPoint;
@@ -839,7 +930,7 @@ int SetEmergencyTask( int aOrgID, int aCmd, const EmergencyTaskInfo* aEmergencyT
         timeTemp1.ReleaseBuffer();
 
         sVAL->endPointId = aEmergencyTask->iBeginKm;
-        sVAL->lineid = (int)aEmergencyTask->iLineName;
+        sVAL->lineid = (int)aEmergencyTask->iRailLine;
 
         sVAL->orgid = aOrgID;
         timeTemp = aEmergencyTask->iTaskName;
@@ -876,7 +967,7 @@ int SetEmergencyTask( int aOrgID, int aCmd, const EmergencyTaskInfo* aEmergencyT
         timeTemp.ReleaseBuffer();
 
         sVAL->endPointId = aEmergencyTask->iBeginKm;
-        sVAL->lineid = (int)aEmergencyTask->iLineName;
+        sVAL->lineid = (int)aEmergencyTask->iRailLine;
 
         sVAL->orgid = aOrgID;
         timeTemp = aEmergencyTask->iTaskName;
@@ -1393,4 +1484,5 @@ void StringToChar(char *p,CString sVal)
 	p =(char*)sVal.GetBuffer(sVal.GetLength());
 	return;
 }
+
 void StringRelease(CString sVAL);

@@ -30,6 +30,7 @@
 #include "Report.h"
 #include "DataListControl.h"
 #include "PermissionGroup.h"
+#include "ModifyPassword.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -91,6 +92,7 @@ BEGIN_MESSAGE_MAP(CRWDSClientView, CView)
     ON_UPDATE_COMMAND_UI(ID_REVIEW_VOICE, &CRWDSClientView::OnUpdateReviewVoice)
     ON_UPDATE_COMMAND_UI(ID_REPORT_MONTH, &CRWDSClientView::OnUpdateReportMonth)
     ON_UPDATE_COMMAND_UI(ID_REVIEW_RECORDSTAFF, &CRWDSClientView::OnUpdateReviewRecordstaff)
+    ON_COMMAND(ID_SET_PASSWORD, &CRWDSClientView::OnSetPassword)
 END_MESSAGE_MAP()
 
 BEGIN_EVENTSINK_MAP(CRWDSClientView, CView)
@@ -340,35 +342,39 @@ int CRWDSClientView::OnCreate(LPCREATESTRUCT lpCreateStruct)
     m_CurrentPermission.iOperate = theApp.m_LoginPermission.iOperate;
     m_CurrentPermission.iReportForm = theApp.m_LoginPermission.iReportForm;
 
+    m_LoginPassword = theApp.m_LoginPassword;
+    m_LoginAccount = theApp.m_LoginAccount;
+
     //读取铁路线
-    CStdioFile file;
-    CString filename = GetModulePath() + _T("\\linename.cfg");
-    if( file.Open(filename, CFile::modeRead) )
-    {
-        CString strLine;
-        CString strName;
-        CString strNo;
-        while(file.ReadString(strLine))
-        {
-            int equare = strLine.Find('=', 0);
-            if (equare == -1)
-            {
-                continue;
-            }
-            strName = strLine.Left(equare);
-            strNo = strLine.Right(strLine.GetLength() - equare - 1);
-            strRailLineName.push_back(strName);
-            strRailLineNameCount++;
-        }
-    }
-    else
-    {//不能打开文件，填入默认值
-        for (int i=0; i<50; i++)
-        {
-            strRailLineName.push_back(_T("未知线路"));
-        }
-        strRailLineNameCount = 50;
-    }
+    GetRailLine(&RailLineList);
+    //CStdioFile file;
+    //CString filename = GetModulePath() + _T("\\linename.cfg");
+    //if( file.Open(filename, CFile::modeRead) )
+    //{
+    //    CString strLine;
+    //    CString strName;
+    //    CString strNo;
+    //    while(file.ReadString(strLine))
+    //    {
+    //        int equare = strLine.Find('=', 0);
+    //        if (equare == -1)
+    //        {
+    //            continue;
+    //        }
+    //        strName = strLine.Left(equare);
+    //        strNo = strLine.Right(strLine.GetLength() - equare - 1);
+    //        strRailLineName.push_back(strName);
+    //        strRailLineNameCount++;
+    //    }
+    //}
+    //else
+    //{//不能打开文件，填入默认值
+    //    for (int i=0; i<50; i++)
+    //    {
+    //        strRailLineName.push_back(_T("未知线路"));
+    //    }
+    //    strRailLineNameCount = 50;
+    //}
 	return 0;
 }
 
@@ -1059,6 +1065,20 @@ void CRWDSClientView::OnSetDevice()
     device.DoModal();
 }
 
+void CRWDSClientView::OnSetPassword()
+{//修改登录者个人密码
+    // TODO: 在此添加命令处理程序代码
+    CModifyPassword password(this);
+    password.SetPassword(m_LoginPassword);
+    if(password.DoModal() == IDOK)
+    {
+        m_LoginPassword = password.GetPassword();
+        //设置密码 
+        SetStaffPassword(theApp.m_LoginOrgID, m_LoginAccount, m_LoginPassword);
+        AfxMessageBox(_T("密码修改成功!"));
+    }
+}
+
 void CRWDSClientView::OnUpdateSetEmergencytask(CCmdUI *pCmdUI)
 {
     // TODO: 在此添加命令更新用户界面处理程序代码
@@ -1329,3 +1349,5 @@ void CRWDSClientView::OnSetPermissiongroup()
     CPermissionGroup pGroup(this);
     pGroup.DoModal();
 }
+
+

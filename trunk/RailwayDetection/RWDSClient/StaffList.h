@@ -48,4 +48,5 @@ public:
 
 
     afx_msg void OnBnClickedBtnSetpermission();
+    afx_msg void OnBnClickedBtnInitialpassword();
 };

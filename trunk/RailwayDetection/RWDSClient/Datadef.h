@@ -7,8 +7,9 @@
 
 using namespace std;
 
-extern vector<CString> strRailLineName;
-extern int strRailLineNameCount;
+struct _RailLine;
+extern vector<_RailLine*> RailLineList;
+//extern int strRailLineNameCount;
 extern const CString strDirectName[];
 extern const int strDirectNameCount;
 extern const CString StrKm;
@@ -20,8 +21,8 @@ extern const int strPictureErrorTypeCount;
 extern const CString strPointState[];
 extern const int strPointStateCount;
 
-#define ENCODERAILWAYFULLNAME(aStr, aRailLine, aKm, aLineDirect)\
-	aStr.Format(strRailLineName[aRailLine]+_T("%.2f")+StrKm+strDirectName[aLineDirect], aKm);
+#define ENCODERAILWAYFULLNAME(aStr, aRailLineName, aKm, aLineDirect)\
+	aStr.Format(aRailLineName+_T("%.2f")+StrKm+strDirectName[aLineDirect], aKm);
 
 #define DECODERAILWAYFULLNAME(aStr, aRailLine, aKm, aLineDirect)\
 	aStrLine.Delete(aStrLine.GetLength()-StrKm.GetLength(), StrKm.GetLength());\
@@ -106,7 +107,7 @@ enum PointState
 #define PERMISSIONSETEMERGENCY 0x0010
 #define PERMISSIONSETORG 0x0020
 #define PERMISSIONSETDEVICE 0x0040
-#define PERMISSIONSETPERMISSIONGROUP 0x0080
+#define PERMISSIONINITIALPASSWORD 0x0080
 #define PERMISSIONVIEWPICTURE 0x0100
 #define PERMISSIONVIEWVOICE 0x0200
 #define PERMISSIONVIEWRECORDE 0x0400
@@ -125,22 +126,32 @@ typedef struct _Single
     int iReportForm;
 }PermissionGroup;
 
+typedef struct _RailLine
+{
+    _RailLine()
+    {
+        iRailID = 0;
+    }
+    int iRailID;
+    CString iRailName;
+}RailLine;
+
+
 typedef struct _MapPoint
 {
     _MapPoint()
     {
-        iRailLine = 0;
         iKM = 0.0;
         iLon = 0.0;
         iLat = 0.0;
         iDirect = KDownLine;
     }
-	int iRailLine;//铁路线
+	RailLine* iRailLine;//铁路线
 	double iKM;//公里处
 	double iLon;
 	double iLat;
 	LineDirect iDirect;//上下行
-	int   iPointId;//点id 对于数据库数据
+	int   iPointId;//点id 从数据库数据
 }MapPoint;
 
 struct _Staff;
@@ -221,7 +232,7 @@ typedef struct _Emergency
     int iTaskID;
 	int iOrgId;
     CString iTaskName;
-    int iLineName;
+    int iRailLine;
     int iBeginKm;//开始处
     int iEndKm;//终点
     time_t iBeginTime;//开始处时间
@@ -305,7 +316,7 @@ typedef struct _OrgObj	//机构
 	struct _OrgObj* iParentOrg;//上级机构
 	vector<int> iChildID;
 	vector<struct _OrgObj*> iChildOrg;//直接下级机构
-    int iBoundaryRail;
+    int iBoundaryRail;//管辖的铁路线
     unsigned int iBoundaryStartKM;
     unsigned int iBoundaryEndKM;
     BOOL iDataSet;//机构基本信息是否已经获取

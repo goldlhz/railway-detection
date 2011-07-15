@@ -176,7 +176,7 @@ void CSchedule::OnLvnItemchangedSchedulelist(NMHDR *pNMHDR, LRESULT *pResult)
 	m_ListArriveTime.DeleteAllItems();
 	for (size_t i=0; i<line->iLineKmLonLat.size(); i++)
 	{
-		ENCODERAILWAYFULLNAME(km, line->iLineKmLonLat[i]->iRailLine, 
+		ENCODERAILWAYFULLNAME(km, line->iLineKmLonLat[i]->iRailLine->iRailName, 
 			line->iLineKmLonLat[i]->iKM, line->iLineKmLonLat[i]->iDirect);
 		if (i < line->iLineKmTime.size())
 		{

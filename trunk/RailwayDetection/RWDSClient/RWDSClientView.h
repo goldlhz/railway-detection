@@ -72,6 +72,8 @@ public:
     void DestroyReportForm();
 protected:
     PermissionGroup m_CurrentPermission;
+    CString m_LoginAccount;
+    CString m_LoginPassword;
 	bool m_SymbolMove;
 	CMapX m_MapX;
 	CString m_SymbolLayer;
@@ -94,8 +96,7 @@ protected:
     OrganizationInfo* m_CurrentOrg;//当前选中的机构
     int m_TestValue;
     BOOL m_MapLoaded;
-    //CString m_LoginAccount;
-    //CString m_LoginPassword;
+
 // 生成的消息映射函数
 protected:
 	afx_msg void OnFilePrintPreview();
@@ -149,6 +150,7 @@ public:
     afx_msg void OnUpdateReviewVoice(CCmdUI *pCmdUI);
     afx_msg void OnUpdateReportMonth(CCmdUI *pCmdUI);
     afx_msg void OnUpdateReviewRecordstaff(CCmdUI *pCmdUI);
+    afx_msg void OnSetPassword();
 };
 extern CRWDSClientView* gClientView;
 

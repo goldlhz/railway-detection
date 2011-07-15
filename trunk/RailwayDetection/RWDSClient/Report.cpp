@@ -63,7 +63,7 @@ BOOL CReport::OnInitDialog()
     //m_ListCtrl.InsertColumn(0, _T("员工号"), LVCFMT_LEFT, clientRect.Width()/4);
     m_ListCtrl.InsertColumn(0, _T("日期"), LVCFMT_LEFT, clientRect.Width()/7);
     m_ListCtrl.InsertColumn(1, _T("星期"), LVCFMT_LEFT, clientRect.Width()/7);
-    m_ListCtrl.InsertColumn(2, _T("姓名"), LVCFMT_LEFT, clientRect.Width()/7);
+    m_ListCtrl.InsertColumn(2, _T("员工号"), LVCFMT_LEFT, clientRect.Width()/7);
     m_ListCtrl.InsertColumn(3, _T("计划记录"), LVCFMT_LEFT, clientRect.Width()/7);
     m_ListCtrl.InsertColumn(4, _T("实际记录"), LVCFMT_LEFT, clientRect.Width()/7);
     m_ListCtrl.InsertColumn(5, _T("异常次数"), LVCFMT_LEFT, clientRect.Width()/7);
@@ -218,7 +218,30 @@ void CReport::OnBnClickedBtnExportreport()
     {
         return;
     }
-    CString strFile = _T("C:\\Test.xlsx");
+
+    CFileDialog hFileDlg(FALSE, NULL, NULL,
+        OFN_FILEMUSTEXIST | OFN_READONLY | OFN_PATHMUSTEXIST,
+        TEXT(_T("excel文件 (*.xlsx, *.xls)|*.xlsx, *.xls|所有文件(*.*)|*.*|")),
+        NULL);
+    CString filer;
+
+    if(hFileDlg.DoModal() == IDCANCEL)
+    {
+        return;
+    }
+    switch( hFileDlg.GetOFN().nFilterIndex)
+    {
+    case 1:
+        filer = _T(".xlsx");
+        break;
+    default:
+        filer = _T("");
+        break;
+    }
+    CString strFile = hFileDlg.GetPathName();
+    strFile += filer;
+    UpdateData(FALSE);
+    
     COleVariant covTrue((short)TRUE), covFalse((short)FALSE), covOptional((long)DISP_E_PARAMNOTFOUND,   VT_ERROR); 
     CApplication   app; 
     CWorkbooks   books; 

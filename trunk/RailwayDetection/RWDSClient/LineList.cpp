@@ -230,7 +230,7 @@ void CLineList::OnLvnItemchangedLinelist(NMHDR *pNMHDR, LRESULT *pResult)
 				break;
 			}
 		}
-		ENCODERAILWAYFULLNAME(str, m_CRWDSClientView->m_CurrentOrg->iMapPoint[i]->iRailLine, 
+		ENCODERAILWAYFULLNAME(str, m_CRWDSClientView->m_CurrentOrg->iMapPoint[i]->iRailLine->iRailName, 
                               m_CRWDSClientView->m_CurrentOrg->iMapPoint[i]->iKM, 
                               m_CRWDSClientView->m_CurrentOrg->iMapPoint[i]->iDirect);
 		if (addSelect)
@@ -306,7 +306,7 @@ void CLineList::OnBnClickedBtnAdd1()
     //SetOrgLine(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_LINE_MODIFY, line);
 
 	CString str;
-	ENCODERAILWAYFULLNAME(str, point->iRailLine, point->iKM, point->iDirect);
+	ENCODERAILWAYFULLNAME(str, point->iRailLine->iRailName, point->iKM, point->iDirect);
 	m_ListSelectedPoint.InsertString(m_ListSelectedPoint.GetCount(), str);
 	m_ListAllPoint.DeleteString(index);
 
@@ -354,7 +354,7 @@ void CLineList::OnBnClickedBtnRemove1()
 		m_ListCtrl.SetItemText(select, 3, _T(""));
 	}
 
-	ENCODERAILWAYFULLNAME(str, point->iRailLine, point->iKM, point->iDirect);
+	ENCODERAILWAYFULLNAME(str, point->iRailLine->iRailName, point->iKM, point->iDirect);
 	m_ListAllPoint.InsertString(m_ListAllPoint.GetCount(), str);
 	m_ListSelectedPoint.DeleteString(index);
 
