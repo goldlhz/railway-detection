@@ -2745,7 +2745,8 @@ bool CDataPackParse::BuildGetRailWayNamePackData(char* pDataBuffer, const GetRai
 	{
 		*((unsigned int*)(pDataBuffer)) = getRailWayNameDownLoadPack.gDataBodyPack.nTotlePack;
 		*((unsigned int*)(pDataBuffer + 4)) = getRailWayNameDownLoadPack.gDataBodyPack.nHadSendPack;
-		memcpy(pDataBuffer + 8, getRailWayNameDownLoadPack.gDataBodyPack.strnName.c_str(),
+		*((unsigned int*)(pDataBuffer + 8)) = getRailWayNameDownLoadPack.gDataBodyPack.nID;
+		memcpy(pDataBuffer + 12, getRailWayNameDownLoadPack.gDataBodyPack.strnName.c_str(),
 			getRailWayNameDownLoadPack.gDataBodyPack.strnName.length());
 
 		return true;

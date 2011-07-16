@@ -117,8 +117,10 @@ private:
 		void* pFunDealSendData);
 
 	int  DealGetRailWayNamePack(DWORD dNumberOfBytes, 
-		char  * pBuffer, 
-		CADODatabase* pDatabase);
+		LPOverKeyPire pKeyOverPire, 
+		CADODatabase* pDatabase,
+		void* pWorkThread,
+		void* pFunDealSendData);
 
 	int  DealSettingLinePack(DWORD dNumberOfBytes, 
 		char  * pBuffer, 

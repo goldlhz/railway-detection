@@ -151,8 +151,11 @@ int CLogicManager::SetLogicData(DWORD dNumberOfBytes,
 			break;
 
 		case GETRAILWAYTABLENAME_PACK:
-			nBackCode = DealGetRailWayNamePack(dNumberOfBytes, pcBuffer, pDatabase);
-			pKeyOverPire->pireOverLappedex.wsaWSABUF.len = nBackCode;
+			nBackCode = DealGetRailWayNamePack(dNumberOfBytes, 
+				pKeyOverPire, 
+				pDatabase,
+				pWorkThread, 
+				pFunSendData);
 			break;
 
 		case SETTINGLINE_PACK:
@@ -1070,31 +1073,62 @@ int  CLogicManager::DealGetGPSPointPack(DWORD dNumberOfBytes,
 
 
 int  CLogicManager::DealGetRailWayNamePack(DWORD dNumberOfBytes, 
-	char  * pBuffer, 
-	CADODatabase* pDatabase)
+	LPOverKeyPire pKeyOverPire, 
+	CADODatabase* pDatabase,
+	void* pWorkThread,
+	void* pFunDealSendData)
 {
-	//if(m_DataPackPares.PackGetRailWayNameUpParse(pBuffer, m_getRailWayNameUpPack))
-	//{
-	//	if(m_AccessBaseData.InitAccesser(pDatabase))
-	//	{
-	//		auto_ptr<CADORecordset> pRecordset(m_AccessBaseData.UpLoadGetRailWayNamePack(m_getRailWayNameUpPack));
-	//		if(pRecordset.get())
-	//		{
-	//			//DWORD nHadSendRecord;
-	//			DWORD nTitleRecord = pRecordset->GetRecordCount();
+	FPDealSendData DealSendData = (FPDealSendData)pFunDealSendData;
 
-	//			if(nTitleRecord > 0)
-	//			{
-	//				m_DataPackPares.PackGetRailWayNameDownBuild(pBuffer, m_getRailWayNameDownPack);
-	//				return m_getRailWayNameDownPack.nBodyLength + 11;
-	//			}
-	//		}
-	//	}
-	//}
+	char * pBuffer = pKeyOverPire->pireOverLappedex.wsaBuffer;
+	if(m_DataPackPares.PackGetRailWayNameUpParse(pBuffer, m_getRailWayNameUpPack))
+	{
+		if(m_AccessBaseData.InitAccesser(pDatabase))
+		{
+			auto_ptr<CADORecordset> pRecordset(m_AccessBaseData.UpLoadGetRailWayNamePack(m_getRailWayNameUpPack));
+			if(pRecordset.get())
+			{
+				DWORD nHadSendRecord;
+				DWORD nTitleRecord = pRecordset->GetRecordCount();
+
+				if(nTitleRecord > 0)
+				{
+					CString strTemp;
+					int     nTemp;
+
+					pRecordset->MoveFirst();
+					for (nHadSendRecord = 1; !pRecordset->IsEOF(); ++nHadSendRecord, pRecordset->MoveNext())
+					{
+						m_getRailWayNameDownPack.gDataBodyPack.nTotlePack = nTitleRecord;
+						m_getRailWayNameDownPack.gDataBodyPack.nHadSendPack = nHadSendRecord;
+						
+						pRecordset->GetFieldValue("TL_id", nTemp);
+						m_getRailWayNameDownPack.gDataBodyPack.nID = nTemp;
+
+						pRecordset->GetFieldValue("TL_Name", strTemp);
+						m_getRailWayNameDownPack.gDataBodyPack.strnName = strTemp.GetBuffer();
+						strTemp.LockBuffer();
+
+						m_getRailWayNameDownPack.nBodyLength = 32;
+						m_DataPackPares.PackGetRailWayNameDownBuild(pBuffer, m_getRailWayNameDownPack);
+						pKeyOverPire->pireOverLappedex.wsaWSABUF.len = m_getRailWayNameDownPack.nBodyLength + 11;
+
+						nTemp = DealSendData(pKeyOverPire, pWorkThread);
+						if(0 != nTemp)
+							return -2;
+					}
+					return 0;
+				}
+			}
+		}
+	}
 
 	m_DataPackPares.FillGetRailWayNameFailPack(m_getRailWayNameDownPack);
 	m_DataPackPares.PackGetRailWayNameDownBuild(pBuffer, m_getRailWayNameDownPack);
-	return m_getRailWayNameDownPack.nBodyLength + 11;
+	pKeyOverPire->pireOverLappedex.wsaWSABUF.len = m_getRailWayNameDownPack.nBodyLength + 11;
+
+	DealSendData(pKeyOverPire, pWorkThread);
+	return 0;
 }
 
 
