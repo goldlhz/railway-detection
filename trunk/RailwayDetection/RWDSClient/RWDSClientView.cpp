@@ -31,6 +31,8 @@
 #include "DataListControl.h"
 #include "PermissionGroup.h"
 #include "ModifyPassword.h"
+#include "SetRailLine.h"
+#include "StaffLogs.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -93,6 +95,9 @@ BEGIN_MESSAGE_MAP(CRWDSClientView, CView)
     ON_UPDATE_COMMAND_UI(ID_REPORT_MONTH, &CRWDSClientView::OnUpdateReportMonth)
     ON_UPDATE_COMMAND_UI(ID_REVIEW_RECORDSTAFF, &CRWDSClientView::OnUpdateReviewRecordstaff)
     ON_COMMAND(ID_SET_PASSWORD, &CRWDSClientView::OnSetPassword)
+//    ON_COMMAND(ID_SET_RAIL, &CRWDSClientView::OnSetRail)
+ON_COMMAND(ID_SET_RAILLINE, &CRWDSClientView::OnSetRailline)
+ON_COMMAND(ID_REPORT_ALARM, &CRWDSClientView::OnReportAlarm)
 END_MESSAGE_MAP()
 
 BEGIN_EVENTSINK_MAP(CRWDSClientView, CView)
@@ -974,6 +979,23 @@ void CRWDSClientView::AddElementFromOrg(OrganizationInfo* aOrg)
     //}
 }
 
+
+
+//void CRWDSClientView::OnSetRail()
+//{
+//    // TODO: 在此添加命令处理程序代码
+//    CSetRailLine railLine;
+//    railLine.DoModal();
+//}
+
+
+void CRWDSClientView::OnSetRailline()
+{
+    // TODO: 在此添加命令处理程序代码
+    CSetRailLine railLine;
+    railLine.DoModal();
+}
+
 void CRWDSClientView::OnSetPoint()
 {
 	// TODO: 在此添加命令处理程序代码
@@ -1260,6 +1282,20 @@ void CRWDSClientView::OnReportMonth()
     }
 }
 
+
+
+void CRWDSClientView::OnReportAlarm()
+{
+    // TODO: 在此添加命令处理程序代码
+    if (!m_CurrentOrg)
+    {
+        AfxMessageBox(_T("请选择机构"));
+        return;
+    }
+    CStaffLogs logs(2);
+    logs.SetTitle(_T("告警查询"));
+    logs.DoModal();
+}
 
 void CRWDSClientView::OnReviewRecorddevice()
 {

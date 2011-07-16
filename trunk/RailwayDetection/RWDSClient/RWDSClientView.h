@@ -151,6 +151,9 @@ public:
     afx_msg void OnUpdateReportMonth(CCmdUI *pCmdUI);
     afx_msg void OnUpdateReviewRecordstaff(CCmdUI *pCmdUI);
     afx_msg void OnSetPassword();
+//    afx_msg void OnSetRail();
+    afx_msg void OnSetRailline();
+    afx_msg void OnReportAlarm();
 };
 extern CRWDSClientView* gClientView;
 

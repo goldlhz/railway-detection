@@ -16,6 +16,7 @@
 #include "CWorkbook.h"
 #include "CWorksheet.h"
 #include "StaffLogs.h"
+#include "CmdDefine.h"
 
 
 // CReport 对话框
@@ -151,8 +152,16 @@ void CReport::ViewReportDetail(ReportInfo* aReport)
 {
     if (aReport)
     {
-        CStaffLogs logs;
+        CStaffLogs logs(1);
         logs.SetReportInfo(aReport);
+        CString textShow;
+        textShow.Format(_T("计划到达: %d, 实际到达: %d, 异常: %d, 未到达: %d"),
+            aReport->iPlanArrived, aReport->iActualArrived, 
+            aReport->iAbnormal, aReport->iUnArrived);
+        logs.ShowStaffInfo(textShow);
+        logs.GetLogs(CMD_GET_NORMALREPORT);
+        logs.SetTitle(_T("员工巡检明细"));
+        //logs.CenterWindow();
         logs.DoModal();
     }
 }

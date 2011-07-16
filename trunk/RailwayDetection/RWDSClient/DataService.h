@@ -63,7 +63,8 @@ int GetStaffScheduleTrack(CString aStaffID, time_t aDate, RecordStaff* aRecord )
 int GetReportInfoList(int aOrgID, int aYear, int aMonth, vector<ReportInfo*>* aReportList);
 //获取日明细
 int GetReportDetail(CString aStaffID, CString aTime, ReportDetail* aReportList);
-
+//获取告警月表
+int GetAlarmByMonth(CString aMonth, ReportDetail* aAlarmList);
 
 int GetOrgMonthPx(GetOrgPxEx const sValue,vector<getorgpxlistresultEx*> *Value);
 int GetOrgMonthxl();

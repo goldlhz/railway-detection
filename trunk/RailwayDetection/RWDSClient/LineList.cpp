@@ -56,8 +56,8 @@ BOOL CLineList::OnInitDialog()
 	m_ListCtrl.SetExtendedStyle(LVS_EX_FULLROWSELECT|LVS_EX_GRIDLINES);
 	CRect clientRect;
 	m_ListCtrl.GetClientRect(&clientRect);
-	m_ListCtrl.InsertColumn(0, _T("路线名"), LVCFMT_LEFT, clientRect.Width()/4);
-	m_ListCtrl.InsertColumn(1, _T("路线编号"), LVCFMT_LEFT, clientRect.Width()/4);
+    m_ListCtrl.InsertColumn(0, _T("路线名"), LVCFMT_LEFT, clientRect.Width()/4);
+    m_ListCtrl.InsertColumn(1, _T("路线编号"), LVCFMT_LEFT, clientRect.Width()/4);
 	m_ListCtrl.InsertColumn(2, _T("开始(KM)"), LVCFMT_LEFT, clientRect.Width()/4);
 	m_ListCtrl.InsertColumn(3, _T("结束(KM)"), LVCFMT_LEFT, clientRect.Width()/4);
 	//m_ListCtrl.InsertColumn(4, _T("终端"), LVCFMT_LEFT, clientRect.Width()/5);

@@ -262,11 +262,37 @@ typedef struct _RecordStaff//员工所巡查流水
     vector<double> iRecordLat;
     vector<CString> iArrivedTime;
 }RecordStaff;
+//
+//typedef struct _PointArriveInfo
+//{
+//    int iRailLineID;//铁路线ID
+//    double iPointKM;//公里处
+//    CString iStaffID;//员工号
+//    cstr
+//    CString iPlanArrivedTime;//应该到时间
+//    CString iActualArrivedTime;//实到时间
+//    PointState iState;//状态
+//}PointArriveInfo;
+//
+//typedef struct _ReportAlarm//月告警明细
+//{
+//    CString iDay;//告警日期
+//    //所有经过点的计划到达时间/实际到达时间/状态 
+//    vector<int>  iRailLineID;//铁路线ID
+//    vector<double> iPointKM;//公里处
+//    vector<CString> iPlanArrivedTime;
+//    vector<CString> iActualArrivedTime;
+//    vector<PointState> iState;
+//}ReportAlarm;
 
-typedef struct _ReportDetail//日明细
+
+typedef struct _ReportDetail//日明细、告警明细
 {
-    CString iDay;
-    //所有经过点的计划到达时间/实际到达时间/状态 
+    vector<CString> iDay;//日期
+    //所有经过点的计划到达时间/实际到达时间/状态
+    vector<CString> iStaffID;//员工号
+    vector<int> iRailLineID;//铁路线ID
+    vector<double> iPointKM;//公里处
     vector<CString> iPlanArrivedTime;
     vector<CString> iActualArrivedTime;
     vector<PointState> iState;

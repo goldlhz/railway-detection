@@ -169,6 +169,7 @@
     <ClInclude Include="RWDSClientDoc.h" />
     <ClInclude Include="RWDSClientView.h" />
     <ClInclude Include="Schedule.h" />
+    <ClInclude Include="SetRailLine.h" />
     <ClInclude Include="StaffList.h" />
     <ClInclude Include="StaffLogs.h" />
     <ClInclude Include="StaticData.h" />
@@ -207,6 +208,7 @@
     <ClCompile Include="RWDSClientDoc.cpp" />
     <ClCompile Include="RWDSClientView.cpp" />
     <ClCompile Include="Schedule.cpp" />
+    <ClCompile Include="SetRailLine.cpp" />
     <ClCompile Include="StaffList.cpp" />
     <ClCompile Include="StaffLogs.cpp" />
     <ClCompile Include="StaticData.cpp" />
