@@ -169,6 +169,7 @@ void CStaffList::OnBnClickedBtnSetpassword()
         return;
     CModifyPassword modifyPassword;
     modifyPassword.SetPassword(m_SeletedStaff->iPassword);
+    //modifyPassword.CenterWindow();
     if(modifyPassword.DoModal() == IDOK)
     {
         m_SeletedStaff->iPassword = modifyPassword.GetPassword();
@@ -314,6 +315,7 @@ void CStaffList::OnBnClickedBtnSetpermission()
         return;
     CPermissionGroup permission;
     permission.SetPermissionValue(m_SeletedStaff->iPermissionGroup);
+    //permission.CenterWindow();
     if( permission.DoModal() == IDOK)
     {
         m_SeletedStaff->iPermissionGroup = permission.GetPermisstionValue();

@@ -28,3 +28,8 @@
 #define CMD_RAIL_ADD 0x43
 #define CMD_RAIL_MODIFY 0x44
 #define CMD_RAIL_DELETE 0x45
+
+//获取日明细
+#define CMD_GET_NORMALREPORT 0x46
+//获取告警月明细
+#define CMD_GET_ALERTREPORT 0x47

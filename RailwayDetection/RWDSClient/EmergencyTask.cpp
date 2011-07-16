@@ -374,6 +374,7 @@ void CEmergencyTask::OnBnClickedBtnSetemstaff()
     }
     COrgTree staffTree(m_CRWDSClientView);
     staffTree.SetEmergencyTaskInfo(m_SeletedTask);
+    //staffTree.CenterWindow();
     staffTree.DoModal();
     SetEmergencyTask(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_EMERGENCY_MODIFYSTAFF,
                      m_SeletedTask);

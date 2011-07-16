@@ -1326,10 +1326,17 @@ int GetReportDetail(CString aStaffID, CString aTime, ReportDetail* aReportList)
 {//Ã÷Ï¸
     /////////////////////////////////////////////////////
 #ifdef TESTCODE
-    aReportList->iDay = aTime;
+    aReportList->iDay.push_back(aTime);
+    aReportList->iRailLineID.push_back(1);
+    aReportList->iPointKM.push_back(100);
+    aReportList->iStaffID.push_back(aStaffID);
     aReportList->iPlanArrivedTime.push_back(_T("9:00"));
     aReportList->iActualArrivedTime.push_back(_T("9:05"));
     aReportList->iState.push_back(KPointNormal);
+
+    aReportList->iRailLineID.push_back(1);
+    aReportList->iPointKM.push_back(101);
+    aReportList->iStaffID.push_back(aStaffID);
     aReportList->iPlanArrivedTime.push_back(_T("9:10"));
     aReportList->iActualArrivedTime.push_back(_T("9:11"));
     aReportList->iState.push_back(KPointUnArrived);
@@ -1355,8 +1362,10 @@ int GetReportDetail(CString aStaffID, CString aTime, ReportDetail* aReportList)
 	{
 		aReportList->iActualArrivedTime.push_back(iter->realTime);
 		aReportList->iPlanArrivedTime.push_back(iter->sArrtime);
-		aReportList->iDay = iter->date;
+        CString tmp = iter->date;
+		aReportList->iDay.push_back(tmp);
 		aReportList->iState.push_back((PointState)iter->pointstate);
+        aReportList->iStaffID.push_back(aStaffID);
 	}
 
 	return KErrNone;
@@ -1413,6 +1422,15 @@ int GetReportInfoList( int aOrgID, int aYear, int aMonth, vector<ReportInfo*>* a
 	}	
 
     return KErrNone;
+}
+
+int GetAlarmByMonth(CString aMonth, ReportDetail* aAlarmList)
+{
+    /////////////////////////////////////////////////////
+#ifdef TESTCODE
+    return KErrNone;
+#endif
+    /////////////////////////////////////////////////////
 }
 
 time_t Time2Strings1(CString sec)
