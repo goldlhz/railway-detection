@@ -33,6 +33,8 @@
 #include "ModifyPassword.h"
 #include "SetRailLine.h"
 #include "StaffLogs.h"
+#include "SystemConfigure.h"
+#include "AboutLoger.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -96,8 +98,11 @@ BEGIN_MESSAGE_MAP(CRWDSClientView, CView)
     ON_UPDATE_COMMAND_UI(ID_REVIEW_RECORDSTAFF, &CRWDSClientView::OnUpdateReviewRecordstaff)
     ON_COMMAND(ID_SET_PASSWORD, &CRWDSClientView::OnSetPassword)
 //    ON_COMMAND(ID_SET_RAIL, &CRWDSClientView::OnSetRail)
-ON_COMMAND(ID_SET_RAILLINE, &CRWDSClientView::OnSetRailline)
-ON_COMMAND(ID_REPORT_ALARM, &CRWDSClientView::OnReportAlarm)
+    ON_COMMAND(ID_SET_RAILLINE, &CRWDSClientView::OnSetRailline)
+    ON_COMMAND(ID_REPORT_ALARM, &CRWDSClientView::OnReportAlarm)
+    //ON_COMMAND(ID_SETCONFIGURE, &CRWDSClientView::OnSetconfigure)
+    ON_COMMAND(ID_LOGERINFO, &CRWDSClientView::OnLogerinfo)
+    ON_COMMAND(ID_SET_CONFIGURE, &CRWDSClientView::OnSetConfigure)
 END_MESSAGE_MAP()
 
 BEGIN_EVENTSINK_MAP(CRWDSClientView, CView)
@@ -1101,6 +1106,33 @@ void CRWDSClientView::OnSetPassword()
     }
 }
 
+//void CRWDSClientView::OnSetconfigure()
+//{
+//    // TODO: 在此添加命令处理程序代码
+//    CSystemConfigure config;
+//    config.DoModal();
+//}
+
+void CRWDSClientView::OnLogerinfo()
+{
+    // TODO: 在此添加命令处理程序代码
+    CAboutLoger loger;
+    CString name;
+    CString org;
+    name = _T("用户名:    ") + theApp.m_LoginAccount;
+    org.Format(_T("所属机构:    %d"), theApp.m_LoginOrgID);
+    loger.SetName(name);
+    loger.SetOrg(org);
+    loger.DoModal();
+}
+
+void CRWDSClientView::OnSetConfigure()
+{
+    // TODO: 在此添加命令处理程序代码
+    CSystemConfigure confige;
+    confige.DoModal();
+}
+
 void CRWDSClientView::OnUpdateSetEmergencytask(CCmdUI *pCmdUI)
 {
     // TODO: 在此添加命令更新用户界面处理程序代码
@@ -1385,5 +1417,8 @@ void CRWDSClientView::OnSetPermissiongroup()
     CPermissionGroup pGroup(this);
     pGroup.DoModal();
 }
+
+
+
 
 
