@@ -154,6 +154,9 @@ public:
 //    afx_msg void OnSetRail();
     afx_msg void OnSetRailline();
     afx_msg void OnReportAlarm();
+    //afx_msg void OnSetconfigure();
+    afx_msg void OnLogerinfo();
+    afx_msg void OnSetConfigure();
 };
 extern CRWDSClientView* gClientView;
 

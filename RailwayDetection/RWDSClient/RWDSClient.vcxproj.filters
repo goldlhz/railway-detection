@@ -252,6 +252,12 @@
     <ClInclude Include="SetRailLine.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="SystemConfigure.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="AboutLoger.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RWDSClient.cpp">
@@ -360,6 +366,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="SetRailLine.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="SystemConfigure.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="AboutLoger.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
