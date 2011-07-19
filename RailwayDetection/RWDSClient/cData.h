@@ -70,6 +70,12 @@ public:
 	int GetJJRWList(const int orgid,ljjListresult *lPoint);
 	//获取紧急任务人员列表
 	int GetJJry(const int rwid,ljjryListresult *lPoint);
+		//设置系统设置
+	int SetSys(const sysBak sValue);
+	int GetSys(sysBak* sValue);
+	int ChaengPassWord(CPassRequest* sValue);
+	int LinesMang(lines* sValue);
+	int GetWarnList(WarnRequest sValue,lWarnRequestReturn* warnValue);
 private:
 	CTCPClient *cs;
 	void CreateConn();

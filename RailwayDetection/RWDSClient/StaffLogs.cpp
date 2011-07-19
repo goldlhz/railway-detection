@@ -16,6 +16,7 @@ IMPLEMENT_DYNAMIC(CStaffLogs, CDialogEx)
 CStaffLogs::CStaffLogs(int aStartWay, CWnd* pParent /*=NULL*/)
 	: CDialogEx(CStaffLogs::IDD, pParent)
 {
+    m_RWDSClientView = (CRWDSClientView*) pParent;
     m_StartWay = aStartWay;
     m_Report = NULL;
 }
@@ -60,7 +61,14 @@ void CStaffLogs::GetLogs(int aCmd)
     }
     else if (aCmd == CMD_GET_ALERTREPORT)
     {
-        GetAlarmByMonth(m_AlarmMonth, &m_AlarmReport);
+        if (m_RWDSClientView)
+        {
+            int tmp, year, month;
+            tmp = _ttoi(m_AlarmMonth);
+            year = tmp / 100;
+            month = tmp % 100;
+            GetAlarmByMonth(m_RWDSClientView->m_CurrentOrg->iOrgID, year, month, &m_AlarmReport);
+        }
     }
 }
 
@@ -175,10 +183,10 @@ void CStaffLogs::ShowCtrlList(ReportDetail& aReport)
         && i<aReport.iStaffID.size(); i++)
     {
         int state = aReport.iState[i] < strPointStateCount ? aReport.iState[i]:0;
-        int railID = aReport.iRailLineID[i];
+        //int railID = aReport.iRailLineID[i];
         CString strPointKM;
         strPointKM.Format(_T("%.2f"), aReport.iPointKM[i]);
-        m_ListCtrl.InsertItem(i, GetRailLineByID(RailLineList, railID)->iRailName);
+        m_ListCtrl.InsertItem(i, aReport.iRailLineID[i]);
         m_ListCtrl.SetItemText(i, 1, strPointKM);
         m_ListCtrl.SetItemText(i, 2, aReport.iStaffID[i]);
         m_ListCtrl.SetItemText(i, 3, aReport.iPlanArrivedTime[i]);

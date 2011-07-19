@@ -53,12 +53,12 @@ BOOL CSetRailLine::OnInitDialog()
     m_ListCtrl.InsertColumn(0, _T("编号"), LVCFMT_LEFT, clientRect.Width()/4);
     m_ListCtrl.InsertColumn(1, _T("铁路名"), LVCFMT_LEFT, clientRect.Width()/4*3);
     CString str;
-    for (size_t i=0; i<RailLineList.size(); i++)
+    for (size_t i=0; i<gRailLineList.size(); i++)
     {
-        str.Format(_T("%d"), RailLineList[i]->iRailID);
+        str.Format(_T("%d"), gRailLineList[i]->iRailID);
         m_ListCtrl.InsertItem(i, str);
-        m_ListCtrl.SetItemText(i, 1, RailLineList[i]->iRailName);
-        m_ListCtrl.SetItemData(i, (DWORD_PTR) RailLineList[i]);
+        m_ListCtrl.SetItemText(i, 1, gRailLineList[i]->iRailName);
+        m_ListCtrl.SetItemData(i, (DWORD_PTR) gRailLineList[i]);
     }
 
     return TRUE;  // return TRUE unless you set the focus to a control
@@ -95,7 +95,7 @@ void CSetRailLine::OnBnClickedBtnRailadd()
         delete rail;
         AfxMessageBox(_T("添加失败, 不能获取铁路编号!"));
     }
-    RailLineList.push_back(rail);
+    gRailLineList.push_back(rail);
     CString str;
     str.Format(_T("%d"), rail->iRailID);
     int index = m_ListCtrl.GetItemCount();
@@ -129,11 +129,11 @@ void CSetRailLine::OnBnClickedBtnRaildelete()
     if(AfxMessageBox(_T("确认删除?")) == IDOK)
     {
         SetRailLine(CMD_RAIL_DELETE, rail);
-        for (size_t i=0; i<RailLineList.size(); i++)
+        for (size_t i=0; i<gRailLineList.size(); i++)
         {
-            if (rail == RailLineList[i])
+            if (rail == gRailLineList[i])
             {
-                RailLineList.erase(RailLineList.begin()+i);
+                gRailLineList.erase(gRailLineList.begin()+i);
                 break;
             }
         }

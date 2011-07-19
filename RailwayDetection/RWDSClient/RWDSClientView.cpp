@@ -356,7 +356,7 @@ int CRWDSClientView::OnCreate(LPCREATESTRUCT lpCreateStruct)
     m_LoginAccount = theApp.m_LoginAccount;
 
     //¶ÁÈ¡ÌúÂ·Ïß
-    GetRailLine(&RailLineList);
+    GetRailLine(&gRailLineList);
     //CStdioFile file;
     //CString filename = GetModulePath() + _T("\\linename.cfg");
     //if( file.Open(filename, CFile::modeRead) )

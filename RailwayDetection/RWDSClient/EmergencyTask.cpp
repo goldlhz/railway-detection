@@ -79,10 +79,10 @@ BOOL CEmergencyTask::OnInitDialog()
     m_ComboEmergencyStatus.AddString(_T("Õý³£"));
     m_ComboEmergencyStatus.AddString(_T("½áÊø"));
 
-    for(size_t i=0; i<RailLineList.size(); i++)
+    for(size_t i=0; i<gRailLineList.size(); i++)
     {
-        m_ComboRailLine.AddString(RailLineList[i]->iRailName);
-        m_ComboRailLine.SetItemData(i, (DWORD_PTR)RailLineList[i]);
+        m_ComboRailLine.AddString(gRailLineList[i]->iRailName);
+        m_ComboRailLine.SetItemData(i, (DWORD_PTR)gRailLineList[i]);
     }
     int count = m_CRWDSClientView->m_CurrentOrg->iEmergency.size();
     CString id;
@@ -154,7 +154,7 @@ void CEmergencyTask::OnLvnItemchangedEmergencylist(NMHDR *pNMHDR, LRESULT *pResu
     GetDlgItem(IDC_EDIT_EMERGENCYID)->SetWindowText(str);
     m_ComboEmergencyStatus.SetCurSel(task->iStatus);
 
-    RailLine* rail = GetRailLineByID(RailLineList, task->iRailLine);
+    RailLine* rail = GetRailLineByID(gRailLineList, task->iRailLine);
     for (int i=0; i<m_ComboRailLine.GetCount(); i++)
     {
         if ((DWORD_PTR)rail == m_ComboRailLine.GetItemData(i))

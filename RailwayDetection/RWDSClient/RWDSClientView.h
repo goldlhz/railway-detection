@@ -29,6 +29,7 @@ class CRWDSClientView : public CView
     friend class CDeviceList;
     friend class CPitureReview;
     friend class CReport;
+    friend class CStaffLogs;
 protected: // 仅从序列化创建
 	CRWDSClientView();
 	DECLARE_DYNCREATE(CRWDSClientView)

@@ -7,6 +7,9 @@ int VerifyLogin( CString& aLoginAccount, CString& aLoginPassword, int* orgID, Pe
 //获取登录者权限
 int GetLoginerPermission(const CString& aLoginAccount);
 
+int GetSystemConfigure(SystemConfigure* aGetConfigure);
+int SetSystemConfigure(const SystemConfigure* aGetConfigure);
+
 //获取/设置铁路线名称
 int GetRailLine(vector<RailLine*>* aRailLineList);
 int SetRailLine(int aCmd, const RailLine* aRailLine);
@@ -64,7 +67,7 @@ int GetReportInfoList(int aOrgID, int aYear, int aMonth, vector<ReportInfo*>* aR
 //获取日明细
 int GetReportDetail(CString aStaffID, CString aTime, ReportDetail* aReportList);
 //获取告警月表
-int GetAlarmByMonth(CString aMonth, ReportDetail* aAlarmList);
+int GetAlarmByMonth(int aOrgID,int aYear, int aMonth, ReportDetail* aAlarmList);
 
 int GetOrgMonthPx(GetOrgPxEx const sValue,vector<getorgpxlistresultEx*> *Value);
 int GetOrgMonthxl();

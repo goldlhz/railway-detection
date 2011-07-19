@@ -1723,6 +1723,208 @@ int cData::GetJJry(const int rwid,ljjryListresult *lPoint)
 	}
 	return 1;
 }
+
+int cData::SetSys(const sysBak sValue)
+{
+	char pDataBuffer[11 + sizeof(sysBak)];
+	memset(pDataBuffer,0,sizeof(pDataBuffer));
+	BaseStruct bs;
+	bs.nBodyLength = sizeof(sysBak);
+	bs.nMsgNumber = SYSSET_PACKET;
+	BuildDataPackShell(pDataBuffer, &bs);
+	memcpy(pDataBuffer+7,&sValue,sizeof(sysBak));
+
+	int iResult = cs->Write(pDataBuffer,11 + sizeof(sysBak));
+	if(iResult < iSocketState)
+	{
+		return -1;
+	}
+
+	BaseResult lr;
+	int it = 11 + sizeof(BaseResult);
+	char cTempBuf[11 + sizeof(BaseResult)];
+	memset(cTempBuf,0,it);
+	memset(&lr,0,sizeof(lr));
+	iResult = cs->Read(cTempBuf,it);
+
+	if(iResult < 0)
+	{
+		return -1;
+	}
+
+	if(DepressPacket(lr,SYSSET_PACKET,cTempBuf))
+	{
+		;
+	}else
+	{
+		lr.result = 1;
+	}
+
+	return lr.result;
+
+}
+int cData::GetSys(sysBak* sValue)
+{
+	char pDataBuffer[11 ];
+	memset(pDataBuffer,0,sizeof(pDataBuffer));
+	BaseStruct bs;
+	bs.nBodyLength = 0;
+	bs.nMsgNumber = SYSGET_PACKET;
+	BuildDataPackShell(pDataBuffer, &bs);
+	//memcpy(pDataBuffer+7,&sValue,sizeof(CPassRequest));
+
+	int iResult = cs->Write(pDataBuffer,11);
+	if(iResult < iSocketState)
+	{
+		return -1;
+	}
+
+	//BaseResult lr;
+	int it = 11 + sizeof(sysBak);
+	char cTempBuf[11 + sizeof(sysBak)];
+	memset(cTempBuf,0,it);
+	//memset(sValue,0,sizeof(sysBak));
+	iResult = cs->Read(cTempBuf,it);
+
+	if(iResult < 0)
+	{
+		return -1;
+	}
+
+	if(DepressPacket(*sValue,SYSGET_PACKET,cTempBuf))
+	{
+		return 0;
+	}else
+	{
+		return 1;
+	}
+
+	return 0;
+}
+int cData::ChaengPassWord(CPassRequest* sValue)
+{
+
+	char pDataBuffer[11 + sizeof(CPassRequest)];
+	memset(pDataBuffer,0,sizeof(pDataBuffer));
+	BaseStruct bs;
+	bs.nBodyLength = sizeof(CPassRequest);
+	bs.nMsgNumber = CHANGEPASSWORD_PACKET;
+	BuildDataPackShell(pDataBuffer, &bs);
+	memcpy(pDataBuffer+7,sValue,sizeof(CPassRequest));
+
+	int iResult = cs->Write(pDataBuffer,11 + sizeof(CPassRequest));
+	if(iResult < iSocketState)
+	{
+		return -1;
+	}
+
+	BaseResult lr;
+	int it = 11 + sizeof(BaseResult);
+	char cTempBuf[11 + sizeof(BaseResult)];
+	memset(cTempBuf,0,it);
+	memset(&lr,0,sizeof(lr));
+	iResult = cs->Read(cTempBuf,it);
+
+	if(iResult < 0)
+	{
+		return -1;
+	}
+
+	if(DepressPacket(lr,CHANGEPASSWORD_PACKET,cTempBuf))
+	{
+		;
+	}else
+	{
+		lr.result = 1;
+	}
+
+	return lr.result;
+}
+int cData::LinesMang(lines* sValue)
+{
+	char pDataBuffer[11 + sizeof(lines)];
+	memset(pDataBuffer,0,sizeof(pDataBuffer));
+	BaseStruct bs;
+	bs.nBodyLength = sizeof(lines);
+	bs.nMsgNumber = LINEMANGMENT;
+	BuildDataPackShell(pDataBuffer, &bs);
+	memcpy(pDataBuffer+7,sValue,sizeof(lines));
+
+	int iResult = cs->Write(pDataBuffer,11 + sizeof(lines));
+	if(iResult < iSocketState)
+	{
+		return -1;
+	}
+
+	BaseResult lr;
+	int it = 11 + sizeof(BaseResult);
+	char cTempBuf[11 + sizeof(BaseResult)];
+	memset(cTempBuf,0,it);
+	memset(&lr,0,sizeof(lr));
+	iResult = cs->Read(cTempBuf,it);
+
+	if(iResult < 0)
+	{
+		return -1;
+	}
+
+	if(DepressPacket(lr,LINEMANGMENT,cTempBuf))
+	{
+		;
+	}else
+	{
+		lr.result = 1;
+	}
+
+	return lr.result;
+}
+
+int cData::GetWarnList(WarnRequest sValue,lWarnRequestReturn* warnValue)
+{
+	char pDataBuffer[11 + sizeof(WarnRequest)];
+	memset(pDataBuffer,0,sizeof(pDataBuffer));
+	BaseStruct bs;
+	bs.nBodyLength = sizeof(WarnRequest);
+	bs.nMsgNumber = ALLWARN_PACKET;
+	BuildDataPackShell(pDataBuffer, &bs);
+	memcpy(pDataBuffer+7,&sValue,sizeof(WarnRequest));
+
+	int iResult = cs->Write(pDataBuffer,11 + sizeof(WarnRequest));
+	if(iResult < iSocketState)
+	{
+		return -1;
+	}
+	int iTotleCount = 0;
+	warnValue->clear();
+	while(1)
+	{
+
+		WarnRequestReturn lr;
+		int it = 11 + sizeof(WarnRequestReturn);
+		char cTempBuf[11 + sizeof(WarnRequestReturn)];
+		memset(cTempBuf,0,it);
+		Sleep(2);
+		iResult = cs->Read(cTempBuf,it);
+
+		if(iResult < 1)
+		{
+			break;
+		}
+		memset(&lr,0,sizeof(lr));
+		if(DepressPacket(lr,ALLWARN_PACKET,cTempBuf))
+		{
+			warnValue->push_back(lr);
+			iTotleCount = lr.totlePacket ;
+			if(lr.CurrentPacket == lr.totlePacket)
+				break;
+		}
+	}
+	if(warnValue->size() != iTotleCount)
+	{
+		return -2;
+	}
+	return 0;
+}
 ////////////////////////////////////////////////////
 template<typename T>
 bool cData::DepressPacket(T& dataDownLoadPack, unsigned char cMsgNumber,const char* buf)

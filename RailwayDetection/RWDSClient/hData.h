@@ -423,6 +423,65 @@ unsigned  int Jj_long;
 }jjryListresult;
 typedef list<jjryListresult> ljjryListresult;
 typedef ljjryListresult::iterator IterlljjryListresult;
+//系统设置
+typedef struct
+{
+unsigned   int dataBak;//gps数据备份时间
+unsigned  int bak;//
+unsigned  int bak1;//
+float WarnTime;//数据警告时间
+float FBak;
+char cData[50];
+char cData1[50];
+}sysBak;
+
+// xiugaimima
+typedef struct
+{
+char oper[20];
+char password[20];
+}CPassRequest;
+
+typedef struct
+{
+unsigned  int IResult;
+
+}CPassRequestresult;
+//警告列表
+typedef struct
+{
+unsigned  int orgid;
+unsigned  int Yea;
+unsigned  int Mon;
+}WarnRequest;
+
+typedef struct
+{
+	unsigned  int totlePacket;
+	unsigned  int CurrentPacket;
+	char LineName[50]; // 线路名称
+	float iDirect ;//公里处
+	char UserId[30];
+	char STime[30];
+	char realTime[30];
+	char data[30];
+	unsigned int iPointState;
+}WarnRequestReturn;
+typedef list<WarnRequestReturn> lWarnRequestReturn;
+typedef lWarnRequestReturn::iterator IterlWarnRequestReturn;
+//线路
+typedef struct
+{
+unsigned  int iTpye;//0 add 1 edit 2 del
+unsigned  int id;
+char name[20];
+}lines;
+typedef struct
+{
+	unsigned  int iResult;
+}linesReturn;
+
+
 //////////////////////
 //////////////////////////////////////////////////////////////////////////
 ///
@@ -474,6 +533,12 @@ typedef ljjryListresult::iterator IterlljjryListresult;
 #define GETJJRWLIST_PACKET              0x27
 #define GETJJRWRYLIST_PACKET            0x28
 #define DELETERY_PACKET                 0x31
+
+#define SYSSET_PACKET                   0x33
+#define SYSGET_PACKET                   0x34
+#define CHANGEPASSWORD_PACKET           0x35
+#define ALLWARN_PACKET                  0x36
+#define LINEMANGMENT                    0x37
 
 #define NoSocket                        0x00
 #define NoData                          0x01

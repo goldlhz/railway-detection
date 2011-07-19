@@ -135,10 +135,10 @@ BOOL COrgList::OnInitDialog()
     m_ComboOrgParent.AddString(str);
     m_ComboOrgParent.SetItemData(0, NULL);
     OrgListVisitForAddComboOrgParent(m_CRWDSClientView->m_Org[0]);
-    for(size_t i=0; i<RailLineList.size(); i++)
+    for(size_t i=0; i<gRailLineList.size(); i++)
     {
-        m_ComboBoundaryLine.AddString(RailLineList[i]->iRailName);
-        m_ComboBoundaryLine.SetItemData(i, (DWORD_PTR)RailLineList[i]);
+        m_ComboBoundaryLine.AddString(gRailLineList[i]->iRailName);
+        m_ComboBoundaryLine.SetItemData(i, (DWORD_PTR)gRailLineList[i]);
     }
     return TRUE;  // return TRUE unless you set the focus to a control
     // 异常: OCX 属性页应返回 FALSE
@@ -167,7 +167,7 @@ void COrgList::OnTvnSelchangedTreeOrglist(NMHDR *pNMHDR, LRESULT *pResult)
     comboIndex = m_ComboOrgParent.FindString(0, parentID);
     
     m_ComboOrgParent.SetCurSel(comboIndex);
-    RailLine* rail = GetRailLineByID(RailLineList, curOrg->iBoundaryRail);
+    RailLine* rail = GetRailLineByID(gRailLineList, curOrg->iBoundaryRail);
     m_ComboBoundaryLine.SetCurSel(0);
     for (int i=0; i<m_ComboBoundaryLine.GetCount(); i++)
     {
