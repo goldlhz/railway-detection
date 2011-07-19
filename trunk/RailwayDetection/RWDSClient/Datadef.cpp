@@ -3,7 +3,8 @@
 
 #include "Datadef.h"
 
-vector<_RailLine*> RailLineList;
+vector<RailLine*> gRailLineList;
+SystemConfigure gSystemConfigure;
 //int strRailLineNameCount = 0;
 
 const CString strDirectName[] = {

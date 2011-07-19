@@ -1,6 +1,8 @@
 #pragma once
 #include "afxcmn.h"
 #include "Datadef.h"
+#include "RWDSClientDoc.h"
+#include "RWDSClientView.h"
 
 
 // CStaffLogs ¶Ô»°¿ò
@@ -24,6 +26,7 @@ public:
     void SetStaffLogsVisible(BOOL aVisible);
     void ShowCtrlList(ReportDetail& aReport);
 private:
+    CRWDSClientView* m_RWDSClientView;
     ReportInfo* m_Report;
     ReportDetail m_AlarmReport;
     CString m_AlarmMonth;

@@ -11,8 +11,8 @@ int VerifyLogin( CString& aLoginAccount, CString& aLoginPassword, int* orgID, Pe
     ///////////////////////////////////////////////////
 #ifdef TESTCODE
     *orgID = 1;
-    //pPower->iBasical = 0x0FFF;
-    pPower->iBasical = 3967;
+    pPower->iBasical = 0x0FFF;
+    //pPower->iBasical = 3967;
     pPower->iOperate = 1;
     pPower->iReportForm = 1;
     return KErrNone;
@@ -38,6 +38,42 @@ int VerifyLogin( CString& aLoginAccount, CString& aLoginPassword, int* orgID, Pe
     aLoginAccount.ReleaseBuffer();
     aLoginPassword.ReleaseBuffer();
 	return iResult;
+}
+
+int GetSystemConfigure(SystemConfigure* aGetConfigure)
+{
+    ///////////////////////////////////////////////////
+#ifdef TESTCODE
+    return KErrNone;
+#endif
+    ///////////////////////////////////////////////////
+    return KErrNone;
+	//	int SetSys(const sysBak sValue);
+	//int GetSys(sysBak* sValue);
+	sysBak sValue;
+	memset(&sValue,0,sizeof(sysBak));
+	cData *cd = new cData();
+	cd->GetSys(&sValue);
+	aGetConfigure->iAlarmMinute = sValue.bak;
+	aGetConfigure->iDuration = sValue.dataBak;
+	return 1;
+}
+
+int SetSystemConfigure(const SystemConfigure* aGetConfigure)
+{
+    ///////////////////////////////////////////////////
+#ifdef TESTCODE
+    return KErrNone;
+#endif
+    ///////////////////////////////////////////////////
+    return KErrNone;
+	cData *cd = new cData();
+	sysBak sValue;
+	memset(&sValue,0,sizeof(sysBak));
+	sValue.bak = aGetConfigure->iAlarmMinute;
+	sValue.dataBak = aGetConfigure->iDuration;
+	cd->SetSys(sValue);
+	return 1;
 }
 
 int GetRailLine( vector<RailLine*>* aRailLineList )
@@ -74,8 +110,23 @@ int GetRailLine( vector<RailLine*>* aRailLineList )
     aRailLineList->push_back(rail);
     
 #endif
-    ///////////////////////////////////////////////////
-    return KErrNone;
+
+	
+	GetLinesName val;
+	val.LineId = 0;
+	lLineName llist;
+	cData *cd = new cData();
+	cd->GetLineName(val,&llist);
+
+	for(iterLineName iter = llist.begin(); iter != llist.end() ; iter++)
+	{
+		RailLine* report = new RailLine();
+		report->iRailName = iter->cName;
+		report->iRailID = iter->id;
+		aRailLineList->push_back(report);
+	}
+	delete cd;
+	return 0;
 }
 
 int SetRailLine( int aCmd, const RailLine* aRailLine )
@@ -85,11 +136,47 @@ int SetRailLine( int aCmd, const RailLine* aRailLine )
     return KErrNone;
 #endif
     ///////////////////////////////////////////////////
-    return KErrNone;
+	cData *cd = new cData();
+	lines sValue;
+	switch(aCmd){
+	case CMD_RAIL_ADD:
+		{
+			sValue.iTpye = 0;
+			CString cTEMP1 = aRailLine->iRailName;
+			char *p2 = (char*)cTEMP1.GetBuffer(cTEMP1.GetLength());
+			memcpy(sValue.name,p2,cTEMP1.GetLength());
+			cTEMP1.ReleaseBuffer();
+			sValue.id = aRailLine->iRailID;
+			cd->LinesMang(&sValue);
 
-//#define CMD_RAIL_ADD 0x43
-//#define CMD_RAIL_MODIFY 0x44
-//#define CMD_RAIL_DELETE 0x45
+			break;
+		}
+		case CMD_RAIL_MODIFY:
+		{
+			sValue.iTpye = 1;	
+			CString cTEMP1 = aRailLine->iRailName;
+			char *p2 = (char*)cTEMP1.GetBuffer(cTEMP1.GetLength());
+			memcpy(sValue.name,p2,cTEMP1.GetLength());
+			cTEMP1.ReleaseBuffer();
+			sValue.id = aRailLine->iRailID;
+			cd->LinesMang(&sValue);
+			break;
+		}
+		case CMD_RAIL_DELETE:
+		{
+			sValue.iTpye = 2;	
+			CString cTEMP1 = aRailLine->iRailName;
+			char *p2 = (char*)cTEMP1.GetBuffer(cTEMP1.GetLength());
+			memcpy(sValue.name,p2,cTEMP1.GetLength());
+			cTEMP1.ReleaseBuffer();
+			sValue.id = aRailLine->iRailID;
+			cd->LinesMang(&sValue);
+			break;
+		}
+		default:
+			break;
+	}
+	return KErrNone;
 }
 
 RailLine* GetRailLineByID(vector<RailLine*>& aRailLineList, int aRailID )
@@ -767,6 +854,22 @@ int SetStaffPassword(int aOrgID, CString aStaffID, CString aPassword)
     return KErrNone;
 #endif
     ///////////////////////////////////////////////////
+	CPassRequest sValue;
+	memset(&sValue,0,sizeof(CPassRequest));
+
+	CString cTEMP1 = aStaffID;
+    char *p2 = (char*)cTEMP1.GetBuffer(cTEMP1.GetLength());
+	memcpy(sValue.oper,p2,cTEMP1.GetLength());
+    cTEMP1.ReleaseBuffer();
+
+	CString cTEMP2 = aPassword;
+    char *p3 = (char*)cTEMP2.GetBuffer(cTEMP2.GetLength());
+	memcpy(sValue.password,p3,cTEMP2.GetLength());
+    cTEMP2.ReleaseBuffer();
+
+	cData *cd = new cData();
+	cd->ChaengPassWord(&sValue);
+	return KErrNone;
 }
 
 
@@ -874,6 +977,11 @@ int SetCalendarSchedule(int aOrgID, const CalendarSchedule* aSchedule/*, const <
 
 int GetEmergencyTask( int aOrgID, vector<EmergencyTaskInfo*>* m_EmergencyList )
 {
+    ///////////////////////////////////////////////////
+#ifdef TESTCODE
+    return KErrNone;
+#endif
+    ///////////////////////////////////////////////////
 	ljjListresult lPoint;
 	cData *cs = new cData();
 	cs->GetJJRWList(aOrgID,&lPoint);
@@ -1327,14 +1435,14 @@ int GetReportDetail(CString aStaffID, CString aTime, ReportDetail* aReportList)
     /////////////////////////////////////////////////////
 #ifdef TESTCODE
     aReportList->iDay.push_back(aTime);
-    aReportList->iRailLineID.push_back(1);
+    aReportList->iRailLineID.push_back(_T("成渝线"));
     aReportList->iPointKM.push_back(100);
     aReportList->iStaffID.push_back(aStaffID);
     aReportList->iPlanArrivedTime.push_back(_T("9:00"));
     aReportList->iActualArrivedTime.push_back(_T("9:05"));
     aReportList->iState.push_back(KPointNormal);
 
-    aReportList->iRailLineID.push_back(1);
+    aReportList->iRailLineID.push_back(_T("成渝线"));
     aReportList->iPointKM.push_back(101);
     aReportList->iStaffID.push_back(aStaffID);
     aReportList->iPlanArrivedTime.push_back(_T("9:10"));
@@ -1424,15 +1532,33 @@ int GetReportInfoList( int aOrgID, int aYear, int aMonth, vector<ReportInfo*>* a
     return KErrNone;
 }
 
-int GetAlarmByMonth(CString aMonth, ReportDetail* aAlarmList)
+int GetAlarmByMonth(int aOrgID, int aYear,int aMonth, ReportDetail* aAlarmList)
 {
     /////////////////////////////////////////////////////
 #ifdef TESTCODE
     return KErrNone;
 #endif
     /////////////////////////////////////////////////////
-}
+	WarnRequest wValue;
+	wValue.Mon = aMonth;
+	wValue.Yea = aYear;
+	wValue.orgid = aOrgID;
+	lWarnRequestReturn warnValue;
+	cData *cd = new cData();
+	cd->GetWarnList(wValue,&warnValue);
+	for(IterlWarnRequestReturn iter = warnValue.begin();iter != warnValue.end(); iter++)
+	{
+		aAlarmList->iActualArrivedTime.push_back(iter->realTime);
+		aAlarmList->iDay.push_back(iter->data);
+		aAlarmList->iPlanArrivedTime.push_back(iter->STime);
+		aAlarmList->iStaffID.push_back(iter->UserId);
+		aAlarmList->iPointKM.push_back(iter->iDirect);
+		aAlarmList->iState.push_back((PointState)iter->iPointState);
+		aAlarmList->iRailLineID.push_back(iter->LineName);
+	}
 
+	return  KErrNone;
+}
 time_t Time2Strings1(CString sec)
 {
 	int iHour,iMonth;
@@ -1502,5 +1628,6 @@ void StringToChar(char *p,CString sVal)
 	p =(char*)sVal.GetBuffer(sVal.GetLength());
 	return;
 }
+
 
 void StringRelease(CString sVAL);

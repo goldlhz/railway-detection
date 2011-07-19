@@ -7,8 +7,25 @@
 
 using namespace std;
 
-struct _RailLine;
-extern vector<_RailLine*> RailLineList;
+typedef struct _RailLine
+{
+    _RailLine()
+    {
+        iRailID = 0;
+    }
+    int iRailID;
+    CString iRailName;
+}RailLine;
+
+typedef struct _SystemConfigure
+{
+    int iDuration;//数据有效期
+    int iAlarmMinute;//告警间隔
+}SystemConfigure;
+
+
+extern vector<RailLine*> gRailLineList;
+extern SystemConfigure gSystemConfigure;
 //extern int strRailLineNameCount;
 extern const CString strDirectName[];
 extern const int strDirectNameCount;
@@ -126,15 +143,6 @@ typedef struct _Single
     int iReportForm;
 }PermissionGroup;
 
-typedef struct _RailLine
-{
-    _RailLine()
-    {
-        iRailID = 0;
-    }
-    int iRailID;
-    CString iRailName;
-}RailLine;
 
 
 typedef struct _MapPoint
@@ -291,7 +299,7 @@ typedef struct _ReportDetail//日明细、告警明细
     vector<CString> iDay;//日期
     //所有经过点的计划到达时间/实际到达时间/状态
     vector<CString> iStaffID;//员工号
-    vector<int> iRailLineID;//铁路线ID
+    vector<CString> iRailLineID;//铁路线名
     vector<double> iPointKM;//公里处
     vector<CString> iPlanArrivedTime;
     vector<CString> iActualArrivedTime;
@@ -318,6 +326,7 @@ typedef struct _ReportInfo//机构月报表
     int iUnArrived;//未到达
 }ReportInfo;
 
+
 typedef struct _OrgObj	//机构
 {
     inline _OrgObj()
@@ -332,6 +341,7 @@ typedef struct _OrgObj	//机构
         iBoundaryStartKM = 0;
         iBoundaryEndKM = 0;
         iCalendar = new CalendarSchedule;
+        //iSystemConfigure = new OrgSystemConfigure;
     }
     //机构基本信息
 	int iOrgID;
@@ -349,6 +359,7 @@ typedef struct _OrgObj	//机构
     BOOL iEmergencyDataSet;//紧急任务数据是否已经获取 
 
     //机构附属信息
+    //OrgSystemConfigure* iSystemConfigure;//系统配置
     vector<MapPoint*> iMapPoint;
     vector<StaffInfo*> iStaff;//该机构的人员
 	vector<DeviceInfo*> iDevice;//该机构拥有的设备
@@ -356,6 +367,7 @@ typedef struct _OrgObj	//机构
     CalendarSchedule* iCalendar;//该机构的排班表
     vector<EmergencyTaskInfo*> iEmergency;
     vector<ReportInfo*> iReportInfo;
+
 }OrganizationInfo;
 
 typedef struct _PictureInfo//图片信息

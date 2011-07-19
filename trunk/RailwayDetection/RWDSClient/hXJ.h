@@ -37,9 +37,10 @@ unsigned   int LineId; //0 获取全部
 
 typedef struct
 {
-	unsigned  int iTotle;
-	unsigned  int HasSendPacket;
-	char  cName[500]; //x 名称和id号之间加“||”，名称之间采用“|||”
+    unsigned  int iTotle;
+    unsigned  int HasSendPacket;
+    unsigned  int id;
+    char  cName[20]; 
 }GetLineNameResult;
 typedef list <GetLineNameResult> lLineName;
 typedef lLineName::iterator iterLineName;

@@ -62,10 +62,10 @@ BOOL CPointList::OnInitDialog()
 	m_ComboUpDown.AddString(_T("下行"));
 
 	m_ComboRailLine.ResetContent();
-	for (size_t i=0; i<RailLineList.size(); i++)
+	for (size_t i=0; i<gRailLineList.size(); i++)
 	{
-		m_ComboRailLine.AddString(RailLineList[i]->iRailName);
-        m_ComboRailLine.SetItemData(i, (DWORD_PTR)RailLineList[i]);
+		m_ComboRailLine.AddString(gRailLineList[i]->iRailName);
+        m_ComboRailLine.SetItemData(i, (DWORD_PTR)gRailLineList[i]);
 	}
 
 	int count = m_CRWDSClientView->m_CurrentOrg->iMapPoint.size();
@@ -97,7 +97,7 @@ void CPointList::OnBnClickedBtnPointadd()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	MapPoint* point = new MapPoint;
-	point->iRailLine = GetRailLineByID(RailLineList, m_CRWDSClientView->m_CurrentOrg->iBoundaryRail);
+	point->iRailLine = GetRailLineByID(gRailLineList, m_CRWDSClientView->m_CurrentOrg->iBoundaryRail);
 	point->iKM = m_CRWDSClientView->m_CurrentOrg->iBoundaryStartKM;
 	point->iLon = 0;
 	point->iLat = 0;
@@ -247,9 +247,9 @@ void CPointList::OnLvnItemchangedPointlist(NMHDR *pNMHDR, LRESULT *pResult)
 	{
 		return;
 	}
-    for (size_t i=0; i<RailLineList.size(); i++)
+    for (size_t i=0; i<gRailLineList.size(); i++)
     {
-        if (m_CRWDSClientView->m_CurrentOrg->iMapPoint[select]->iRailLine == RailLineList[i])
+        if (m_CRWDSClientView->m_CurrentOrg->iMapPoint[select]->iRailLine == gRailLineList[i])
         {
             m_ComboRailLine.SetCurSel(i);
             break;
