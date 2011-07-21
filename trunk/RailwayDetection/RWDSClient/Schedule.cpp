@@ -18,6 +18,7 @@ CSchedule::CSchedule(CWnd* pParent)
 {
 	m_CRWDSClientView = static_cast<CRWDSClientView*>(pParent);
     m_StaffChanged = FALSE;
+    //m_TimeChanged = FALSE;
 }
 
 CSchedule::~CSchedule()
@@ -283,7 +284,7 @@ void CSchedule::OnBnClickedBtnModifytime()
 	for (size_t i=0; i<m_ModifyLineArrvieTime.size(); i++)
 	{
 		if (m_SelectedLine == m_ModifyLineArrvieTime[i])
-		{
+		{//该线路已经修改过
 			pushback = FALSE;
 			break;
 		}
@@ -293,6 +294,7 @@ void CSchedule::OnBnClickedBtnModifytime()
 		m_ModifyLineArrvieTime.push_back(m_SelectedLine);
 		//m_ModifyArrvieTime = TRUE;
 	}
+    //m_TimeChanged = TRUE;
 	
 }
 
@@ -357,6 +359,11 @@ void CSchedule::OnBnClickedBtnModifycalender()
         SetOrgLine(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_LINE_MODIFY, m_SelectedLine);
     }
 
+    for( size_t i=0; i<m_ModifyLineArrvieTime.size(); i++)
+    {//保存线路的时间
+        SetOrgLine(m_CRWDSClientView->m_CurrentOrg->iOrgID, CMD_LINE_MODIFY, m_ModifyLineArrvieTime[i]);
+    }
+    m_ModifyLineArrvieTime.clear();
     AfxMessageBox(_T("修改成功"));
 }
 

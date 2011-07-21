@@ -331,8 +331,8 @@ void CFileView::OnNMClickFileView(NMHDR *pNMHDR, LRESULT *pResult)
 
             if (!curOrg->iDataSet)
             {//从未获取该机构的数据
-                GetOrgData(curOrg);
-                curOrg->iDataSet = TRUE;
+                //GetOrgData(curOrg);
+                //curOrg->iDataSet = TRUE;
             }
         }
         //else if(TVHT_ONITEMBUTTON & uFlag)
@@ -402,8 +402,8 @@ void CFileView::OnTvnItemexpandingFileView(NMHDR *pNMHDR, LRESULT *pResult)
         {//从未展开过最后一层机构
             if (!curOrg->iDataSet)
             {
-                GetOrgData(curOrg);
-                curOrg->iDataSet = TRUE;
+                //GetOrgData(curOrg);
+                //curOrg->iDataSet = TRUE;
             }
         }
     }

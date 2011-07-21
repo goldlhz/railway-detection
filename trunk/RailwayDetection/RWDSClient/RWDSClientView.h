@@ -71,6 +71,12 @@ public:
 	void MapxSetText(double aMapLon, double aMapLat, CString aText);
 	void MapxCleanAllFeature(CString aLayerName);
     void DestroyReportForm();
+    void GetPointList(OrganizationInfo* aOrg);
+    void GetLineList(OrganizationInfo* aOrg);
+    void GetStaffList(OrganizationInfo* aOrg);
+    void GetDeviceList(OrganizationInfo* aOrg);
+    void GetCalendar(OrganizationInfo* aOrg);
+    void GetEmergencyList(OrganizationInfo* aOrg);
 protected:
     PermissionGroup m_CurrentPermission;
     CString m_LoginAccount;
@@ -158,6 +164,7 @@ public:
     //afx_msg void OnSetconfigure();
     afx_msg void OnLogerinfo();
     afx_msg void OnSetConfigure();
+
 };
 extern CRWDSClientView* gClientView;
 

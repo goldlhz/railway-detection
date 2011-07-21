@@ -38,6 +38,7 @@ protected:
 	BOOL m_ModifyArrvieTime;
 	vector<LineInfo*> m_ModifyLineArrvieTime;
     BOOL m_StaffChanged;
+    //BOOL m_TimeChanged;
 public:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnLvnItemchangedSchedulelist(NMHDR *pNMHDR, LRESULT *pResult);
