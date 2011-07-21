@@ -372,6 +372,8 @@ void CEmergencyTask::OnBnClickedBtnSetemstaff()
     {
         return;
     }
+    m_CRWDSClientView->GetDeviceList(m_CRWDSClientView->m_CurrentOrg);
+    m_CRWDSClientView->GetStaffList(m_CRWDSClientView->m_CurrentOrg);
     COrgTree staffTree(m_CRWDSClientView);
     staffTree.SetEmergencyTaskInfo(m_SeletedTask);
     //staffTree.CenterWindow();

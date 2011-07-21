@@ -993,6 +993,55 @@ void CRWDSClientView::AddElementFromOrg(OrganizationInfo* aOrg)
 //    railLine.DoModal();
 //}
 
+void CRWDSClientView::GetPointList(OrganizationInfo* aOrg)
+{
+    if (!aOrg->iMapPointSet)
+    {//点的数据未获取
+        GetOrgPoint(aOrg->iOrgID, gRailLineList, &aOrg->iMapPoint);
+        aOrg->iMapPointSet = TRUE;
+    }
+}
+
+void CRWDSClientView::GetLineList(OrganizationInfo* aOrg)
+{
+    if (!aOrg->iLineSet)
+    {
+        GetOrgLine(aOrg->iOrgID, aOrg->iMapPoint, &aOrg->iLine);
+        aOrg->iLineSet = TRUE;
+    }
+}
+
+void CRWDSClientView::GetStaffList(OrganizationInfo* aOrg)
+{
+    if (!aOrg->iStaffSet)
+    {
+        GetOrgStaff(aOrg->iOrgID, aOrg->iDevice, &aOrg->iStaff);
+        aOrg->iStaffSet = TRUE;
+    }
+}
+
+void CRWDSClientView::GetDeviceList(OrganizationInfo* aOrg)
+{
+    if (!aOrg->iDeviceSet)
+    {
+        GetOrgDevice(aOrg->iOrgID, &aOrg->iDevice);
+        aOrg->iDeviceSet = TRUE;
+    }
+}
+
+void CRWDSClientView::GetCalendar(OrganizationInfo* aOrg)
+{
+    if(!aOrg->iCalendarSet)
+    {
+        GetCalendarSchedule(aOrg->iOrgID, &aOrg->iStaff, aOrg->iCalendar);
+        aOrg->iCalendarSet = TRUE;
+    }
+}
+
+void CRWDSClientView::GetEmergencyList(OrganizationInfo* aOrg)
+{
+
+}
 
 void CRWDSClientView::OnSetRailline()
 {
@@ -1009,6 +1058,7 @@ void CRWDSClientView::OnSetPoint()
         AfxMessageBox(_T("请选择机构"));
         return;
     }
+    GetPointList(m_CurrentOrg);
 	CPointList setPoint(this);
 	setPoint.DoModal();
 }
@@ -1021,6 +1071,8 @@ void CRWDSClientView::OnSetLine()
         AfxMessageBox(_T("请选择机构"));
         return;
     }
+    GetPointList(m_CurrentOrg);
+    GetLineList(m_CurrentOrg);
 	CLineList lineList(this);
 	lineList.DoModal();
 }
@@ -1034,6 +1086,11 @@ void CRWDSClientView::OnSetSchedule()
         AfxMessageBox(_T("请选择机构"));
             return;
     }
+    GetPointList(m_CurrentOrg);
+    GetLineList(m_CurrentOrg);
+    GetDeviceList(m_CurrentOrg);
+    GetStaffList(m_CurrentOrg);
+    GetCalendar(m_CurrentOrg);
 	CSchedule schedule(this);
 	schedule.DoModal();
 }
@@ -1045,7 +1102,11 @@ void CRWDSClientView::OnSetStaff()
     {
         AfxMessageBox(_T("请选择机构"));
             return;
-    }
+    }    
+    GetPointList(m_CurrentOrg);
+    GetLineList(m_CurrentOrg);
+    GetDeviceList(m_CurrentOrg);
+    GetStaffList(m_CurrentOrg);
     CStaffList setStaff(this);
     setStaff.DoModal();
 }
@@ -1088,6 +1149,7 @@ void CRWDSClientView::OnSetDevice()
         AfxMessageBox(_T("请选择机构"));
         return;
     }
+    GetDeviceList(m_CurrentOrg);
     CDeviceList device(this);
     device.DoModal();
 }
@@ -1344,6 +1406,7 @@ void CRWDSClientView::OnReviewRecordstaff()
         return;
     }
     m_DisplayFlag = KStaffLog;
+    GetStaffList(m_CurrentOrg);
     CRecordStaff rstaff(this);
     if(m_CurrentOrg && rstaff.DoModal() == IDOK)
     {

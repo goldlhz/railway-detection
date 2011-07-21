@@ -326,7 +326,7 @@ void CStaffList::OnBnClickedBtnSetpermission()
 void CStaffList::OnBnClickedBtnInitialpassword()
 {
     // TODO: 在此添加控件通知处理程序代码
-    if (AfxMessageBox(_T("确定要初始化密码？")))
+    if (AfxMessageBox(_T("确定要初始化密码？"), MB_OKCANCEL) == IDOK)
     {
         m_SeletedStaff->iPassword = _T("1111");
         //设置密码 

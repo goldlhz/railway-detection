@@ -109,8 +109,9 @@ int GetRailLine( vector<RailLine*>* aRailLineList )
     rail->iRailName = _T("成西线");
     aRailLineList->push_back(rail);
     
+    return KErrNone;
 #endif
-
+///////////////////////////////////////////////////
 	
 	GetLinesName val;
 	val.LineId = 0;
@@ -1015,7 +1016,11 @@ int GetEmergencyTask( int aOrgID, vector<EmergencyTaskInfo*>* m_EmergencyList )
 
 int SetEmergencyTask( int aOrgID, int aCmd, const EmergencyTaskInfo* aEmergencyTask )
 {
-   // aEmergencyTask->
+    ///////////////////////////////////////////////////
+#ifdef TESTCODE
+    return GetCurrentTime()%100;
+#endif
+    ///////////////////////////////////////////////////
     int iResult = 0;
 	if( CMD_EMERGENCY_MODIFY== aCmd )//紧急任务休息
 	{

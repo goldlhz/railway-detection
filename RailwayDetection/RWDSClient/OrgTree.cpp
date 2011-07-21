@@ -195,11 +195,17 @@ void COrgTree::OnTvnSelchangedTreeOrg(NMHDR *pNMHDR, LRESULT *pResult)
         HTREEITEM childItem = m_TreeOrg.GetChildItem(curItem);
         if (!childItem || childItem && m_TreeOrg.GetItemText(childItem).Compare(_T("")) == 0)
         {//未获取此机构人员
-            if (curOrg->iDevice.size() == 0)
+            if (!curOrg->iDeviceSet)
             {
                 GetOrgDevice(curOrg->iOrgID, &curOrg->iDevice);
+                curOrg->iDeviceSet = TRUE;
             }
-            GetOrgStaff(curOrg->iOrgID, curOrg->iDevice, &(curOrg->iStaff));
+            if (!curOrg->iStaffSet)
+            {
+                GetOrgStaff(curOrg->iOrgID, curOrg->iDevice, &(curOrg->iStaff));
+                curOrg->iStaffSet = TRUE;
+            }
+            
         }
     }
     m_ListOrgData.DeleteAllItems();

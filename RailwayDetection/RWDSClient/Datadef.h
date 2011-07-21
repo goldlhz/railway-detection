@@ -341,6 +341,12 @@ typedef struct _OrgObj	//机构
         iBoundaryStartKM = 0;
         iBoundaryEndKM = 0;
         iCalendar = new CalendarSchedule;
+        iMapPointSet = FALSE;
+        iStaffSet = FALSE;
+        iDeviceSet = FALSE;
+        iLineSet = FALSE;
+        iCalendarSet = FALSE;
+        iEmergencySet = FALSE;
         //iSystemConfigure = new OrgSystemConfigure;
     }
     //机构基本信息
@@ -361,11 +367,17 @@ typedef struct _OrgObj	//机构
     //机构附属信息
     //OrgSystemConfigure* iSystemConfigure;//系统配置
     vector<MapPoint*> iMapPoint;
+    BOOL iMapPointSet;
     vector<StaffInfo*> iStaff;//该机构的人员
+    BOOL iStaffSet;
 	vector<DeviceInfo*> iDevice;//该机构拥有的设备
+    BOOL iDeviceSet;
 	vector<LineInfo*> iLine;//该机构配置的路线，若不为最后一级，则为NULL
+    BOOL iLineSet;
     CalendarSchedule* iCalendar;//该机构的排班表
+    BOOL iCalendarSet;
     vector<EmergencyTaskInfo*> iEmergency;
+    BOOL iEmergencySet;
     vector<ReportInfo*> iReportInfo;
 
 }OrganizationInfo;
