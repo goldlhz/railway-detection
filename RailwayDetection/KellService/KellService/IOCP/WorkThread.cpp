@@ -246,28 +246,31 @@ int CWorkThread::DealRecvData(LPOverKeyPire pKeyOverPire, void* parameter, strin
 	if(pKeyOverPire && parameter)
 	{
 		int nRevcCount;
+		timeval tm;
+		fd_set f_set;
 
-		// 接收数据时，设定接收的长度小于缓冲长度2个字节
-		// 以保证在接收GPS数据时不会出现缓冲溢出
-		memset(pKeyOverPire->pireOverLappedex.wsaBuffer, 0x00, BUFFER_SIZE_TO_CLIENT);
-		nRevcCount = recv(pKeyOverPire->pireOverLappedex.wsaClientSocket,
-			pKeyOverPire->pireOverLappedex.wsaBuffer,
-			BUFFER_SIZE_TO_CLIENT - 2,
-			0);
+		FD_ZERO(&f_set);
+		FD_SET(pKeyOverPire->pireOverLappedex.wsaClientSocket, &f_set);
 
-		if(nRevcCount != SOCKET_ERROR)
+		tm.tv_sec = 10;
+		tm.tv_usec = 0;
+
+		nRevcCount = select(0, &f_set, NULL, NULL, &tm);
+		if(nRevcCount > 0)
 		{
-			strContext += pKeyOverPire->pireOverLappedex.wsaBuffer;
-			return 0;
-		}
-		else
-		{
-			if(WSAEWOULDBLOCK == WSAGetLastError())
+			// 接收数据时，设定接收的长度小于缓冲长度2个字节
+			// 以保证在接收GPS数据时不会出现缓冲溢出
+			memset(pKeyOverPire->pireOverLappedex.wsaBuffer, 0x00, BUFFER_SIZE_TO_CLIENT);
+			nRevcCount = recv(pKeyOverPire->pireOverLappedex.wsaClientSocket,
+				pKeyOverPire->pireOverLappedex.wsaBuffer,
+				BUFFER_SIZE_TO_CLIENT - 2,
+				0);
+
+			if(nRevcCount != SOCKET_ERROR)
 			{
-				Sleep(0);
-				return 0;
+				strContext += pKeyOverPire->pireOverLappedex.wsaBuffer;
+				return nRevcCount;
 			}
-			return 1;
 		}
 	}
 

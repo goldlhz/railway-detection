@@ -86,6 +86,15 @@ void CADODatabase::dump_com_error(_com_error &e)
 	m_strErrorDescription = (LPCSTR)bstrDescription ;
 	m_strLastError = _T("Connection String = " + GetConnectionString() + '\n' + ErrorStr);
 	m_dwLastError = e.Error(); 
+
+	//FILE* file;
+	//file = fopen("d:\\info.txt", "a");
+	//if(file)
+	//{
+	//	fwrite(ErrorStr.GetBuffer(), 1, ErrorStr.GetLength(), file);
+	//	fclose(file);
+	//}
+
 	#ifdef _DEBUG
 		AfxMessageBox(ErrorStr, MB_OK | MB_ICONERROR );
 	#endif
