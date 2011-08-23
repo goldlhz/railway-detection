@@ -18,8 +18,12 @@ public:
 	// 缺省认为buffer的长度为1024
 	bool PackGPSUpParse(const char* pDataBuffer, GPS_UpLoad_Pack& gpsUpLoadPack, 
 		DWORD& dNumberOfBytes, string& strGPSContext, string& strTel);	// 解析上行数据包
+
+	bool GetGPSUpContent(const char* pDataBuffer, DWORD& dNumberOfBytes, string& strGPSContext, string& strTEL);
+	bool PackGPSUpParse1(const char* pGPSContext, GPS_UpLoad_Pack& gpsUpLoadPack, const string& strTel);
+
 	bool PackGPSUpPicParse(string& strDestGPSContext, string& strDestGPSPicContext, int& nType);
-	
+
 	int  PackGPSDownBuild(char* pDataBuffer, const GPS_DownLoad_Pack& gpsDownLoadPack);	// 格式化下行数据包
 	void FillGPSFailPack(GPS_DownLoad_Pack& gpsDownLoadPack);							// 填写失败时的返回包
 
@@ -203,6 +207,7 @@ public:
 	bool PackOpteLineDownBuild(char* pDataBuffer, OpteLine_Download_Pack& opteLineDownLoadPack);
 	void FillOpteLineFailPack(OpteLine_Download_Pack& opteLineDownLoadPack);
 
+	bool GetPackLength(const string& strGPSContext, DWORD& nHeaderLength, DWORD& nBodyLength);
 private:
 	int ParseGPSPackHttpShell(const char* pDataBuffer, char* outBuffer, 
 		string& strGPSContext, DWORD& nPackLength, string& strTel);
@@ -350,10 +355,15 @@ private:
 
 	bool ParseOpteLinePackData(const char* pDataBuffer, OpteLine_Upload_Pack& opteLineUpLoadPack);
 	bool BuildOpteLinePackData(char* pDataBuffer, const OpteLine_Download_Pack& opteLineDownLoadPack);
+	
+
 private: 
 	unsigned int GetContextLength(vector<string>& vecGPSLine);
 	string		 GetContextTel(vector<string>& vecGPSLine);
 	int ParseGPSPicDataSite(string& strGPSContext);
+	int  GetGPSSite(const char* pGPSCOntext);
+
+
 	string         m_strFind1;													// 查找  \r\n
 	string		   m_strFind2;													// 查找  0xffffffff
 	string	       m_strSrcBase64;

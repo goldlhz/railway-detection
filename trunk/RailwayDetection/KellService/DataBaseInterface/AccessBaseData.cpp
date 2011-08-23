@@ -28,6 +28,7 @@ bool CAccessBaseData::UploadGPSPack(const GPS_UpLoad_Pack& gpsUpPack,
 {
 	if(m_pDatabase)
 	{
+		bool bErrorCode = false;
 		memset(m_strBuffer, 0x00, INPUTSQLBUFFERS);
 		sprintf_s(m_strBuffer, INPUTSQLBUFFERS, "insert into t_gps(G_time, G_j, G_w, G_tel) values('%s', %.7f, %.7f, '%s')",
 			gpsUpPack.gDataBodyPack.strTime.c_str(), 
@@ -39,12 +40,15 @@ bool CAccessBaseData::UploadGPSPack(const GPS_UpLoad_Pack& gpsUpPack,
 		{
 			if(!m_pDatabase->Open())
 			{
+				bErrorCode = false;
 				goto ErrorDeal;
 			}
 		}
 
+		bErrorCode = true;
 		if(!m_pDatabase->Execute(m_strBuffer))
 		{
+			bErrorCode = false;
 			goto ErrorDeal;
 		}
 
@@ -57,7 +61,7 @@ ErrorDeal:
 		gpsDownPack.gDataBodyPack.strTime = gpsUpPack.gDataBodyPack.strTime;
 
 		gpsDownPack.nBodyLength = 8 + gpsUpPack.gDataBodyPack.nTerminalIdentifyLength;
-		return true;
+		return bErrorCode;
 	}
 	
 	return false;

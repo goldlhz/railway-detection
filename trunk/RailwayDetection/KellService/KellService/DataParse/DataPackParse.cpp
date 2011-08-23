@@ -77,27 +77,113 @@ bool CDataPackParse::PackGPSUpParse(const char* pDataBuffer,
 		{
 			return true;
 		}
+		DoWriteLogInfo(LOG_INFO, _T("CDataPackParse::PackGPSUpParse(), 收到一个无效的数据包"));
 	}
 
 	return false;
 }
 
+bool CDataPackParse::GetGPSUpContent(const char* pDataBuffer, DWORD& dNumberOfBytes, string& strGPSContext, string& strTEL)
+{
+	if(pDataBuffer)
+	{
+		const string& strContent = pDataBuffer;
+		static string strLengthLog = "Content-Length:";
+		static string strTelLog = "X-Up-Calling-Line-Id:";
+		static string strEnter = "\r\n\r\n";
+
+		string::size_type nSite;
+		nSite = strContent.find(strLengthLog);
+		if(string::npos == nSite)
+		{
+			DoWriteLogInfo(LOG_INFO, _T("CDataPackParse::PackGPSUpParse1(nSite), 收到一个无效的数据包"));
+			return false;
+		}
+		
+		string::size_type nSite1;
+		nSite1 = strContent.find("\r\n", nSite);
+		if(string::npos == nSite1)
+		{
+			DoWriteLogInfo(LOG_INFO, _T("CDataPackParse::PackGPSUpParse1(nSite1), 收到一个无效的数据包"));
+			return false;
+		}
+
+		string strLength = strContent.substr(nSite + strLengthLog.length(), nSite1 - (nSite + strLengthLog.length()));
+		dNumberOfBytes = CCommonFunction::StringToInt(strLength);
+
+		nSite = strContent.find(strTelLog);
+		if(string::npos == nSite)
+		{
+			DoWriteLogInfo(LOG_INFO, _T("CDataPackParse::PackGPSUpParse1(nSite10), 收到一个无效的数据包"));
+			return false;
+		}
+
+		nSite1 = strContent.find("\r\n", nSite);
+		if(string::npos == nSite1)
+		{
+			DoWriteLogInfo(LOG_INFO, _T("CDataPackParse::PackGPSUpParse1(nSite11), 收到一个无效的数据包"));
+			return false;
+		}
+
+		CString strTempTel = strContent.substr( nSite + strTelLog.length(), nSite1 - (nSite + strTelLog.length()) ).c_str();
+		strTempTel.Trim();
+
+		strTEL = strTempTel.GetBuffer();
+
+		nSite = strContent.find(strEnter);
+		if(string::npos == nSite)
+		{
+			DoWriteLogInfo(LOG_INFO, _T("CDataPackParse::PackGPSUpParse1(nSite20), 收到一个无效的数据包"));
+			return false;
+		}
+
+		strGPSContext = strContent.substr(nSite + strEnter.length());
+		return true;
+	}
+	return false;
+}
+
+bool CDataPackParse::PackGPSUpParse1(const char* pGPSContext, GPS_UpLoad_Pack& gpsUpLoadPack, const string& strTel)
+{
+	if(pGPSContext)
+	{
+		int nGPSSite ;
+		nGPSSite = GetGPSSite(pGPSContext);
+		if(nGPSSite <= 0)
+		{
+			DoWriteLogInfo(LOG_INFO, _T("CDataPackParse::PackGPSUpParse1, 在GPS包中没有找到定位信息,这不是一个定位包"));
+			return false;
+		}
+
+		memset(m_bufferGPSPack1, 0x00, GPS_BUFFER_SIZE);
+		memcpy(m_bufferGPSPack1, pGPSContext + nGPSSite, 52);
+
+		if(ParseDataPackShell(m_bufferGPSPack1, gpsUpLoadPack))
+		{
+			if(GPS_PACK == gpsUpLoadPack.nMsgNumber)
+			{
+				if(ParseGPSPackData(m_bufferGPSPack1 + 7, gpsUpLoadPack))
+					return true;
+			}
+		}
+	}
+	return false;
+}
+
+
 bool CDataPackParse::PackGPSUpPicParse(string& strDestGPSContext, string& strDestGPSPicContext, int& nType)
 {
 	int nSite;
-
 	unsigned int nPicLength;
 
 	nSite = ParseGPSPicDataSite(strDestGPSContext);
 	if(-1 != nSite)
 	{
 		nPicLength = *(unsigned int*)(&strDestGPSContext[nSite]);
-		nType = *(unsigned short*)(&strDestGPSContext[nSite + 4 + nPicLength]);
-		strDestGPSPicContext.append(&strDestGPSContext[nSite + 4], nPicLength);
-
+		nType = *(unsigned short*)(&strDestGPSContext[nSite + 6 + nPicLength]);
+		strDestGPSPicContext.append(&strDestGPSContext[nSite + 6], nPicLength);
 		return true;
 	}
-
 	return false;
 }
 
@@ -3637,27 +3723,84 @@ int CDataPackParse::ParseGPSPicDataSite(string& strGPSContext)
 	unsigned int nMask = *((unsigned int *)(&strGPSContext[0]));
 	unsigned char cTID = *((unsigned char*)(&strGPSContext[5]));
 
-	if(THINGTALK_TID_MO_PICTURE == cTID)
+	if(!(nMask & THINGTALK_MASK_PICTURE))
+		return -1;
+
+	if(nMask & THINGTALK_MASK_MYNUMBER)
+		nSite += 11;
+
+	if(nMask & THINGTALK_MASK_TIME)
+		nSite += 6;
+
+	if(nMask & THINGTALK_MASK_WORKER_ID)
+		nSite += 20;
+
+	if(nMask & THINGTALK_MASK_GPS)
+		nSite += 52;
+
+	if(nMask & THINGTALK_MASK_SCANNER)
 	{
-		if(nMask & THINGTALK_MASK_MYNUMBER)
-			nSite += 11;
+		short nScannerLength = *((short *)(strGPSContext.c_str()[nSite]));
+		nSite += nScannerLength;
+	}
 
-		if(nMask & THINGTALK_MASK_TIME)
-			nSite += 6;
+	return nSite;
+}
 
-		if(nMask & THINGTALK_MASK_WORKER_ID)
-			nSite += 20;
+int  CDataPackParse::GetGPSSite(const char* pGPSCOntext)
+{
+	int nSite = 6;
+	unsigned int nMask = *((unsigned int *)(&pGPSCOntext[0]));
+	unsigned char cTID = *((unsigned char*)(&pGPSCOntext[5]));
 
-		if(nMask & THINGTALK_MASK_GPS)
-			nSite += 52;
+	if(!(nMask & THINGTALK_MASK_GPS))
+		return -1;
 
-		if(nMask & THINGTALK_MASK_SCANNER)
+	if(nMask & THINGTALK_MASK_MYNUMBER)
+		nSite += 11;
+
+	if(nMask & THINGTALK_MASK_TIME)
+		nSite += 6;
+
+	if(nMask & THINGTALK_MASK_WORKER_ID)
+		nSite += 20;
+
+	return nSite;
+}
+
+bool CDataPackParse::GetPackLength(const string& strGPSContext, DWORD& nHeaderLength, DWORD& nBodyLength)
+{
+	if(!strGPSContext.empty())
+	{
+		static string strLengthLog = "Content-Length:";
+		static string strEnter = "\r\n\r\n";
+
+		string::size_type nSite;
+		nSite = strGPSContext.find(strLengthLog);
+		if(string::npos == nSite)
 		{
-			short nScannerLength = *((short *)(strGPSContext.c_str()[nSite]));
-			nSite += nScannerLength;
+			return false;
 		}
 
-		return nSite;
+		string::size_type nSite1;
+		nSite1 = strGPSContext.find("\r\n", nSite);
+		if(string::npos == nSite1)
+		{
+			return false;
+		}
+
+		string strLength = strGPSContext.substr(nSite + strLengthLog.length(), nSite1 - (nSite + strLengthLog.length()));
+		nBodyLength = CCommonFunction::StringToInt(strLength);
+
+		nSite = strGPSContext.find(strEnter);
+		if(string::npos == nSite)
+		{
+			return false;
+		}
+
+		nHeaderLength = nSite +  strEnter.length() - 1;
+		return true;
 	}
-	return -1;
+	return false;
+
 }

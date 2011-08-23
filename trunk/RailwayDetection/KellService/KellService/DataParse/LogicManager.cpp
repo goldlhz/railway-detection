@@ -328,71 +328,76 @@ int  CLogicManager::DealGPSPack(DWORD dNumberOfBytes,
 	// 我也要返回一个包回去
 	int nFlag = 1;
 	DWORD nBodyLength;
+	string strSourContext;
 	string strGPSContext;
+	string strDestGPSContext;
+	string strDestGPSPicContext;
 	string strTel;
+	int    nType = 0;
 
 	FPDealRecvData DealRecvData = (FPDealRecvData)pFunRecvData;
 	FPDealSendData DealSendData = (FPDealSendData)pFunSendData;
-	char * pBuffer = pKeyOverPire->pireOverLappedex.wsaBuffer;
+	char* pBuffer = pKeyOverPire->pireOverLappedex.wsaBuffer;
+	strSourContext = pKeyOverPire->pireOverLappedex.wsaBuffer;
 
-	if(m_DataPackPares.PackGPSUpParse(pBuffer, m_gpsUpPack, nBodyLength, strGPSContext, strTel))
+	//新修改程序
+	if(m_DataPackPares.GetGPSUpContent(strSourContext.c_str(), nBodyLength, strGPSContext, strTel))
 	{
-		if(strGPSContext.empty())
+		nFlag = 1;
+		while(strGPSContext.length() < (nBodyLength - 1))
 		{
-			if(m_AccessBaseData.InitAccesser(pDatabase))
-			{
-				m_AccessBaseData.UploadGPSPack(m_gpsUpPack, m_gpsDownPack);
-			}
+			nFlag = DealRecvData(pKeyOverPire, pWorkThread, strGPSContext);
+			if(nFlag <= 0)
+				break;
 		}
-		else
+		if(nFlag > 0)
 		{
-			while(strGPSContext.length() < nBodyLength)
+			strDestGPSContext = base64_decode(strGPSContext);
+
+			// Deal gps data
+			if(m_DataPackPares.PackGPSUpParse1(strDestGPSContext.c_str(), m_gpsUpPack, strTel))
 			{
-				nFlag = DealRecvData(pKeyOverPire, pWorkThread, strGPSContext);
-				if(nFlag != 0)
-					break;
+				if(m_AccessBaseData.InitAccesser(pDatabase))
+				{
+					if(!m_AccessBaseData.UploadGPSPack(m_gpsUpPack, m_gpsDownPack))
+					{ 
+						DoWriteLogInfo(LOG_INFO, _T("CLogicManager::DealGPSPack(), GPS信息写入数据库时出错"));
+					}
+				}
 			}
 
-			if(0 == nFlag)
+			// deal pic data
+			if(m_DataPackPares.PackGPSUpPicParse(strDestGPSContext, strDestGPSPicContext, nType))
 			{
-				int    nType = 0;
-				string strDestGPSContext;
-				string strDestGPSPicContext;
-				strDestGPSContext = base64_decode(strGPSContext);
-
-				if(m_DataPackPares.PackGPSUpPicParse(strDestGPSContext, strDestGPSPicContext, nType))
+				if(m_AccessBaseData.InitAccesser(pDatabase))
 				{
-					if(m_AccessBaseData.InitAccesser(pDatabase))
+					string strPicName;
+					GPSPIC_Pack gpsPicUpLoadPack;
+
+					FillPicStoreStruct(gpsPicUpLoadPack, strTel, nType);
+					strPicName = pGobalConfig->GetPicFilePath() + "\\" + gpsPicUpLoadPack.strPicName.substr(0, 8);//gpsPicUpLoadPack.strTime;
+
+					if(BuildPicDir(strPicName))
 					{
-						string strPicName;
-						GPSPIC_Pack gpsPicUpLoadPack;
-
-						FillPicStoreStruct(gpsPicUpLoadPack, strTel, nType);
-						strPicName = pGobalConfig->GetPicFilePath() + "\\" + gpsPicUpLoadPack.strPicName.substr(0, 8);//gpsPicUpLoadPack.strTime;
-
-						if(BuildPicDir(strPicName))
+						if(m_AccessBaseData.UpLoadGPSPICPack(gpsPicUpLoadPack))
 						{
-							if(m_AccessBaseData.UpLoadGPSPICPack(gpsPicUpLoadPack))
+							strPicName = strPicName + "\\" + gpsPicUpLoadPack.strPicName;
+							FILE* fPic = fopen(strPicName.c_str(), "wb");
+							if(fPic)
 							{
-								strPicName = strPicName + "\\" + gpsPicUpLoadPack.strPicName;
-								FILE* fPic = fopen(strPicName.c_str(), "wb");
-								if(fPic)
-								{
-									fwrite(strDestGPSPicContext.c_str(), strDestGPSPicContext.length(), 1, fPic);
-									fclose(fPic);
-								}
+								fwrite(strDestGPSPicContext.c_str(), strDestGPSPicContext.length(), 1, fPic);
+								fclose(fPic);
 							}
 						}
 					}
 				}
-			}
+			}	
 		}
-	}
+	}		
 
 	nBodyLength = m_DataPackPares.PackGPSDownBuild(pBuffer, m_gpsDownPack);
 	pKeyOverPire->pireOverLappedex.wsaWSABUF.len = nBodyLength;
 	DealSendData(pKeyOverPire, pWorkThread);
-
 	return -2;
 }
 
