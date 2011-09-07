@@ -407,6 +407,7 @@ struct GetRailWayTableName_Download_Type
 {
 	unsigned int nTotlePack;
 	unsigned int nHadSendPack;
+	unsigned int nID;
 	string		 strnName;
 };
 typedef Pack_Shell_Type<GetRailWayTableName_Upload_Type>   GetRailWayName_Upload_Pack;
@@ -802,6 +803,92 @@ struct WorkerPoll_Download_Type
 typedef Pack_Shell_Type<WorkerPoll_Upload_Type> WorkerPoll_Upload_Pack;
 typedef Pack_Shell_Type<WorkerPoll_Download_Type> WorkerPoll_Download_Pack;
 
+// 系统设置msgnum = 0x33
+struct SysSetting_Upload_Type
+{
+	unsigned int nDataBak;	//gps数据备份时间
+	unsigned int nBak;		//
+	unsigned int nBak1;		//
+	float        fWarnTime;	//数据警告时间
+	float		 fBak;
+	string       strData;
+	string		 strData1;
+};
+struct SysSetting_Download_Type
+{
+	unsigned int nResult;
+};
+typedef Pack_Shell_Type<SysSetting_Upload_Type> SysSetting_Upload_Pack;
+typedef Pack_Shell_Type<SysSetting_Download_Type> SysSetting_Download_Pack;
+
+// 获取系统设置msgnum = 0x34
+struct SysSettingGet_Upload_Type
+{
+	// 无内容
+};
+struct SysSettingGet_Download_Type
+{
+	unsigned int nDataBak;	//gps数据备份时间
+	unsigned int nBak;		//
+	unsigned int nBak1;		//
+	float        fWarnTime;	//数据警告时间
+	float		 fBak;
+	string       strData;
+	string		 strData1;
+};
+typedef Pack_Shell_Type<SysSettingGet_Upload_Type> SysSettingGet_Upload_Pack;
+typedef Pack_Shell_Type<SysSettingGet_Download_Type> SysSettingGet_Download_Pack;
+
+// 修改密码 msgnum = 0x35
+struct ModifyPassword_Upload_Type
+{
+	string strOper;
+	string strPassword;
+};
+struct ModifyPassword_Download_Type
+{
+	unsigned int nResult;
+};
+typedef Pack_Shell_Type<ModifyPassword_Upload_Type> ModifyPassword_Upload_Pack;
+typedef Pack_Shell_Type<ModifyPassword_Download_Type> ModifyPassword_Download_Pack;
+
+// 月度机构人员警告点 msgnum=0x36
+struct WorkWramPoint_Upload_Type
+{
+	unsigned  int nOrgID;
+	unsigned  int nYear;
+	unsigned  int nMonth;
+
+};
+struct WorkWramPoint_Download_Type
+{
+	unsigned  int nTotlePacket;
+	unsigned  int nCurrentPacket;
+	string       strLineName; // 线路名称
+	float        fDirect ;//公里处
+	string       strUserId;
+	string       strSTime;
+	string       strRealTime;
+	string       strData;
+	unsigned int nPointState;
+};
+typedef Pack_Shell_Type<WorkWramPoint_Upload_Type> WorkWramPoint_Upload_Pack;
+typedef Pack_Shell_Type<WorkWramPoint_Download_Type> WorkWramPoint_Download_Pack;
+
+// 线路添加、修改、删除 msgnum = 0x37
+struct OpteLine_Upload_Type
+{
+	unsigned  int nType;//0 add 1 edit 2 del
+	unsigned  int nID;
+	string        strName;
+};
+struct OpteLine_Download_Type
+{
+	unsigned int nResult;
+};
+typedef Pack_Shell_Type<OpteLine_Upload_Type> OpteLine_Upload_Pack;
+typedef Pack_Shell_Type<OpteLine_Download_Type> OpteLine_Download_Pack;
+
 //////////////////////////////////////////////////////////////////////////
 ///
 /// 数据包类型宏定义
@@ -849,3 +936,8 @@ typedef Pack_Shell_Type<WorkerPoll_Download_Type> WorkerPoll_Download_Pack;
 #define WORKERPOLLQUERY_PACK			0X30
 #define	URGENCYMISSIONDELETE_PACK		0X31
 #define WORKERPOLL_PACK					0X32
+#define SYSSETTING_PACK					0X33
+#define SYSSETTINGGET_PACK				0X34
+#define MODIFYPASS_PACK					0X35
+#define WORKERWARNPOINT_PACK			0X36
+#define OPTELINE_PACK					0X37
