@@ -250,6 +250,7 @@ private:
 		CADODatabase* pDatabase);
 private:
 	void FillPicStoreStruct(GPSPIC_Pack& gpsPicUpLoadPack, string strTel, int nType);
+	void FileVedioStruct(Vedio_Pack& gpsVedioLoadPack, string strTel, int nType);
 	bool BuildPicDir(string strDir);
 
 	CDataPackParse			m_DataPackPares;

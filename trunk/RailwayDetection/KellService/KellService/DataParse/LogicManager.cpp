@@ -333,6 +333,7 @@ int  CLogicManager::DealGPSPack(DWORD dNumberOfBytes,
 	string strDestGPSContext;
 	string strDestGPSPicContext;
 	string strTel;
+	int    nFileType = 0;
 	int    nType = 0;
 
 	FPDealRecvData DealRecvData = (FPDealRecvData)pFunRecvData;
@@ -367,29 +368,67 @@ int  CLogicManager::DealGPSPack(DWORD dNumberOfBytes,
 			}
 
 			// deal pic data
-			if(m_DataPackPares.PackGPSUpPicParse(strDestGPSContext, strDestGPSPicContext, nType))
+			if(m_DataPackPares.PackGPSUpPicParse(strDestGPSContext, strDestGPSPicContext, nType, nFileType))
 			{
-				if(m_AccessBaseData.InitAccesser(pDatabase))
+				switch(nFileType)
 				{
-					string strPicName;
-					GPSPIC_Pack gpsPicUpLoadPack;
-
-					FillPicStoreStruct(gpsPicUpLoadPack, strTel, nType);
-					strPicName = pGobalConfig->GetPicFilePath() + "\\" + gpsPicUpLoadPack.strPicName.substr(0, 8);//gpsPicUpLoadPack.strTime;
-
-					if(BuildPicDir(strPicName))
+				case 1:
 					{
-						if(m_AccessBaseData.UpLoadGPSPICPack(gpsPicUpLoadPack))
+						if(m_AccessBaseData.InitAccesser(pDatabase))
 						{
-							strPicName = strPicName + "\\" + gpsPicUpLoadPack.strPicName;
-							FILE* fPic = fopen(strPicName.c_str(), "wb");
-							if(fPic)
+							string strPicName;
+							GPSPIC_Pack gpsPicUpLoadPack;
+
+							FillPicStoreStruct(gpsPicUpLoadPack, strTel, nType);
+							strPicName = pGobalConfig->GetPicFilePath() + "\\" + gpsPicUpLoadPack.strPicName.substr(0, 8) + "_pic";//gpsPicUpLoadPack.strTime;
+
+							if(BuildPicDir(strPicName))
 							{
-								fwrite(strDestGPSPicContext.c_str(), strDestGPSPicContext.length(), 1, fPic);
-								fclose(fPic);
+								if(m_AccessBaseData.UpLoadGPSPICPack(gpsPicUpLoadPack))
+								{
+									strPicName = strPicName + "\\" + gpsPicUpLoadPack.strPicName;
+									FILE* fPic = fopen(strPicName.c_str(), "wb");
+									if(fPic)
+									{
+										fwrite(strDestGPSPicContext.c_str(), strDestGPSPicContext.length(), 1, fPic);
+										fclose(fPic);
+									}
+								}
 							}
 						}
 					}
+					break;
+				case 2:
+					{
+						if(m_AccessBaseData.InitAccesser(pDatabase))
+						{
+							string strVedioName;
+							Vedio_Pack gpsVedioUpLoadPack;
+
+							FileVedioStruct(gpsVedioUpLoadPack, strTel, nType);
+							strVedioName = pGobalConfig->GetPicFilePath() + "\\" + gpsVedioUpLoadPack.strName.substr(0, 8) + "_veido";//gpsPicUpLoadPack.strTime;
+
+							if(BuildPicDir(strVedioName))
+							{
+								if(m_AccessBaseData.UpLoadGPSVEDIOPack(gpsVedioUpLoadPack))
+								{
+									strVedioName = strVedioName + "\\" + gpsVedioUpLoadPack.strName;
+									FILE* fPic = fopen(strVedioName.c_str(), "wb");
+									if(fPic)
+									{
+										fwrite(strDestGPSPicContext.c_str(), strDestGPSPicContext.length(), 1, fPic);
+										fclose(fPic);
+									}
+								}
+							}
+						}
+					}
+					break;
+				case 3:
+					{
+
+					}
+					break;
 				}
 			}	
 		}
@@ -2326,6 +2365,19 @@ void CLogicManager::FillPicStoreStruct(GPSPIC_Pack& gpsPicUpLoadPack, string str
 		gpsPicUpLoadPack.strPicName.substr(12, 2);
 	gpsPicUpLoadPack.strTel = strTel;
 	gpsPicUpLoadPack.nType = nType;
+}
+
+void CLogicManager::FileVedioStruct(Vedio_Pack& gpsVedioLoadPack, string strTel, int nType)
+{
+	gpsVedioLoadPack.strName = CCommonFunction::GetCurrentTimeByFormat() + ".3g2";
+	gpsVedioLoadPack.strTime = gpsVedioLoadPack.strName.substr(0, 4) + "-" + 
+		gpsVedioLoadPack.strName.substr(4, 2) + "-" +
+		gpsVedioLoadPack.strName.substr(6, 2) + " " +
+		gpsVedioLoadPack.strName.substr(8, 2) + ":" +
+		gpsVedioLoadPack.strName.substr(10, 2) +":" +
+		gpsVedioLoadPack.strName.substr(12, 2);
+	gpsVedioLoadPack.strTel = strTel;
+	gpsVedioLoadPack.nType = nType;
 }
 
 bool CLogicManager::BuildPicDir(string strDir)

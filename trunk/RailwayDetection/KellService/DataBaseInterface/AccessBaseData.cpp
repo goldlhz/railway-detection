@@ -94,6 +94,33 @@ bool CAccessBaseData::UpLoadGPSPICPack(const GPSPIC_Pack& gpsPicUpLoadPack)
 	return false;
 }
 
+bool CAccessBaseData::UpLoadGPSVEDIOPack(const Vedio_Pack& gpsVedioUpLoadPack)
+{
+	if(m_pDatabase)
+	{
+		memset(m_strBuffer, 0x00, INPUTSQLBUFFERS);
+		sprintf_s(m_strBuffer, INPUTSQLBUFFERS, "insert into t_vedio(V_name, V_Telno, V_timer, V_type) values('%s', '%s', '%s', %d)",
+			gpsVedioUpLoadPack.strName .c_str(), 
+			gpsVedioUpLoadPack.strTel.c_str(), 
+			gpsVedioUpLoadPack.strTime.c_str(),
+			gpsVedioUpLoadPack.nType);
+
+		if(!m_pDatabase->IsOpen())
+		{
+			if(!m_pDatabase->Open())
+			{
+				return false;
+			}
+		}
+
+		if(m_pDatabase->Execute(m_strBuffer))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 bool CAccessBaseData::UploadLoginPack(const Login_UpLoad_Pack& loginUpPack, 
 	Login_DownLoad_Pack& loginDownPack)
 {

@@ -19,6 +19,8 @@ public:
 
 	bool UpLoadGPSPICPack(const GPSPIC_Pack& gpsPicUpLoadPack); 
 
+	bool UpLoadGPSVEDIOPack(const Vedio_Pack& gpsVedioUpLoadPack);
+
 	bool UploadLoginPack(const Login_UpLoad_Pack& loginUpPack, 
 		Login_DownLoad_Pack& loginDownPack);
 

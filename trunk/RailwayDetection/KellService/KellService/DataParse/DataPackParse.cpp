@@ -171,10 +171,11 @@ bool CDataPackParse::PackGPSUpParse1(const char* pGPSContext, GPS_UpLoad_Pack& g
 }
 
 
-bool CDataPackParse::PackGPSUpPicParse(string& strDestGPSContext, string& strDestGPSPicContext, int& nType)
+bool CDataPackParse::PackGPSUpPicParse(string& strDestGPSContext, string& strDestGPSPicContext, int& nType, int& nFileType)
 {
 	int nSite;
 	unsigned int nPicLength;
+	char strFileName[33] = {0};
 
 	nSite = ParseGPSPicDataSite(strDestGPSContext);
 	if(-1 != nSite)
@@ -182,7 +183,25 @@ bool CDataPackParse::PackGPSUpPicParse(string& strDestGPSContext, string& strDes
 		nPicLength = *(unsigned int*)(&strDestGPSContext[nSite]);
 		nType = *(unsigned short*)(&strDestGPSContext[nSite + 6 + nPicLength]);
 		strDestGPSPicContext.append(&strDestGPSContext[nSite + 6], nPicLength);
-		return true;
+
+		memcpy(strFileName, (void*)(&strDestGPSContext[nSite + 6 + nPicLength + 20]), 32);
+		string strName = strFileName;
+
+		if(string::npos != strName.find(".jpg"))
+		{
+			nFileType = 1;
+			return true;
+		}
+		else if(string::npos != strName.find(".3g2"))
+		{
+			nFileType = 2;
+			return true;
+		}
+		else if(string::npos != strName.find(".qcp"))
+		{
+			nFileType = 3;
+			return true;
+		}
 	}
 	return false;
 }
