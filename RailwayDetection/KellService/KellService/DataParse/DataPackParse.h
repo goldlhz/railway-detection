@@ -22,7 +22,7 @@ public:
 	bool GetGPSUpContent(const char* pDataBuffer, DWORD& dNumberOfBytes, string& strGPSContext, string& strTEL);
 	bool PackGPSUpParse1(const char* pGPSContext, GPS_UpLoad_Pack& gpsUpLoadPack, const string& strTel);
 
-	bool PackGPSUpPicParse(string& strDestGPSContext, string& strDestGPSPicContext, int& nType);
+	bool PackGPSUpPicParse(string& strDestGPSContext, string& strDestGPSPicContext, int& nType, int& nFileType);
 
 	int  PackGPSDownBuild(char* pDataBuffer, const GPS_DownLoad_Pack& gpsDownLoadPack);	// 格式化下行数据包
 	void FillGPSFailPack(GPS_DownLoad_Pack& gpsDownLoadPack);							// 填写失败时的返回包
