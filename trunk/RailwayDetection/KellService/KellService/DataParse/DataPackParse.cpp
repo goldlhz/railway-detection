@@ -2077,6 +2077,91 @@ void CDataPackParse::FillOpteLineFailPack(OpteLine_Download_Pack& opteLineDownLo
 	opteLineDownLoadPack.gDataBodyPack.nResult = 0;
 }
 
+bool CDataPackParse::PackGetVedioListPackUpPack(const char* pDataBuffer, GetVedioList_Upload_Pack& getVedioListUpLoadPack)
+{
+	ASSERT(pDataBuffer);
+	if(pDataBuffer)
+	{
+		if(ParseDataPackShell(pDataBuffer, getVedioListUpLoadPack))
+		{
+			if(GETVEDIOLIST_PACK == getVedioListUpLoadPack.nMsgNumber)
+			{
+				if(ParseGetVedioListPackData(pDataBuffer + 7, getVedioListUpLoadPack))
+					return true;
+			}
+		}
+	}
+	return false;
+}
+bool CDataPackParse::PackGetVedioListPackDownBuild(char* pDataBuffer, GetVedioList_Download_Pack& getVedioListDownLoadPack)
+{
+	ASSERT(pDataBuffer);
+	if(pDataBuffer)
+	{
+		memset(pDataBuffer, 0x00, BUFFER_SIZE_TO_CLIENT);
+		if(BuildDataPackShell(pDataBuffer, getVedioListDownLoadPack, GETVEDIOLIST_PACK))
+		{
+			if(BuildGetVedioListPackData(pDataBuffer + 7, getVedioListDownLoadPack))
+				return true;
+		}
+	}
+	return false;
+}
+void CDataPackParse::FillGetVedioListPackFailPack(GetVedioList_Download_Pack& getVedioListDownLoadPack)
+{
+	getVedioListDownLoadPack.nBeginIdentify = PACK_IDENTIFY;
+	getVedioListDownLoadPack.nMsgNumber = GETVEDIOLIST_PACK;
+	getVedioListDownLoadPack.nBodyLength = 82;
+
+	getVedioListDownLoadPack.gDataBodyPack.nTotalPacket = 0;
+	getVedioListDownLoadPack.gDataBodyPack.nCurrentPacket = 0;
+	getVedioListDownLoadPack.gDataBodyPack.strName = "";
+	getVedioListDownLoadPack.gDataBodyPack.strTime = "";
+	getVedioListDownLoadPack.gDataBodyPack.nType = 0;
+	getVedioListDownLoadPack.gDataBodyPack.strTel = "";
+}
+
+bool CDataPackParse::PackGetVedioDataUpPack(const char* pDataBuffer, GetVedioData_Upload_Pack& getVedioDataUpLoadPack)
+{
+	ASSERT(pDataBuffer);
+	if(pDataBuffer)
+	{
+		if(ParseDataPackShell(pDataBuffer, getVedioDataUpLoadPack))
+		{
+			if(GETVEDIODATA_PACK == getVedioDataUpLoadPack.nMsgNumber)
+			{
+				if(ParseGetVedioDataPackData(pDataBuffer + 7, getVedioDataUpLoadPack))
+					return true;
+			}
+		}
+	}
+	return false;
+}
+bool CDataPackParse::PackGetVedioDataDownBuild(char* pDataBuffer, GetVedioData_Download_Pack& getVedioDataDownLoadPack)
+{
+	ASSERT(pDataBuffer);
+	if(pDataBuffer)
+	{
+		memset(pDataBuffer, 0x00, BUFFER_SIZE_TO_CLIENT);
+		if(BuildDataPackShell(pDataBuffer, getVedioDataDownLoadPack, GETVEDIODATA_PACK))
+		{
+			if(BuildGetVedioDataPackData(pDataBuffer + 7, getVedioDataDownLoadPack))
+				return true;
+		}
+	}
+	return false;
+}
+void CDataPackParse::FillGetVedioDataFilePack(GetVedioData_Download_Pack& getVedioDataDownLoadPack)
+{
+	getVedioDataDownLoadPack.nBeginIdentify = PACK_IDENTIFY;
+	getVedioDataDownLoadPack.nMsgNumber = GETVEDIODATA_PACK;
+	getVedioDataDownLoadPack.nBodyLength = 1024+12;
+
+	getVedioDataDownLoadPack.gDataBodyPack.nTtlePacket = 0;
+	getVedioDataDownLoadPack.gDataBodyPack.nCurrentPacket = 0;
+	getVedioDataDownLoadPack.gDataBodyPack.nPagesize = 0;
+}
+
 int CDataPackParse::ParseGPSPackHttpShell(const char* pDataBuffer, char* outBuffer, 
 	string& strGPSContext, DWORD& nPackLength, string& strTel)
 {
@@ -3670,6 +3755,73 @@ bool CDataPackParse::BuildOpteLinePackData(char* pDataBuffer, const OpteLine_Dow
 	}
 	return false;
 }
+
+bool CDataPackParse::ParseGetVedioListPackData(const char* pDataBuffer, GetVedioList_Upload_Pack& getVedioListUpLoadPack)
+{
+	ASSERT(pDataBuffer);
+	if(pDataBuffer)
+	{
+		memset(m_tempBuffer1, 0x00, TEMP_BUFFER_SIZE);
+		memset(m_tempBuffer2, 0x00, TEMP_BUFFER_SIZE);
+
+		getVedioListUpLoadPack.gDataBodyPack.nOrgID = *((unsigned int*)(pDataBuffer));
+		memcpy(m_tempBuffer1, pDataBuffer + 4, 20);
+		memcpy(m_tempBuffer2, pDataBuffer + 24, 20);
+		getVedioListUpLoadPack.gDataBodyPack.strSTime = m_tempBuffer1;
+		getVedioListUpLoadPack.gDataBodyPack.strETime = m_tempBuffer2;
+
+		return true;
+	}
+	return false;
+}
+bool CDataPackParse::BuildGetVedioListPackData(char* pDataBuffer, const GetVedioList_Download_Pack& getVedioListDownLoadPack)
+{
+	ASSERT(pDataBuffer);
+	if(pDataBuffer)
+	{
+		*((unsigned int*)(pDataBuffer)) = getVedioListDownLoadPack.gDataBodyPack.nTotalPacket;
+		*((unsigned int*)(pDataBuffer + 4)) = getVedioListDownLoadPack.gDataBodyPack.nCurrentPacket;
+		memcpy(pDataBuffer + 8, getVedioListDownLoadPack.gDataBodyPack.strName.c_str(), getVedioListDownLoadPack.gDataBodyPack.strName.length());
+		memcpy(pDataBuffer + 38, getVedioListDownLoadPack.gDataBodyPack.strTime.c_str(), getVedioListDownLoadPack.gDataBodyPack.strTime.length());
+		*((unsigned int*)(pDataBuffer + 58)) = getVedioListDownLoadPack.gDataBodyPack.nType; 
+		memcpy(pDataBuffer + 62, getVedioListDownLoadPack.gDataBodyPack.strTel.c_str(), getVedioListDownLoadPack.gDataBodyPack.strTel.length());
+
+		return true;
+	}
+	return false;
+}
+
+
+bool CDataPackParse::ParseGetVedioDataPackData(const char* pDataBuffer, GetVedioData_Upload_Pack& getVedioDataUpLoadPack)
+{
+	ASSERT(pDataBuffer);
+	if(pDataBuffer)
+	{
+		memset(m_tempBuffer1, 0x00, TEMP_BUFFER_SIZE);
+
+		memcpy(m_tempBuffer1, pDataBuffer, 30);
+		getVedioDataUpLoadPack.gDataBodyPack.strVedioName = m_tempBuffer1;
+
+		return true;
+	}
+	return false;
+}
+bool CDataPackParse::BuildGetVedioDataPackData(char* pDataBuffer, const GetVedioData_Download_Pack& getVedioDataDownLoadPack)
+{
+	ASSERT(pDataBuffer);
+	if(pDataBuffer)
+	{
+		*((unsigned int*)(pDataBuffer)) = getVedioDataDownLoadPack.gDataBodyPack.nTtlePacket;
+		*((unsigned int*)(pDataBuffer + 4)) = getVedioDataDownLoadPack.gDataBodyPack.nCurrentPacket;
+		*((unsigned int*)(pDataBuffer + 8)) = getVedioDataDownLoadPack.gDataBodyPack.nPagesize;
+
+		memcpy(pDataBuffer + 12, getVedioDataDownLoadPack.gDataBodyPack.picBuffer, 1024);
+
+		return true;
+	}
+	return false;
+}
+
 
 unsigned int CDataPackParse::GetContextLength(vector<string>& vecGPSLine)
 {

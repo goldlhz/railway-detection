@@ -311,6 +311,16 @@ int CLogicManager::SetLogicData(DWORD dNumberOfBytes,
 			nBackCode = DealOpteLinePack(dNumberOfBytes, pcBuffer, pDatabase);
 			pKeyOverPire->pireOverLappedex.wsaWSABUF.len = nBackCode;
 			break;
+
+		case GETVEDIOLIST_PACK:
+			nBackCode = DealGetVedioListPack(dNumberOfBytes, pKeyOverPire, pDatabase, pWorkThread, pFunSendData);
+			pKeyOverPire->pireOverLappedex.wsaWSABUF.len = nBackCode;
+			break;
+
+		case GETVEDIODATA_PACK:
+			nBackCode = DealGetVedioDataPack(dNumberOfBytes, pKeyOverPire, pDatabase, pWorkThread, pFunSendData, pGobalConfig);
+			pKeyOverPire->pireOverLappedex.wsaWSABUF.len = nBackCode;
+			break;
 		}
 	}
 	return nBackCode;
@@ -1641,7 +1651,7 @@ int  CLogicManager::DealGetPicDataPack(DWORD dNumberOfBytes,
 				FILE * fPic = NULL;
 				string strPicnName;
 
-				strPicnName = pGobalConfig->GetPicFilePath() + "\\" + gpsPicPack.strPicName.substr(0, 8) + "\\" + gpsPicPack.strPicName;
+				strPicnName = pGobalConfig->GetPicFilePath() + "\\" + gpsPicPack.strPicName.substr(0, 8) + "_pic\\" + gpsPicPack.strPicName;
 				fPic = fopen(strPicnName.c_str(), "rb");
 				if(fPic)
 				{
@@ -2352,6 +2362,158 @@ int  CLogicManager::DealOpteLinePack(DWORD dNumberOfBytes,
 	m_DataPackPares.PackOpteLineDownBuild(pBuffer, m_opteLineDownPack);
 
 	return m_opteLineDownPack.nBodyLength + 11;
+}
+
+int  CLogicManager::DealGetVedioListPack(DWORD dNumberOfBytes, 
+				LPOverKeyPire pKeyOverPire, 
+				CADODatabase* pDatabase,
+				void* pWorkThread,
+				void* pFunDealSendData)
+{
+	FPDealSendData DealSendData = (FPDealSendData)pFunDealSendData;
+
+	char * pBuffer = pKeyOverPire->pireOverLappedex.wsaBuffer;
+
+	if(m_DataPackPares.PackGetVedioListPackUpPack(pBuffer, m_getVedioListUpPack))
+	{
+		if(m_AccessBaseData.InitAccesser(pDatabase))
+		{
+			auto_ptr<CADORecordset> pRecordset(m_AccessBaseData.UpLoadGetVedioListPack(m_getVedioListUpPack));
+			if(pRecordset.get())
+			{
+				DWORD nHadSendRecord;
+				DWORD nTitleRecord = pRecordset->GetRecordCount();
+
+				if(nTitleRecord > 0)
+				{
+					CString strTemp;
+					int     nTemp;
+
+					pRecordset->MoveFirst();
+					for (nHadSendRecord = 1; !pRecordset->IsEOF(); ++nHadSendRecord, pRecordset->MoveNext())
+					{
+						m_getVedioListDownPack.gDataBodyPack.nTotalPacket = nTitleRecord;
+						m_getVedioListDownPack.gDataBodyPack.nCurrentPacket = nHadSendRecord;
+
+						pRecordset->GetFieldValue("V_name", strTemp);
+						m_getVedioListDownPack.gDataBodyPack.strName = strTemp;
+						strTemp.LockBuffer();
+
+						pRecordset->GetFieldValue("V_timer", strTemp);
+						m_getVedioListDownPack.gDataBodyPack.strTime = strTemp;
+						strTemp.LockBuffer();
+
+						pRecordset->GetFieldValue("V_type", nTemp);
+						m_getVedioListDownPack.gDataBodyPack.nType = nTemp;
+
+						pRecordset->GetFieldValue("V_Telno", strTemp);
+						m_getVedioListDownPack.gDataBodyPack.strTel = strTemp;
+						strTemp.LockBuffer();
+
+						m_getVedioListDownPack.nBodyLength = 82;
+						m_DataPackPares.PackGetVedioListPackDownBuild(pBuffer, m_getVedioListDownPack);
+						pKeyOverPire->pireOverLappedex.wsaWSABUF.len = m_getVedioListDownPack.nBodyLength + 11;
+
+						nTemp = DealSendData(pKeyOverPire, pWorkThread);
+						if(0 != nTemp)
+							return -2;
+					}
+					return 0;
+				}
+			}
+		}
+	}
+
+	m_DataPackPares.FillGetVedioListPackFailPack(m_getVedioListDownPack);
+	m_DataPackPares.PackGetVedioListPackDownBuild(pBuffer, m_getVedioListDownPack);
+	pKeyOverPire->pireOverLappedex.wsaWSABUF.len = m_getVedioListDownPack.nBodyLength + 11;
+
+	DealSendData(pKeyOverPire, pWorkThread);
+	return 0;
+}
+
+int  CLogicManager::DealGetVedioDataPack(DWORD dNumberOfBytes, 
+				LPOverKeyPire pKeyOverPire, 
+				CADODatabase* pDatabase,
+				void* pWorkThread,
+				void* pFunDealSendData,
+				CGobalConfig* pGobalConfig)
+{
+	Vedio_Pack gpsVedioPack;
+	FPDealSendData DealSendData = (FPDealSendData)pFunDealSendData;
+
+	char * pBuffer = pKeyOverPire->pireOverLappedex.wsaBuffer;
+
+	if(m_DataPackPares.PackGetVedioDataUpPack(pBuffer, m_getVedioDataUpPack))
+	{
+		if(m_AccessBaseData.InitAccesser(pDatabase))
+		{
+			if(m_AccessBaseData.UpLoadGetVedioDataPack(m_getVedioDataUpPack, gpsVedioPack))
+			{
+				FILE * fPic = NULL;
+				string strPicnName;
+
+				strPicnName = pGobalConfig->GetPicFilePath() + "\\" + gpsVedioPack.strName.substr(0, 8) + "_veido\\" + gpsVedioPack.strName;
+				fPic = fopen(strPicnName.c_str(), "rb");
+				if(fPic)
+				{
+					long lFileLength;
+					const int nBufferLength = 1024;
+
+					fseek(fPic, 0, SEEK_END);
+					lFileLength = ftell(fPic);
+
+					if(lFileLength > 0)
+					{
+						int nTotalPack;
+						int nCurrentPack;
+						int nReadCount;
+						int nTemp;
+
+						if((lFileLength % nBufferLength) == 0)
+							nTotalPack = lFileLength / (nBufferLength);
+						else
+							nTotalPack = lFileLength / (nBufferLength) + 1;
+
+						fseek(fPic, 0, SEEK_SET);
+						for (nCurrentPack = 1; nCurrentPack <= nTotalPack ; ++nCurrentPack )
+						{
+							m_getVedioDataDownPack.gDataBodyPack.nTtlePacket = nTotalPack;
+							m_getVedioDataDownPack.gDataBodyPack.nCurrentPacket = nCurrentPack;
+							m_getVedioDataDownPack.gDataBodyPack.nPagesize = lFileLength;
+
+							memset(m_getVedioDataDownPack.gDataBodyPack.picBuffer, 0x00, nBufferLength);
+
+							nReadCount = fread(m_getVedioDataDownPack.gDataBodyPack.picBuffer, 1, nBufferLength, fPic);
+							if(nReadCount > 0)
+							{
+								m_getVedioDataDownPack.nBodyLength = nBufferLength + 12;
+								m_DataPackPares.PackGetVedioDataDownBuild(pBuffer, m_getVedioDataDownPack);
+								pKeyOverPire->pireOverLappedex.wsaWSABUF.len = m_getVedioDataDownPack.nBodyLength + 11;
+
+								nTemp = DealSendData(pKeyOverPire, pWorkThread);
+								if(0 != nTemp)
+								{
+									fclose(fPic);
+									return -2;
+								}
+							}
+						}
+						fclose(fPic);
+						return 0;
+					}
+					fclose(fPic);
+				}
+			}
+		}
+	}
+
+	m_DataPackPares.FillGetVedioDataFilePack(m_getVedioDataDownPack);
+	m_DataPackPares.PackGetVedioDataDownBuild(pBuffer, m_getVedioDataDownPack);
+	pKeyOverPire->pireOverLappedex.wsaWSABUF.len = m_getVedioDataDownPack.nBodyLength + 11;
+
+	DealSendData(pKeyOverPire, pWorkThread);
+	return 0;
 }
 
 void CLogicManager::FillPicStoreStruct(GPSPIC_Pack& gpsPicUpLoadPack, string strTel, int nType)

@@ -248,6 +248,19 @@ private:
 	int  DealOpteLinePack(DWORD dNumberOfBytes, 
 		char  * pBuffer, 
 		CADODatabase* pDatabase);
+
+	int  DealGetVedioListPack(DWORD dNumberOfBytes, 
+		LPOverKeyPire pKeyOverPire, 
+		CADODatabase* pDatabase,
+		void* pWorkThread,
+		void* pFunDealSendData);
+
+	int  DealGetVedioDataPack(DWORD dNumberOfBytes, 
+		LPOverKeyPire pKeyOverPire, 
+		CADODatabase* pDatabase,
+		void* pWorkThread,
+		void* pFunDealSendData,
+		CGobalConfig* pGobalConfig);
 private:
 	void FillPicStoreStruct(GPSPIC_Pack& gpsPicUpLoadPack, string strTel, int nType);
 	void FileVedioStruct(Vedio_Pack& gpsVedioLoadPack, string strTel, int nType);
@@ -394,5 +407,11 @@ private:
 	
 	OpteLine_Upload_Pack				m_opteLineUpPack;
 	OpteLine_Download_Pack				m_opteLineDownPack;
+
+	GetVedioList_Upload_Pack			m_getVedioListUpPack;
+	GetVedioList_Download_Pack			m_getVedioListDownPack;
+
+	GetVedioData_Upload_Pack			m_getVedioDataUpPack;	
+	GetVedioData_Download_Pack			m_getVedioDataDownPack;
 };
 
