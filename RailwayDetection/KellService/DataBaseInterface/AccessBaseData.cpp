@@ -2347,6 +2347,76 @@ ErrorDeal:
 	return false;
 }
 
+CADORecordset* CAccessBaseData::UpLoadGetVedioListPack(const GetVedioList_Upload_Pack& getVedioListUpPack)
+{
+	if(m_pDatabase)
+	{
+		memset(m_strBuffer, 0x00, INPUTSQLBUFFERS);
+		sprintf_s(m_strBuffer, INPUTSQLBUFFERS, "select * from t_vedio where V_Telno in (select Device_Pid from t_device where Device_Org = %d) and datediff(d,V_timer,'%s') > 0 and datediff(d,'%s',V_timer) >= 0",
+			getVedioListUpPack.gDataBodyPack.nOrgID,
+			getVedioListUpPack.gDataBodyPack.strETime.c_str(),
+			getVedioListUpPack.gDataBodyPack.strSTime.c_str());
+
+		if(!m_pDatabase->IsOpen())
+		{
+			if(!m_pDatabase->Open())
+			{
+				return NULL;
+			}
+		}
+
+		CADORecordset* pRecordset = new CADORecordset(m_pDatabase);
+		if(pRecordset->Open(m_strBuffer))
+		{
+			return pRecordset;
+		}
+	}
+	return NULL;
+}
+
+
+bool CAccessBaseData::UpLoadGetVedioDataPack(const GetVedioData_Upload_Pack& getVedioDataUpPack,
+	Vedio_Pack& gpsVedioPack)
+{
+	if(m_pDatabase)
+	{
+		memset(m_strBuffer, 0x00, INPUTSQLBUFFERS);
+		sprintf_s(m_strBuffer, INPUTSQLBUFFERS, "select * from t_vedio where V_name = '%s'",
+			getVedioDataUpPack.gDataBodyPack.strVedioName.c_str());
+
+		if(!m_pDatabase->IsOpen())
+		{
+			if(!m_pDatabase->Open())
+			{
+				return false;
+			}
+		}
+
+		if(m_adoRecordSet.Open(m_pDatabase->GetActiveConnection(), m_strBuffer))
+		{
+			if(m_adoRecordSet.GetRecordCount() <= 0)
+			{
+				return false;
+			}
+
+			CString strTemp;
+
+			m_adoRecordSet.MoveFirst();
+
+			m_adoRecordSet.GetFieldValue("V_name", strTemp);
+			gpsVedioPack.strName = strTemp.GetBuffer();
+			strTemp.LockBuffer();
+
+			m_adoRecordSet.GetFieldValue("V_timer", strTemp);
+			gpsVedioPack.strTime = strTemp.GetBuffer();
+			strTemp.LockBuffer();
+
+			return true;
+		}
+	}
+	return false;
+}
+
 
 string CAccessBaseData::GetCurrentTimeByFormat()
 {

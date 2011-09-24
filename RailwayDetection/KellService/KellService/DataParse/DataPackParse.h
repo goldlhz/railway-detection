@@ -207,6 +207,14 @@ public:
 	bool PackOpteLineDownBuild(char* pDataBuffer, OpteLine_Download_Pack& opteLineDownLoadPack);
 	void FillOpteLineFailPack(OpteLine_Download_Pack& opteLineDownLoadPack);
 
+	bool PackGetVedioListPackUpPack(const char* pDataBuffer, GetVedioList_Upload_Pack& getVedioListUpLoadPack);
+	bool PackGetVedioListPackDownBuild(char* pDataBuffer, GetVedioList_Download_Pack& getVedioListDownLoadPack);
+	void FillGetVedioListPackFailPack(GetVedioList_Download_Pack& getVedioListDownLoadPack);
+
+	bool PackGetVedioDataUpPack(const char* pDataBuffer, GetVedioData_Upload_Pack& getVedioDataUpLoadPack);
+	bool PackGetVedioDataDownBuild(char* pDataBuffer, GetVedioData_Download_Pack& getVedioDataDownLoadPack);
+	void FillGetVedioDataFilePack(GetVedioData_Download_Pack& getVedioDataDownLoadPack);
+
 	bool GetPackLength(const string& strGPSContext, DWORD& nHeaderLength, DWORD& nBodyLength);
 private:
 	int ParseGPSPackHttpShell(const char* pDataBuffer, char* outBuffer, 
@@ -356,7 +364,11 @@ private:
 	bool ParseOpteLinePackData(const char* pDataBuffer, OpteLine_Upload_Pack& opteLineUpLoadPack);
 	bool BuildOpteLinePackData(char* pDataBuffer, const OpteLine_Download_Pack& opteLineDownLoadPack);
 	
+	bool ParseGetVedioListPackData(const char* pDataBuffer, GetVedioList_Upload_Pack& getVedioListUpLoadPack);
+	bool BuildGetVedioListPackData(char* pDataBuffer, const GetVedioList_Download_Pack& getVedioListDownLoadPack);
 
+	bool ParseGetVedioDataPackData(const char* pDataBuffer, GetVedioData_Upload_Pack& getVedioDataUpLoadPack);
+	bool BuildGetVedioDataPackData(char* pDataBuffer, const GetVedioData_Download_Pack& getVedioDataDownLoadPack);
 private: 
 	unsigned int GetContextLength(vector<string>& vecGPSLine);
 	string		 GetContextTel(vector<string>& vecGPSLine);

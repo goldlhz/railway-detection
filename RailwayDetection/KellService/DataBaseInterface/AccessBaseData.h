@@ -138,6 +138,11 @@ public:
 	
 	bool UpLoadOpteLinePack(const OpteLine_Upload_Pack& opteLineUpPack,
 		OpteLine_Download_Pack& opteLineDownPack);
+
+	CADORecordset* UpLoadGetVedioListPack(const GetVedioList_Upload_Pack& getVedioListUpPack);
+
+	bool UpLoadGetVedioDataPack(const GetVedioData_Upload_Pack& getVedioDataUpPack,
+		Vedio_Pack& gpsVedioPack);
 private:
 	string GetCurrentTimeByFormat();
 
