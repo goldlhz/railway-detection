@@ -61,6 +61,14 @@ struct GPSPIC_Pack
 	string strTime;
 };
 
+struct Vedio_Pack
+{
+	string strName;
+	string strTel;
+	string strTime;
+	unsigned int nType;
+};
+
 // Login通讯 msgnum=0x0a
 struct Login_Upload_Type
 {
@@ -889,6 +897,44 @@ struct OpteLine_Download_Type
 typedef Pack_Shell_Type<OpteLine_Upload_Type> OpteLine_Upload_Pack;
 typedef Pack_Shell_Type<OpteLine_Download_Type> OpteLine_Download_Pack;
 
+
+// 获取视频 msgnum=0x38
+struct GetVedioList_Upload_Type
+{
+	unsigned int nOrgID;
+	string		 strSTime;
+	string		 strETime;
+};
+
+struct GetVedioList_Download_Type
+{
+	unsigned int nTotalPacket;
+	unsigned int nCurrentPacket;
+	string		 strName;
+	string		 strTime;
+	unsigned int nType;
+	string		 strTel;
+};
+typedef Pack_Shell_Type<GetVedioList_Upload_Type>   GetVedioList_Upload_Pack;
+typedef Pack_Shell_Type<GetVedioList_Download_Type> GetVedioList_Download_Pack;
+
+// 图像获取 msgnum=0x39
+struct GetVedioData_Upload_Type
+{
+	string		strVedioName;
+};
+
+struct GetVedioData_Download_Type
+{
+	unsigned  int nTtlePacket;
+	unsigned  int nCurrentPacket;
+	unsigned  int nPagesize;
+	char		  picBuffer[1024];
+};
+typedef Pack_Shell_Type<GetVedioData_Upload_Type> GetVedioData_Upload_Pack;
+typedef Pack_Shell_Type<GetVedioData_Download_Type> GetVedioData_Download_Pack;
+
+
 //////////////////////////////////////////////////////////////////////////
 ///
 /// 数据包类型宏定义
@@ -941,3 +987,5 @@ typedef Pack_Shell_Type<OpteLine_Download_Type> OpteLine_Download_Pack;
 #define MODIFYPASS_PACK					0X35
 #define WORKERWARNPOINT_PACK			0X36
 #define OPTELINE_PACK					0X37
+#define GETVEDIOLIST_PACK				0X38
+#define GETVEDIODATA_PACK				0X39
