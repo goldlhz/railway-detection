@@ -2061,7 +2061,7 @@ CADORecordset* CAccessBaseData::UploadWorkerPollPack(const WorkerPoll_Upload_Pac
 	if(m_pDatabase)
 	{
 		memset(m_strBuffer, 0x00, INPUTSQLBUFFERS);
-		sprintf_s(m_strBuffer, INPUTSQLBUFFERS, "Select R_pointid,r_pxdate,R_arrTime,R_realtime,R_pid,P_state from T_realPb where R_Userid ='%s' and r_pxdate = '%s'",
+		sprintf_s(m_strBuffer, INPUTSQLBUFFERS, "Select R_pointid,r_pxdate,R_arrTime,R_realtime,R_pid,P_state, tl_name, Pit_Dis from V_realPb where R_Userid ='%s' and r_pxdate = '%s'",
 			workerPollUpPack.gDataBodyPack.strOper.c_str(),
 			workerPollUpPack.gDataBodyPack.strDate.c_str());
 

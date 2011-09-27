@@ -370,9 +370,12 @@ int  CLogicManager::DealGPSPack(DWORD dNumberOfBytes,
 			{
 				if(m_AccessBaseData.InitAccesser(pDatabase))
 				{
-					if(!m_AccessBaseData.UploadGPSPack(m_gpsUpPack, m_gpsDownPack))
-					{ 
-						DoWriteLogInfo(LOG_INFO, _T("CLogicManager::DealGPSPack(), GPS信息写入数据库时出错"));
+					if(m_gpsUpPack.gDataBodyPack.nLongitude != 0)
+					{
+						if(!m_AccessBaseData.UploadGPSPack(m_gpsUpPack, m_gpsDownPack))
+						{ 
+							DoWriteLogInfo(LOG_INFO, _T("CLogicManager::DealGPSPack(), GPS信息写入数据库时出错"));
+						}
 					}
 				}
 			}
@@ -2151,6 +2154,7 @@ int  CLogicManager::DealWorkerPollPack(DWORD dNumberOfBytes,
 				{
 					CString strTemp;
 					int     nTemp;
+					double  dTemp;
 
 					pRecordset->MoveFirst();
 					for (nHadSendRecord = 1; !pRecordset->IsEOF(); ++nHadSendRecord, pRecordset->MoveNext())
@@ -2177,11 +2181,17 @@ int  CLogicManager::DealWorkerPollPack(DWORD dNumberOfBytes,
 						m_workerPollDownPack.gDataBodyPack.strPID = strTemp.GetBuffer();
 						strTemp.LockBuffer();
 
+						pRecordset->GetFieldValue(_T("tl_name"), strTemp);
+						m_workerPollDownPack.gDataBodyPack.strLineName = strTemp.GetBuffer();
+						strTemp.LockBuffer();
+
+						pRecordset->GetFieldValue(_T("Pit_Dis"), dTemp);
+						m_workerPollDownPack.gDataBodyPack.nPoint = (unsigned int)dTemp;
+
 						pRecordset->GetFieldValue(_T("P_state"), nTemp);
 						m_workerPollDownPack.gDataBodyPack.nPointState = nTemp;
 
-
-						m_workerPollDownPack.nBodyLength = 96;
+						m_workerPollDownPack.nBodyLength = 92 + 24;
 						m_DataPackPares.PackWorkerPollDownBuild(pBuffer, m_workerPollDownPack);
 						pKeyOverPire->pireOverLappedex.wsaWSABUF.len = m_workerPollDownPack.nBodyLength + 11;
 
