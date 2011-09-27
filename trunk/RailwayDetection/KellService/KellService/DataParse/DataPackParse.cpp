@@ -1896,7 +1896,7 @@ void CDataPackParse::FillWorkerPollFailPack(WorkerPoll_Download_Pack& workerPoll
 {
 	workerPollDownLoadPack.nBeginIdentify = PACK_IDENTIFY;
 	workerPollDownLoadPack.nMsgNumber = WORKERPOLL_PACK;
-	workerPollDownLoadPack.nBodyLength = 96;
+	workerPollDownLoadPack.nBodyLength = 92 + 24;
 
 	workerPollDownLoadPack.gDataBodyPack.nTotlePacket = 0;
 	workerPollDownLoadPack.gDataBodyPack.nCurrentPacket = 0;
@@ -1906,6 +1906,8 @@ void CDataPackParse::FillWorkerPollFailPack(WorkerPoll_Download_Pack& workerPoll
 	workerPollDownLoadPack.gDataBodyPack.strPID = "";
 	workerPollDownLoadPack.gDataBodyPack.strRealTime = "";
 	workerPollDownLoadPack.gDataBodyPack.nPointState = 0;
+	workerPollDownLoadPack.gDataBodyPack.strLineName = "";
+	workerPollDownLoadPack.gDataBodyPack.nPoint = 0;
 }
 
 bool CDataPackParse::PackSysSettingUpPack(const char* pDataBuffer, SysSetting_Upload_Pack& sysSettingUpLoadPack)
@@ -3593,12 +3595,16 @@ bool CDataPackParse::BuildWorkerPollPackData(char* pDataBuffer, const WorkerPoll
 	{
 		*((unsigned int*)(pDataBuffer)) = workerPollDownLoadPack.gDataBodyPack.nTotlePacket;
 		*((unsigned int*)(pDataBuffer + 4)) = workerPollDownLoadPack.gDataBodyPack.nCurrentPacket;
-		*((unsigned int*)(pDataBuffer + 8)) = workerPollDownLoadPack.gDataBodyPack.nPointID;
-		memcpy(pDataBuffer + 12, workerPollDownLoadPack.gDataBodyPack.strDate.c_str(), workerPollDownLoadPack.gDataBodyPack.strDate.length());
-		memcpy(pDataBuffer + 32, workerPollDownLoadPack.gDataBodyPack.strArrtime.c_str(), workerPollDownLoadPack.gDataBodyPack.strArrtime.length());
-		memcpy(pDataBuffer + 52, workerPollDownLoadPack.gDataBodyPack.strRealTime.c_str(), workerPollDownLoadPack.gDataBodyPack.strRealTime.length());
-		memcpy(pDataBuffer + 72, workerPollDownLoadPack.gDataBodyPack.strPID.c_str(), workerPollDownLoadPack.gDataBodyPack.strPID.length());
-		*((unsigned int*)(pDataBuffer + 92)) = workerPollDownLoadPack.gDataBodyPack.nPointState;
+		//*((unsigned int*)(pDataBuffer + 8)) = workerPollDownLoadPack.gDataBodyPack.nPointID;
+		memcpy(pDataBuffer + 12 - 4, workerPollDownLoadPack.gDataBodyPack.strDate.c_str(), workerPollDownLoadPack.gDataBodyPack.strDate.length());
+		memcpy(pDataBuffer + 32 - 4, workerPollDownLoadPack.gDataBodyPack.strArrtime.c_str(), workerPollDownLoadPack.gDataBodyPack.strArrtime.length());
+		memcpy(pDataBuffer + 52 - 4, workerPollDownLoadPack.gDataBodyPack.strRealTime.c_str(), workerPollDownLoadPack.gDataBodyPack.strRealTime.length());
+		memcpy(pDataBuffer + 72 - 4, workerPollDownLoadPack.gDataBodyPack.strPID.c_str(), workerPollDownLoadPack.gDataBodyPack.strPID.length());
+		
+		memcpy(pDataBuffer + 92 - 4, workerPollDownLoadPack.gDataBodyPack.strLineName.c_str(), workerPollDownLoadPack.gDataBodyPack.strLineName.length());
+		*((unsigned int*)(pDataBuffer + 112 - 4)) = workerPollDownLoadPack.gDataBodyPack.nPoint;		
+		
+		*((unsigned int*)(pDataBuffer + 116 - 4)) = workerPollDownLoadPack.gDataBodyPack.nPointState;
 
 		return true;
 	}
